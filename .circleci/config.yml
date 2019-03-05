@@ -1,4 +1,3 @@
----
 version: 2
 jobs:
   install-dependencies: &test
@@ -9,11 +8,17 @@ jobs:
       - checkout
       - restore_cache: &restore_cache
           keys:
-            - v1-npm-{{checksum ".circleci/config.yml"}}-{{checksum "package-lock.json"}}
-            - v1-npm-{{checksum ".circleci/config.yml"}}
+            - dependencies-{{ checksum "package.json" }}
+            - dependencies-
       - run:
           name: Install dependencies
           command: npm install --quiet
+      - save_cache:
+          paths: [node_modules]
+          key: dependencies-{{ checksum "package.json" }}
+      - persist_to_workspace:
+          root: ./
+          paths: [node_modules]
       - run: ./bin/run --version
       - run: ./bin/run --help
   build:
@@ -30,7 +35,8 @@ jobs:
 
 workflows:
   version: 2
-  'project-starter':
+  "project-starter":
     jobs:
       - install-dependencies
-      - build
+      - build:
+          requires: [install-dependencies]
