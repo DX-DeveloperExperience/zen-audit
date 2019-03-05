@@ -1,0 +1,56 @@
+{
+  "name": "project-starter",
+  "description": "A tool that gathers everything you need to complete your projects workflows",
+  "version": "0.0.0",
+  "author": "Zenika - Demey Emmanuel - Lafrance Antoine",
+  "bin": {
+    "project-starter-cli": "./bin/run"
+  },
+  "bugs": "https://github.com/DX-DeveloperExperience/project-starter/issues",
+  "dependencies": {
+    "@oclif/command": "^1.5.11",
+    "@oclif/config": "^1.12.9",
+    "@oclif/plugin-help": "^2.1.6",
+    "tslib": "^1.9.3"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "^1.21.2",
+    "@oclif/tslint": "^3.1.1",
+    "@types/node": "^10.12.29",
+    "globby": "^8.0.2",
+    "ts-node": "^8.0.2",
+    "tslint": "^5.13.1",
+    "typescript": "^3.3.3333"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/lib",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
+  ],
+  "homepage": "https://github.com/DX-DeveloperExperience/project-starter",
+  "keywords": [
+    "oclif"
+  ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "oclif": {
+    "commands": "./lib/commands",
+    "bin": "project-starter-cli",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "repository": "DX-DeveloperExperience/project-starter",
+  "scripts": {
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "tslint -p . -t stylish",
+    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "test": "echo NO TESTS",
+    "version": "oclif-dev readme && git add README.md"
+  },
+  "types": "lib/index.d.ts"
+}
