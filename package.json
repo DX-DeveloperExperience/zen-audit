@@ -18,6 +18,7 @@
     "@oclif/tslint": "^3.1.1",
     "@types/node": "^10.12.29",
     "globby": "^8.0.2",
+    "jest": "^24.1.0",
     "ts-node": "^8.0.2",
     "tslint": "^5.13.1",
     "typescript": "^3.3.3333"
@@ -49,7 +50,7 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p . -t stylish",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "echo NO TESTS",
+    "test": "jest",
     "version": "oclif-dev readme && git add README.md"
   },
   "types": "lib/index.d.ts"
