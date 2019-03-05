@@ -1,12 +1,12 @@
 {
-  "name": "project-starter-cli",
-  "description": "a tool that guides you to add all you need for your project deployment",
+  "name": "project-starter",
+  "description": "A tool to gather everything you need to deploy a new project",
   "version": "0.0.0",
   "author": "Zenika - Demey Emmanuel - Lafrance Antoine",
   "bin": {
     "project-starter-cli": "./bin/run"
   },
-  "bugs": "https://github.com/project-starter/project-starter/issues",
+  "bugs": "https://github.com/DX-DeveloperExperience/project-starter/issues",
   "dependencies": {
     "@oclif/command": "^1.5.11",
     "@oclif/config": "^1.12.9",
@@ -31,7 +31,7 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/project-starter/project-starter",
+  "homepage": "https://github.com/DX-DeveloperExperience/project-starter",
   "keywords": [
     "oclif"
   ],
@@ -44,7 +44,7 @@
       "@oclif/plugin-help"
     ]
   },
-  "repository": "project-starter/project-starter",
+  "repository": "DX-DeveloperExperience/project-starter",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p . -t stylish",

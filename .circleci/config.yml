@@ -39,7 +39,7 @@ jobs:
 
 workflows:
   version: 2
-  "project-starter-cli":
+  "project-starter":
     jobs:
       - node-latest
       - node-8
