@@ -28,7 +28,7 @@ jobs:
       - setup_remote_docker
       - checkout
       - attach_workspace:
-        at: ./
+          at: ./
       - run:
           name: npm run ci tests
           command: npm run ci
