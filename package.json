@@ -20,6 +20,7 @@
     "@types/node": "^10.12.29",
     "globby": "^8.0.2",
     "jest": "^24.1.0",
+    "prettier": "^1.16.4",
     "ts-jest": "^24.0.0",
     "ts-node": "^8.0.2",
     "tslint": "^5.13.1",
@@ -72,5 +73,9 @@
       "json",
       "node"
     ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all"
   }
 }
