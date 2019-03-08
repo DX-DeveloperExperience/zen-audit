@@ -16,7 +16,7 @@ export class StackRegister {
    * This method returns every classes that implements the Stack interface.
    */
   static getImplementations(): Array<Constructor<Stack>> {
-    return this.implementations;
+    return StackRegister.implementations;
   }
 
   /**
@@ -25,6 +25,6 @@ export class StackRegister {
    * @param ctor The constructor of the class that implements the Stack interface
    */
   static register<P extends Constructor<Stack>>(ctor: P) {
-    this.implementations.push(ctor);
+    StackRegister.implementations.push(ctor);
   }
 }
