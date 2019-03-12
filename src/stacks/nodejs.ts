@@ -1,5 +1,4 @@
-import Stack from './stack';
-import { StackRegister } from '../tests/stacks/stack-register';
+import { StackRegister } from './stack-register';
 import * as fs from 'fs';
 import FileUtils from '../file-utils';
 /**

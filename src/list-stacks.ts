@@ -1,5 +1,6 @@
-import { StackRegister } from './tests/stacks/stack-register';
+import { StackRegister } from './stacks/stack-register';
 import * as fs from 'fs';
+import Stack from './stacks/stack';
 
 // import all stack files
 fs.readdirSync(__dirname + '/stacks').forEach(path => {
@@ -10,7 +11,7 @@ fs.readdirSync(__dirname + '/stacks').forEach(path => {
  * Returns an array of every stack instanciated object
  */
 export class ListStacks {
-  static getProjectStacks(): any[] {
+  static getProjectStacks(): Stack[] {
     return StackRegister.getImplementations()
       .map(stack => new stack())
       .filter(stack => stack.exists());
