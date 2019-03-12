@@ -1,4 +1,4 @@
-import Stack from './stacks/stack';
+import Stack from './stack';
 interface Constructor<T> {
   new (...args: any[]): T;
   readonly prototype: T;
