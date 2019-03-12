@@ -1,17 +1,18 @@
-import { listFiles } from 'list-files-in-dir';
-import { StackRegister } from './stack-register';
+import { StackRegister } from './tests/stacks/stack-register';
 import * as fs from 'fs';
 
+// import all stack files
 fs.readdirSync(__dirname + '/stacks').forEach(path => {
   require(__dirname + '/stacks/' + path.replace('.ts', ''));
 });
-//import './stacks/nodejs';
-import { fstat } from 'fs';
 
+/**
+ * Returns an array of every stack instanciated object
+ */
 export class ListStacks {
-  static getProjectStacks(path: string): any[] {
+  static getProjectStacks(): any[] {
     return StackRegister.getImplementations()
       .map(stack => new stack())
-      .filter(stack => stack.existsInPath(path));
+      .filter(stack => stack.exists());
   }
 }
