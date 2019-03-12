@@ -1,12 +1,16 @@
-import { StackRegister } from '../stack-register';
+import { StackRegister } from './stack-register';
+import FileUtils from '../file-utils';
 
 @StackRegister.register
 export default class TsLint {
   readonly requiredFiles: string[] = ['tslint.json'];
-  existsInPath(paths: string): boolean {
-    return true;
+  exists() {
+    return FileUtils.filesExist(this.requiredFiles);
   }
-  doSomething() {
-    console.log('do 1');
+
+  getName() {
+    return 'TS Lint';
   }
+
+  apply() {}
 }
