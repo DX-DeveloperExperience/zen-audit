@@ -1,7 +1,7 @@
 import { Command, flags } from '@oclif/command';
-import { ListStacks } from './list-kinds';
+import { ListStacks } from './list-stacks';
 
-class Toto extends Command {
+class ProjectFillerCli extends Command {
   static description = 'describe the command here';
 
   static flags = {
@@ -17,11 +17,14 @@ class Toto extends Command {
   static args = [{ name: 'file' }];
 
   async run() {
-    const { args, flags } = this.parse(Toto);
+    const { args, flags } = this.parse(ProjectFillerCli);
 
-    const stacks = ListStacks.getProjectStacks('./');
-    stacks.forEach(stack => stack.doSomething());
+    const stacks = ListStacks.getProjectStacks();
+    stacks.forEach(stack => {
+      this.log('Stack found : ' + stack.getName());
+      stack.apply();
+    });
   }
 }
 
-export = Toto;
+export = ProjectFillerCli;
