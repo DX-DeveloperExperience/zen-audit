@@ -1,7 +1,6 @@
+import { ListRules } from './list-stacks';
 import { Command, flags } from '@oclif/command';
-import { ListStacks } from './list-stacks';
-import Stack from './stacks/stack';
-
+import Rule from './rules/rule';
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
 
@@ -26,18 +25,18 @@ class ProjectFillerCli extends Command {
   static args = [{ name: 'file' }];
 
   async run() {
-    const { args, flags } = this.parse(ProjectFillerCli);
-    let stacks: Stack[] = [];
+    const { args, flags: runFlags } = this.parse(ProjectFillerCli);
+    let stacks: Rule[] = [];
 
     this.log('Searching for stacks...');
-    stacks = ListStacks.getProjectStacks();
+    stacks = ListRules.getProjectStacks();
 
-    if (flags.stacks) {
+    if (runFlags.stacks) {
       stacks.forEach(stack => {
         this.log('Stack found: ' + stack.getName());
       });
     }
-    if (flags.apply) {
+    if (runFlags.apply) {
       stacks.forEach(stack => {
         stack.apply();
       });

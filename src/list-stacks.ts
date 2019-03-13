@@ -1,6 +1,6 @@
-import { StackRegister } from './stacks/stack-register';
+import { RuleRegister } from './rules/rule-register';
 import * as fs from 'fs';
-import Stack from './stacks/stack';
+import Rule from './rules/rule';
 
 // import all stack files
 fs.readdirSync(__dirname + '/stacks').forEach(path => {
@@ -10,10 +10,10 @@ fs.readdirSync(__dirname + '/stacks').forEach(path => {
 /**
  * Returns an array of every stack instanciated object
  */
-export class ListStacks {
-  static getProjectStacks(): Stack[] {
-    return StackRegister.getImplementations()
-      .map(stack => new stack())
-      .filter(stack => stack.exists());
+export class ListRules {
+  static getProjectStacks(): Rule[] {
+    return RuleRegister.getImplementations()
+      .map(rule => new rule())
+      .filter(rule => rule.exists());
   }
 }
