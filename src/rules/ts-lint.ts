@@ -12,10 +12,9 @@ export default class TsLint {
   }
 
   exists() {
-    return (
-      FileUtils.filesExistIn(this.rootPath, this.requiredFiles) &&
-      this.isInDevDep()
-    );
+    return FileUtils.filesExistIn(this.rootPath, this.requiredFiles);
+    // &&
+    // this.isInDevDep()
   }
 
   getName() {
@@ -24,17 +23,17 @@ export default class TsLint {
 
   apply() {}
 
-  isInDevDep(): boolean {
-    try {
-      const fileToStr = fs.readFileSync(this.rootPath + 'package.json', {
-        encoding: 'utf8',
-      });
-      const parsed = JSON.parse(fileToStr);
+  // isInDevDep(): boolean {
+  //   try {
+  //     const fileToStr = fs.readFileSync(this.rootPath + 'package.json', {
+  //       encoding: 'utf8',
+  //     });
+  //     const parsed = JSON.parse(fileToStr);
 
-      return parsed.devDependencies.tslint;
-    } catch (err) {
-      console.log(err);
-      return false;
-    }
-  }
+  //     return parsed.devDependencies.tslint;
+  //   } catch (err) {
+  //     console.log(err);
+  //     return false;
+  //   }
+  // }
 }
