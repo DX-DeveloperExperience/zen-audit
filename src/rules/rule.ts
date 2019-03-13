@@ -6,6 +6,7 @@ export default interface Rule {
    * An array containing all the required files of the Rule.
    */
   readonly requiredFiles: string[];
+  rootPath: string;
   /**
    * Returns true if the rule exists at the root of the project.
    */

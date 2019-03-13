@@ -8,15 +8,18 @@ import FileUtils from '../file-utils';
  */
 @RuleRegister.register
 export default class NodeJS {
-  readonly requiredFiles: string[] = ['./package-lock.json', './package.json'];
-  files: number[] = [];
-  errors: string[] = [];
+  readonly requiredFiles: string[] = ['package-lock.json', 'package.json'];
+  rootPath: string;
+
+  constructor(rootPath: string) {
+    this.rootPath = rootPath;
+  }
 
   /**
    * Returns true if the project contains the NodeJS stack.
    */
   exists() {
-    return FileUtils.filesExist(this.requiredFiles);
+    return FileUtils.filesExistIn(this.rootPath, this.requiredFiles);
   }
 
   /**
@@ -29,7 +32,7 @@ export default class NodeJS {
       let fileToStr = fs.readFileSync(file, { encoding: 'utf8' });
       fileToStr = fileToStr.replace(
         /(\^|\~?)(([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?/g,
-        this.removeTildOrCircumflex,
+        this.correctSemverNotation,
       );
 
       fs.writeFileSync(file, fileToStr, {
@@ -46,7 +49,7 @@ export default class NodeJS {
    * @param p1 The first string of sub-corresponding Regex
    * @param p2 The second string of sub-corresponding Regex
    */
-  removeTildOrCircumflex(corresponding: string, p1: string, p2: string) {
+  correctSemverNotation(corresponding: string, p1: string, p2: string) {
     return p2;
   }
 
