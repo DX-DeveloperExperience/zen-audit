@@ -3,7 +3,7 @@ import { RuleRegister } from './rule-register';
 import * as fs from 'fs';
 
 @RuleRegister.register
-export default class TsLint {
+export default class Linter {
   readonly requiredFiles: string[] = ['tslint.json'];
   rootPath: string;
 
@@ -13,23 +13,24 @@ export default class TsLint {
 
   exists() {
     return (
-      FileUtils.filesExistIn(this.rootPath, this.requiredFiles) &&
+      FileUtils.filesExistIn(this.rootPath, this.requiredFiles) ||
       this.isInDevDep()
     );
   }
 
   getName() {
-    return 'TS Lint';
+    return 'Linter';
   }
 
   apply() {}
 
   isInDevDep(): boolean {
     try {
-      const fileToStr = fs.readFileSync(this.rootPath + 'package.json', {
-        encoding: 'utf8',
-      });
-      const parsed = JSON.parse(fileToStr);
+      const parsed = JSON.parse(
+        fs.readFileSync(this.rootPath + 'package.json', {
+          encoding: 'utf8',
+        }),
+      );
 
       return parsed.devDependencies.tslint || parsed.devDependencies.eslint;
     } catch (err) {
