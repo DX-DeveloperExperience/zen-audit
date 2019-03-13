@@ -1,37 +1,56 @@
-import TsLint from '../../rules/ts-lint';
+import Linter from '../../rules/linter';
 import * as fs from 'fs';
 
 const rootPath = './src/tests/rules/';
 const packageFilePath = rootPath + 'package.json';
 
-test('isInDevDep should return false if ts-lint not in dev dependencies', () => {
-  const packageJSON = {
+afterEach(() => {
+  fs.unlinkSync(packageFilePath);
+});
+
+test('isInDevDep should return false if tslint not in dev dependencies', () => {
+  const packageJSON = JSON.stringify({
     devDependencies: {
       dependency1: 'dependency1',
       dependency2: 'dependency2',
     },
-  };
+  });
 
-  fs.writeFileSync(packageFilePath, JSON.stringify(packageJSON), {
+  fs.writeFileSync(packageFilePath, packageJSON, {
     encoding: 'utf8',
   });
 
-  expect(new TsLint(rootPath).isInDevDep()).toBeFalsy();
-
-  fs.unlinkSync(packageFilePath);
+  expect(new Linter(rootPath).isInDevDep()).toBeFalsy();
 });
 
-test('isInDevDep should return true if ts-lint in devDependencies', () => {
-  const packageJSON = {
+test('isInDevDep should return true if tslint in devDependencies', () => {
+  const packageJSON = JSON.stringify({
     devDependencies: {
       dependency1: 'dependency1',
-      'ts-lint': 'dependency2',
+      tslint: 'dependency2',
     },
-  };
+  });
+
+  fs.writeFileSync(packageFilePath, packageJSON, { encoding: 'utf8' });
+
+  expect(new Linter(rootPath).isInDevDep()).toBeTruthy();
 });
 
-test('isInDevDep should return false if ts-lint found elsewhere than in devDependencies', () => {
-  const packageJSON = {
+test('isInDevDep should return true if eslint is in devDependencies', () => {
+  const packageJSON = JSON.stringify({
+    devDependencies: {
+      dependency1: 'dependency1',
+      eslint: 'dependency2',
+    },
+  });
+
+  fs.writeFileSync(packageFilePath, packageJSON, { encoding: 'utf8' });
+
+  expect(new Linter(rootPath).isInDevDep()).toBeTruthy();
+});
+
+test('isInDevDep should return false if tslint found elsewhere than in devDependencies', () => {
+  const packageJSON = JSON.stringify({
     devDependencies: {
       dependency1: 'dependency1',
       dependency2: 'dependency2',
@@ -43,7 +62,9 @@ test('isInDevDep should return false if ts-lint found elsewhere than in devDepen
       other1: 'other',
       other2: 'other2',
     },
-  };
+  });
 
-  expect(new TsLint(rootPath).isInDevDep()).toBeFalsy();
+  fs.writeFileSync(packageFilePath, packageJSON, { encoding: 'utf8' });
+
+  expect(new Linter(rootPath).isInDevDep()).toBeFalsy();
 });
