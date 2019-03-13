@@ -8,9 +8,9 @@ export default class FileUtils {
    * A function to check whether a file exists
    * @param filePath The file to check the existence of
    */
-  static fileExists(filePath: string): boolean {
+  static fileExistsIn(rootPath: string, filePath: string): boolean {
     try {
-      fs.accessSync(filePath);
+      fs.accessSync(rootPath + filePath);
       return true;
     } catch (error) {
       return false;
@@ -21,10 +21,10 @@ export default class FileUtils {
    * A function to check whether multiple files exist
    * @param filesPaths An array of files to check the existence of
    */
-  static filesExist(filesPaths: string[]): boolean {
+  static filesExistIn(path: string, filesPaths: string[]): boolean {
     filesPaths.forEach(filePath => {
       try {
-        fs.accessSync(filePath);
+        fs.accessSync(path + filePath);
       } catch (error) {
         return false;
       }
