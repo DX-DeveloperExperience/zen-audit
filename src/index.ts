@@ -1,4 +1,4 @@
-import { ListRules } from './list-stacks';
+import { ListRules } from './list-rules';
 import { Command, flags } from '@oclif/command';
 import Rule from './rules/rule';
 class ProjectFillerCli extends Command {
@@ -16,9 +16,9 @@ class ProjectFillerCli extends Command {
       char: 'a',
       description: 'Applies recommandations to every found stack',
     }),
-    stacks: flags.boolean({
-      char: 's',
-      description: 'Show every found stack',
+    rules: flags.boolean({
+      char: 'r',
+      description: 'Search for rules that may apply to your project',
     }),
   };
 
@@ -28,10 +28,10 @@ class ProjectFillerCli extends Command {
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
     let stacks: Rule[] = [];
 
-    this.log('Searching for stacks...');
-    stacks = ListRules.getProjectStacks();
+    this.log('Scanning your project...');
+    stacks = ListRules.findRulesToApplyIn('./');
 
-    if (runFlags.stacks) {
+    if (runFlags.rules) {
       stacks.forEach(stack => {
         this.log('Stack found: ' + stack.getName());
       });
