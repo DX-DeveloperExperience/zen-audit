@@ -1,5 +1,7 @@
+import { FileNotFoundError } from './../errors/FileNotFoundError';
 import { RuleRegister } from './rule-register';
 import * as fs from 'fs';
+import { FileNotReadableError } from '../errors/FileNotReadableError';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
@@ -10,6 +12,7 @@ export default class ExactNpmVersion {
   readonly requiredFiles: string[] = ['package-lock.json', 'package.json'];
   readonly rootPath: string;
   private readonly packageJSON = this.rootPath + 'package.json';
+  private parsedFile: string = '';
 
   constructor(rootPath?: string) {
     if (rootPath === undefined) {
@@ -17,50 +20,44 @@ export default class ExactNpmVersion {
     } else {
       this.rootPath = rootPath;
     }
+
+    try {
+      this.parsedFile = fs.readFileSync(this.packageJSON, {
+        encoding: 'utf8',
+      });
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        throw new FileNotFoundError(this.packageJSON);
+      } else if (err.code === 'EACCESS') {
+        throw new FileNotReadableError(this.packageJSON);
+      }
+    }
   }
 
   /**
    * Returns true if the project contains npm dependencies with semver that needs to be corrected.
    */
   exists() {
-    try {
-      const parsedFile = fs.readFileSync(this.packageJSON, {
-        encoding: 'utf8',
-      });
-
-      // tslint:disable-next-line: max-line-length
-      return (
-        parsedFile.match(
-          /^"(\^|\~)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)",?$/,
-        ) !== null
-      );
-    } catch (err) {
-      if (err.code === 'ENOENT') {
-        throw new FileNotFoundException(this.packageJSON);
-      } else if (err.code === 'EACCESS') {
-        throw new FileNotReadableException(this.packageJSON);
-      }
-      return false;
-    }
+    // tslint:disable-next-line: max-line-length
+    return (
+      this.parsedFile.match(
+        /^"(\^|\~)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)",?$/,
+      ) !== null
+    );
   }
 
   /**
    * Removes tilds or circumflex inside package.json's dependencies' Semvers
    */
   apply() {
-    try {
-      let fileToStr = fs.readFileSync(this.packageJSON, { encoding: 'utf8' });
-      fileToStr = fileToStr.replace(
-        /^"(\^|\~?)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)",?$/g,
-        this.correctSemverNotation,
-      );
+    const correctedParse = this.parsedFile.replace(
+      /^"(\^|\~?)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)",?$/g,
+      this.correctSemverNotation,
+    );
 
-      fs.writeFileSync(this.packageJSON, fileToStr, {
-        encoding: 'utf8',
-      });
-    } catch (err) {
-      throw new Error('File ' + this.packageJSON + ' not found.');
-    }
+    fs.writeFileSync(this.packageJSON, correctedParse, {
+      encoding: 'utf8',
+    });
   }
 
   /**
