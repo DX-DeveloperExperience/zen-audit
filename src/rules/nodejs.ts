@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import FileUtils from '../file-utils';
 
 /**
- * NodeJS implementation of stack interface. This class checks if the given path
- * is a project using node.
+ * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
+ * accent in Semver of every dependency.
  */
 @RuleRegister.register
 export default class NodeJS {
@@ -16,15 +16,14 @@ export default class NodeJS {
   }
 
   /**
-   * Returns true if the project contains the NodeJS stack.
+   * Returns true if the project contains npm dependencies with semver that needs to be corrected.
    */
   exists() {
     return FileUtils.filesExistIn(this.rootPath, this.requiredFiles);
   }
 
   /**
-   * Apply recommendations for NodeJS projects. Here, it just removes tild or circumflex
-   * for semver.
+   * Removes tilds or circumflex inside package.json's dependencies' Semvers
    */
   apply() {
     const file = 'package.json';
@@ -54,7 +53,7 @@ export default class NodeJS {
   }
 
   /**
-   * Returns the name of this stack. Here, it returns NodeJS
+   * Returns the name of this rule.
    */
   getName() {
     return 'NodeJS';
