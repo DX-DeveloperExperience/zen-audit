@@ -1,44 +1,65 @@
 import { RuleRegister } from './rule-register';
 import * as fs from 'fs';
-import FileUtils from '../file-utils';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
  * accent in Semver of every dependency.
  */
 @RuleRegister.register
-export default class NodeJS {
+export default class ExactNpmVersion {
   readonly requiredFiles: string[] = ['package-lock.json', 'package.json'];
-  rootPath: string;
+  readonly rootPath: string;
+  private readonly packageJSON = this.rootPath + 'package.json';
 
-  constructor(rootPath: string) {
-    this.rootPath = rootPath;
+  constructor(rootPath?: string) {
+    if (rootPath === undefined) {
+      this.rootPath = './';
+    } else {
+      this.rootPath = rootPath;
+    }
   }
 
   /**
    * Returns true if the project contains npm dependencies with semver that needs to be corrected.
    */
   exists() {
-    return FileUtils.filesExistIn(this.rootPath, this.requiredFiles);
+    try {
+      const parsedFile = fs.readFileSync(this.packageJSON, {
+        encoding: 'utf8',
+      });
+
+      // tslint:disable-next-line: max-line-length
+      return (
+        parsedFile.match(
+          /^"(\^|\~)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)",?$/,
+        ) !== null
+      );
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        throw new FileNotFoundException(this.packageJSON);
+      } else if (err.code === 'EACCESS') {
+        throw new FileNotReadableException(this.packageJSON);
+      }
+      return false;
+    }
   }
 
   /**
    * Removes tilds or circumflex inside package.json's dependencies' Semvers
    */
   apply() {
-    const file = 'package.json';
     try {
-      let fileToStr = fs.readFileSync(file, { encoding: 'utf8' });
+      let fileToStr = fs.readFileSync(this.packageJSON, { encoding: 'utf8' });
       fileToStr = fileToStr.replace(
-        /(\^|\~?)(([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?/g,
+        /^"(\^|\~?)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)",?$/g,
         this.correctSemverNotation,
       );
 
-      fs.writeFileSync(file, fileToStr, {
+      fs.writeFileSync(this.packageJSON, fileToStr, {
         encoding: 'utf8',
       });
     } catch (err) {
-      throw new Error('File ' + file + ' not found.');
+      throw new Error('File ' + this.packageJSON + ' not found.');
     }
   }
 
@@ -56,6 +77,6 @@ export default class NodeJS {
    * Returns the name of this rule.
    */
   getName() {
-    return 'NodeJS';
+    return 'Exact npm version';
   }
 }
