@@ -11,7 +11,7 @@ import { FileNotReadableError } from '../errors/FileNotReadableError';
 export default class ExactNpmVersion {
   readonly requiredFiles: string[] = ['package-lock.json', 'package.json'];
   readonly rootPath: string;
-  private readonly packageJSON = this.rootPath + 'package.json';
+  private packageJSON: string;
   private parsedFile: string = '';
 
   constructor(rootPath?: string) {
@@ -20,6 +20,8 @@ export default class ExactNpmVersion {
     } else {
       this.rootPath = rootPath;
     }
+
+    this.packageJSON = this.rootPath + 'package.json';
 
     try {
       this.parsedFile = fs.readFileSync(this.packageJSON, {
