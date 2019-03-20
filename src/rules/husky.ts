@@ -2,7 +2,6 @@ import { FileNotReadableError } from './../errors/FileNotReadableError';
 import { FileNotFoundError } from './../errors/FileNotFoundError';
 import { RuleRegister } from './rule-register';
 import * as fs from 'fs';
-import FileUtils from '../file-utils';
 
 @RuleRegister.register
 export default class Husky {
@@ -38,14 +37,11 @@ export default class Husky {
   }
 
   exists() {
-    return (
-      FileUtils.filesExistIn(this.rootPath, this.requiredFiles) ||
-      this.isInDevDep()
-    );
+    return this.isInDevDep();
   }
 
   isInDevDep(): boolean {
-    return this.parsedFile.devDependencies.husky !== null;
+    return this.parsedFile.devDependencies.husky !== undefined;
   }
 
   getName(): string {
