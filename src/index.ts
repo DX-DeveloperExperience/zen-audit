@@ -26,10 +26,9 @@ class ProjectFillerCli extends Command {
 
   async run() {
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
-    let stacks: Rule[] = [];
 
     this.log('Scanning your project...');
-    stacks = ListRules.findRulesToApplyIn('./');
+    const stacks = ListRules.findRulesToApplyIn('./');
 
     if (runFlags.rules) {
       stacks.forEach(stack => {
