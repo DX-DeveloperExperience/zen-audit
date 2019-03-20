@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import Rule from './rules/rule';
 
 // import all rules files
-fs.readdirSync(__dirname + '/rules').forEach(path => {
-  require(__dirname + '/rules/' + path.replace('.ts', ''));
+fs.readdirSync(`${__dirname}/rules`).forEach(path => {
+  require(`${__dirname}/rules/${path.replace('.ts', '')}`);
 });
 
 /**
