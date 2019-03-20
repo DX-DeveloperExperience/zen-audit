@@ -11,12 +11,8 @@ export default class Linter {
   private packageJSON: string;
   private parsedFile: any;
 
-  constructor(rootPath: string) {
-    if (rootPath === undefined) {
-      this.rootPath = rootPath;
-    } else {
-      this.rootPath = rootPath;
-    }
+  constructor(rootPath: string = './') {
+    this.rootPath = rootPath;
 
     this.packageJSON = this.rootPath + 'package.json';
 
