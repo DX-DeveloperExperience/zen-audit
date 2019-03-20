@@ -50,8 +50,8 @@ export default class Linter {
 
   isInDevDep(): boolean {
     return (
-      this.parsedFile.devDependencies.tslint !== null ||
-      this.parsedFile.devDependencies.eslint !== null
+      this.parsedFile.devDependencies.tslint !== undefined ||
+      this.parsedFile.devDependencies.eslint !== undefined
     );
   }
 }
