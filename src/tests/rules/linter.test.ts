@@ -1,12 +1,9 @@
 import Linter from '../../rules/linter';
-import * as fs from 'fs';
+
+const fs = require('fs');
+jest.mock('fs');
 
 const rootPath = './src/tests/rules/';
-const packageFilePath = rootPath + 'package.json';
-
-afterEach(() => {
-  fs.unlinkSync(packageFilePath);
-});
 
 test('isInDevDep should return false if tslint not in dev dependencies', () => {
   const packageJSON = JSON.stringify({
@@ -16,9 +13,7 @@ test('isInDevDep should return false if tslint not in dev dependencies', () => {
     },
   });
 
-  fs.writeFileSync(packageFilePath, packageJSON, {
-    encoding: 'utf8',
-  });
+  fs.readFileSync.mockReturnValue(packageJSON);
 
   expect(new Linter(rootPath).isInDevDep()).toBeFalsy();
 });
@@ -31,7 +26,7 @@ test('isInDevDep should return true if tslint in devDependencies', () => {
     },
   });
 
-  fs.writeFileSync(packageFilePath, packageJSON, { encoding: 'utf8' });
+  fs.readFileSync.mockReturnValue(packageJSON);
 
   expect(new Linter(rootPath).isInDevDep()).toBeTruthy();
 });
@@ -44,7 +39,7 @@ test('isInDevDep should return true if eslint is in devDependencies', () => {
     },
   });
 
-  fs.writeFileSync(packageFilePath, packageJSON, { encoding: 'utf8' });
+  fs.readFileSync.mockReturnValue(packageJSON);
 
   expect(new Linter(rootPath).isInDevDep()).toBeTruthy();
 });
@@ -64,7 +59,7 @@ test('isInDevDep should return false if tslint found elsewhere than in devDepend
     },
   });
 
-  fs.writeFileSync(packageFilePath, packageJSON, { encoding: 'utf8' });
+  fs.readFileSync.mockReturnValue(packageJSON);
 
   expect(new Linter(rootPath).isInDevDep()).toBeFalsy();
 });
