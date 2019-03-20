@@ -9,10 +9,13 @@ import { FileNotReadableError } from '../errors/FileNotReadableError';
  */
 @RuleRegister.register
 export default class ExactNpmVersion {
-  readonly requiredFiles: string[] = ['package-lock.json', 'package.json'];
+  readonly requiredFiles: string[] = ['package.json'];
   readonly rootPath: string;
-  private packageJSON: string;
-  private parsedFile: string = '';
+  private packageJSONPath: string;
+  private parsedFile: any;
+  // tslint:disable-next-line: max-line-length
+  readonly semverRegex = /^(\^|\~)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/g;
+  readonly jsonObjectsToCheck: string[] = ['dependencies', 'devDependencies'];
 
   constructor(rootPath?: string) {
     if (rootPath === undefined) {
@@ -21,55 +24,102 @@ export default class ExactNpmVersion {
       this.rootPath = rootPath;
     }
 
-    this.packageJSON = this.rootPath + 'package.json';
+    this.packageJSONPath = this.rootPath + 'package.json';
 
     try {
-      this.parsedFile = fs.readFileSync(this.packageJSON, {
-        encoding: 'utf8',
-      });
+      this.parsedFile = JSON.parse(
+        fs.readFileSync(this.packageJSONPath, {
+          encoding: 'utf8',
+        }),
+      );
     } catch (err) {
       if (err.code === 'ENOENT') {
-        throw new FileNotFoundError(this.packageJSON);
+        throw new FileNotFoundError(this.packageJSONPath);
       } else if (err.code === 'EACCESS') {
-        throw new FileNotReadableError(this.packageJSON);
+        throw new FileNotReadableError(this.packageJSONPath);
       }
     }
   }
 
   /**
-   * Returns true if the project contains npm dependencies with semver that needs to be corrected.
+   * Returns true if the project contains npm dependencies or devDependencies with semver that needs to be corrected.
    */
   exists() {
-    // tslint:disable-next-line: max-line-length
-    return (
-      this.parsedFile.match(
-        /^"(\^|\~)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)",?$/,
-      ) !== null
-    );
+    this.jsonObjectsToCheck.map(jsonObjStr => {
+      const jsonObj: string[] = Object.values(this.parsedFile[jsonObjStr]);
+
+      if (this.valuesMatches(jsonObj, this.semverRegex)) {
+        return true;
+      }
+    });
+
+    return false;
+  }
+
+  /**
+   * This method returns true if any string in the provided array of values matches the regexp.
+   * @param values An array of string containing the values to match the regexp
+   * @param regex A RegExp that will try to match with values
+   */
+  valuesMatches(values: string[], regex: RegExp) {
+    values.map((val: string) => {
+      if (val.match(regex)) {
+        return true;
+      }
+    });
+    return false;
   }
 
   /**
    * Removes tilds or circumflex inside package.json's dependencies' Semvers
    */
   apply() {
-    const correctedParse = this.parsedFile.replace(
-      /^"(\^|\~?)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)",?$/g,
-      this.correctSemverNotation,
-    );
-
-    fs.writeFileSync(this.packageJSON, correctedParse, {
+    fs.writeFileSync(this.packageJSONPath, this.correctSemverNotation(), {
       encoding: 'utf8',
     });
   }
 
   /**
    * The replacement function that returns the semver without the tild or circumflex accents
-   * @param corresponding The string that corresponds to the Regex
-   * @param p1 The first string of sub-corresponding Regex
-   * @param p2 The second string of sub-corresponding Regex
    */
-  correctSemverNotation(corresponding: string, p1: string, p2: string) {
-    return p2;
+  correctSemverNotation(): string {
+    const depEntries: string[][] = Object.entries(this.parsedFile.dependencies);
+    const devDepEntries: string[][] = Object.entries(
+      this.parsedFile.devDependencies,
+    );
+
+    this.parsedFile.dependencies = this.replaceMatchingEntries(
+      depEntries,
+      this.semverRegex,
+    );
+    this.parsedFile.devDependencies = this.replaceMatchingEntries(
+      devDepEntries,
+      this.semverRegex,
+    );
+
+    return JSON.stringify(this.parsedFile);
+  }
+
+  replaceMatchingEntries(entries: string[][], regex: RegExp) {
+    const changedEntries = entries.map(([dep, val]) => {
+      if (val.match(this.semverRegex)) {
+        return [
+          dep,
+          val.replace(this.semverRegex, (_A: string, b: string, c: string) => {
+            return c;
+          }),
+        ];
+      }
+      return [dep, val];
+    });
+
+    const result = changedEntries.reduce((acc, current) => {
+      return {
+        ...acc,
+        [current[0]]: current[1],
+      };
+    }, {});
+    return result;
   }
 
   /**
