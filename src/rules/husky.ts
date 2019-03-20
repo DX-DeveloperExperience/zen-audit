@@ -10,12 +10,8 @@ export default class Husky {
   private packageJSON: string;
   private parsedFile: any;
 
-  constructor(rootPath?: string) {
-    if (rootPath === undefined) {
-      this.rootPath = './';
-    } else {
-      this.rootPath = rootPath;
-    }
+  constructor(rootPath: string = './') {
+    this.rootPath = rootPath;
 
     this.packageJSON = this.rootPath + 'package.json';
 
