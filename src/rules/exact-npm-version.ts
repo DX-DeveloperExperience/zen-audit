@@ -15,14 +15,16 @@ export default class ExactNpmVersion {
   private parsedFile: any;
   // tslint:disable-next-line: max-line-length
   readonly semverRegex = /^(\^|\~)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/g;
-  readonly jsonObjectsToCheck: string[] = ['dependencies', 'devDependencies'];
+  readonly jsonObjectsToCheck: string[] = [
+    'dependencies',
+    'devDependencies',
+    'bundledDependencies',
+    'optionalDependencies',
+    'peerDependencies',
+  ];
 
-  constructor(rootPath?: string) {
-    if (rootPath === undefined) {
-      this.rootPath = './';
-    } else {
-      this.rootPath = rootPath;
-    }
+  constructor(rootPath: string = './') {
+    this.rootPath = rootPath;
 
     this.packageJSONPath = this.rootPath + 'package.json';
 
