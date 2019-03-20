@@ -48,13 +48,16 @@ export default class ExactNpmVersion {
    */
   exists() {
     this.jsonObjectsToCheck.map(jsonObjStr => {
-      const jsonObj: string[] = Object.values(this.parsedFile[jsonObjStr]);
+      const jsonObj = this.parsedFile[jsonObjStr];
 
-      if (this.valuesMatches(jsonObj, this.semverRegex)) {
-        return true;
+      if (jsonObj !== undefined) {
+        const jsonObjValues: string[] = Object.values(jsonObj);
+
+        if (this.valuesMatches(jsonObjValues, this.semverRegex)) {
+          return true;
+        }
       }
     });
-
     return false;
   }
 
