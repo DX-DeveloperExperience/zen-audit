@@ -1,5 +1,4 @@
-project-starter-cli
-===================
+# project-starter-cli
 
 a tool that guides you to add all you need for your project deployment
 
@@ -10,11 +9,15 @@ a tool that guides you to add all you need for your project deployment
 [![License](https://img.shields.io/npm/l/project-starter-cli.svg)](https://github.com/project-starter/project-starter/blob/master/package.json)
 
 <!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
-<!-- tocstop -->
+
+- [Usage](#usage)
+- [Commands](#commands)
+  <!-- tocstop -->
+
 # Usage
+
 <!-- usage -->
+
 ```sh-session
 $ npm install -g project-starter
 $ project-starter-cli COMMAND
@@ -26,11 +29,15 @@ USAGE
   $ project-starter-cli COMMAND
 ...
 ```
+
 <!-- usagestop -->
+
 # Commands
+
 <!-- commands -->
-* [`project-starter-cli hello [FILE]`](#project-starter-cli-hello-file)
-* [`project-starter-cli help [COMMAND]`](#project-starter-cli-help-command)
+
+- [`project-starter-cli hello [FILE]`](#project-starter-cli-hello-file)
+- [`project-starter-cli help [COMMAND]`](#project-starter-cli-help-command)
 
 ## `project-starter-cli hello [FILE]`
 
@@ -68,4 +75,5 @@ OPTIONS
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.1.6/src/commands/help.ts)_
+
 <!-- commandsstop -->
