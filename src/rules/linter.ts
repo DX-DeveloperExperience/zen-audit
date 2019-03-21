@@ -14,7 +14,7 @@ export default class Linter {
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
 
-    this.packageJSON = this.rootPath + 'package.json';
+    this.packageJSON = `${this.rootPath}package.json`;
 
     try {
       this.parsedFile = JSON.parse(

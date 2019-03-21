@@ -26,7 +26,7 @@ export default class ExactNpmVersion {
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
 
-    this.packageJSONPath = this.rootPath + 'package.json';
+    this.packageJSONPath = `${this.rootPath}package.json`;
 
     try {
       this.parsedFile = JSON.parse(

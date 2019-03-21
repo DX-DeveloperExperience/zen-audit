@@ -17,7 +17,7 @@ export default class Husky {
       this.rootPath = rootPath;
     }
 
-    this.packageJSON = this.rootPath + 'package.json';
+    this.packageJSON = `${this.rootPath}package.json`;
 
     try {
       this.parsedFile = JSON.parse(
