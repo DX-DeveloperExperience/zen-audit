@@ -8,9 +8,9 @@ export default interface Rule {
   readonly requiredFiles: string[];
   readonly rootPath: string;
   /**
-   * Returns true if the rule exists at the root of the project.
+   * Returns true if the rule should be applied.
    */
-  exists(): boolean;
+  shouldBeApplied(): boolean;
   /**
    * Returns the name of the Rule.
    */

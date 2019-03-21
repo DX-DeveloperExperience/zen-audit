@@ -46,7 +46,7 @@ export default class ExactNpmVersion {
   /**
    * Returns true if the project contains npm dependencies or devDependencies with semver that needs to be corrected.
    */
-  exists() {
+  shouldBeApplied() {
     this.jsonObjectsToCheck.map(jsonObjStr => {
       const jsonObj = this.parsedFile[jsonObjStr];
 

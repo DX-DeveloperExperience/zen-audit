@@ -32,7 +32,7 @@ test('Should return false if no incorrect semver is found', () => {
   });
   fs.readFileSync.mockReturnValue(packageJSON);
 
-  expect(new ExactNpmVersion(rootPath).exists()).toBeFalsy();
+  expect(new ExactNpmVersion(rootPath).shouldBeApplied()).toBeFalsy();
 });
 
 test('Should return true if incorrect semver with ^ is found', () => {
@@ -49,7 +49,7 @@ test('Should return true if incorrect semver with ^ is found', () => {
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
-  expect(new ExactNpmVersion(rootPath).exists()).toBeFalsy();
+  expect(new ExactNpmVersion(rootPath).shouldBeApplied()).toBeFalsy();
 });
 
 test('Should return true if incorrect semver with ~ is found', () => {
@@ -66,7 +66,7 @@ test('Should return true if incorrect semver with ~ is found', () => {
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
-  expect(new ExactNpmVersion(rootPath).exists()).toBeFalsy();
+  expect(new ExactNpmVersion(rootPath).shouldBeApplied()).toBeFalsy();
 });
 
 test('Should return false if incorrect semver is in json object that does not need to be checked', () => {
@@ -87,7 +87,7 @@ test('Should return false if incorrect semver is in json object that does not ne
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
-  expect(new ExactNpmVersion(rootPath).exists()).toBeFalsy();
+  expect(new ExactNpmVersion(rootPath).shouldBeApplied()).toBeFalsy();
 });
 
 test('Should replace ^ or ~ in package.json', () => {

@@ -36,8 +36,8 @@ export default class Husky {
     // TODO
   }
 
-  exists() {
-    return this.isInDevDep();
+  shouldBeApplied() {
+    return !this.isInDevDep();
   }
 
   isInDevDep(): boolean {
