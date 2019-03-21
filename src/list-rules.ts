@@ -14,6 +14,6 @@ export class ListRules {
   static findRulesToApplyIn(rootPath: string): Rule[] {
     return RuleRegister.getImplementations()
       .map(rule => new rule(rootPath))
-      .filter(rule => rule.exists());
+      .filter(rule => rule.shouldBeApplied());
   }
 }
