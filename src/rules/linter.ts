@@ -30,8 +30,8 @@ export default class Linter {
   }
 
   shouldBeApplied() {
-    return (
-      FileUtils.filesExistIn(this.rootPath, this.requiredFiles) ||
+    return !(
+      FileUtils.filesExistIn(this.rootPath, this.requiredFiles) &&
       this.isInDevDep()
     );
   }
