@@ -29,9 +29,9 @@ export default class Linter {
     }
   }
 
-  exists() {
-    return (
-      FileUtils.filesExistIn(this.rootPath, this.requiredFiles) ||
+  shouldBeApplied() {
+    return !(
+      FileUtils.filesExistIn(this.rootPath, this.requiredFiles) &&
       this.isInDevDep()
     );
   }
