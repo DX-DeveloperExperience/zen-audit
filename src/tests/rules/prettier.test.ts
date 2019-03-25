@@ -1,4 +1,4 @@
-import Prettier from '../../rules/prettier';
+import { Prettier } from '../../rules/prettier';
 
 const fs = require('fs');
 jest.mock('fs');

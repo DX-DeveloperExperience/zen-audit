@@ -1,5 +1,5 @@
 import { FileNotFoundError } from './../../errors/FileNotFoundError';
-import ExactNpmVersion from '../../rules/exact-npm-version';
+import { ExactNpmVersion } from '../../rules/exact-npm-version';
 
 const fs = require('fs');
 

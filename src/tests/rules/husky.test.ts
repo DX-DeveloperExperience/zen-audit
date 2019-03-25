@@ -1,4 +1,4 @@
-import Husky from '../../rules/husky';
+import { Husky } from '../../rules/husky';
 
 const fs = require('fs');
 jest.mock('fs');

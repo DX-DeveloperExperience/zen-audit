@@ -2,7 +2,7 @@ import { RuleRegister } from './rule-register';
 import * as fs from 'fs';
 
 @RuleRegister.register
-export default class VSCodeExtensions {
+export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
   readonly rootPath: string;
   private extensionsJSON: string;

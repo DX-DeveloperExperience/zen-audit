@@ -4,7 +4,7 @@ import { RuleRegister } from './rule-register';
 import * as fs from 'fs';
 
 @RuleRegister.register
-export default class Husky {
+export class Husky {
   readonly requiredFiles: string[] = ['package.json'];
   readonly rootPath: string;
   private packageJSON: string;

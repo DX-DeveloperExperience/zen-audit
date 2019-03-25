@@ -5,7 +5,7 @@ import { RuleRegister } from './rule-register';
 import * as fs from 'fs';
 
 @RuleRegister.register
-export default class Linter {
+export class Linter {
   readonly requiredFiles: string[] = ['tslint.json'];
   readonly rootPath: string;
   private packageJSON: string;

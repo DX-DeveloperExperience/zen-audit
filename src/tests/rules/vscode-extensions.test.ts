@@ -1,4 +1,4 @@
-import VSCodeExtensions from '../../rules/vscode-extensions';
+import { VSCodeExtensions } from '../../rules/vscode-extensions';
 
 const fs = require('fs');
 

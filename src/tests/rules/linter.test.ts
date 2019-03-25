@@ -1,4 +1,4 @@
-import Linter from '../../rules/linter';
+import { Linter } from '../../rules/linter';
 import FileUtils from '../../file-utils';
 
 const fs = require('fs');

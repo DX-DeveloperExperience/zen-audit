@@ -8,7 +8,7 @@ import { FileNotReadableError } from '../errors/FileNotReadableError';
  * accent in Semver of every dependency.
  */
 @RuleRegister.register
-export default class ExactNpmVersion {
+export class ExactNpmVersion {
   readonly requiredFiles: string[] = ['package.json'];
   readonly rootPath: string;
   private packageJSONPath: string;
