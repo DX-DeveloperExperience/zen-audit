@@ -40,7 +40,11 @@ export default class Husky {
     return this.parsedFile.devDependencies.husky !== undefined;
   }
 
-  getName(): string {
+  name(): string {
     return 'Husky';
+  }
+
+  description(): string {
+    return 'Husky can prevent bad commits or bad push.';
   }
 }

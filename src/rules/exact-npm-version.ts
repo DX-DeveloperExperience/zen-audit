@@ -130,7 +130,11 @@ export default class ExactNpmVersion {
   /**
    * Returns the name of this rule.
    */
-  getName() {
+  name() {
     return 'Exact npm version';
+  }
+
+  description() {
+    return 'Strict version: in order to avoid breaking changes, you should use a strict version for your dependencies.';
   }
 }

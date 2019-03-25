@@ -44,7 +44,11 @@ export default class Husky {
     return this.parsedFile.devDependencies.prettier !== undefined;
   }
 
-  getName(): string {
+  name(): string {
     return 'Husky';
+  }
+
+  description(): string {
+    return 'Prettier keeps your code well formatted.';
   }
 }

@@ -12,11 +12,15 @@ export default interface Rule {
    */
   shouldBeApplied(): boolean;
   /**
-   * Returns the name of the Rule.
-   */
-  getName(): string;
-  /**
    * A function that applies the recommendations.
    */
   apply(): void;
+  /**
+   * Returns the name of the Rule.
+   */
+  name(): string;
+  /**
+   * Returns a description of the rule
+   */
+  description(): string;
 }

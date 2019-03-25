@@ -36,10 +36,6 @@ export default class Linter {
     );
   }
 
-  getName() {
-    return 'Linter';
-  }
-
   apply() {
     // TODO
   }
@@ -49,5 +45,13 @@ export default class Linter {
       this.parsedFile.devDependencies.tslint !== undefined ||
       this.parsedFile.devDependencies.eslint !== undefined
     );
+  }
+
+  name() {
+    return 'Linter';
+  }
+
+  description() {
+    return 'Linter: you may use a linter (tslint or eslint) to keep your code error free and syntaxically correct.';
   }
 }
