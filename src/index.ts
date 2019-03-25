@@ -14,7 +14,7 @@ class ProjectFillerCli extends Command {
     force: flags.boolean({ char: 'f' }),
     apply: flags.boolean({
       char: 'a',
-      description: 'Applies recommandations to every found stack',
+      description: 'Apply rules',
     }),
     rules: flags.boolean({
       char: 'r',
@@ -28,16 +28,16 @@ class ProjectFillerCli extends Command {
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
 
     this.log('Scanning your project...');
-    const stacks = ListRules.findRulesToApplyIn('./');
+    const rules = ListRules.findRulesToApplyIn('./');
 
     if (runFlags.rules) {
-      stacks.forEach(stack => {
-        this.log('Stack found: ' + stack.getName());
+      rules.forEach(rule => {
+        this.log('Rule found: ' + rule.name());
       });
     }
     if (runFlags.apply) {
-      stacks.forEach(stack => {
-        stack.apply();
+      rules.forEach(rule => {
+        rule.apply();
       });
     }
   }
