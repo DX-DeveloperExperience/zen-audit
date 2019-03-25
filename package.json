@@ -59,9 +59,11 @@
     "posttest": "tslint -p . -t stylish",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
     "test": "jest",
+    "jest-cache": "jest --clearCache",
+    "audit": "npm audit",
     "prettier-test": "prettier -l \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "tslint -p tsconfig.json -c tslint.json",
-    "ci": "jest --clearCache && npm-run-all prettier-test lint test",
+    "ci": "npm-run-all audit jest-cache prettier-test lint test",
     "version": "oclif-dev readme && git add README.md"
   },
   "types": "lib/index.d.ts",
