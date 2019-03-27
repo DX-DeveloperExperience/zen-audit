@@ -6,8 +6,7 @@ import { StackRegister } from '../../stacks/stack-register';
 //   // have to implement Stack methods in my tests
 // }
 
-// test('getImplementations() should return an array containing two class constructors', () => {
-//   const dummyStack = new DummyStack();
-
-//   expect(StackRegister.getImplementations().length).toEqual(1);
-// });
+test('getImplementations() should return an array containing two class constructors', () => {
+  //   const dummyStack = new DummyStack();
+  //   expect(StackRegister.getImplementations().length).toEqual(1);
+});
