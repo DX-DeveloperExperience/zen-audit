@@ -35,11 +35,22 @@ jobs:
       - run:
           name: coveralls test
           command: npm run test:cov && (cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js)
-
+  build-for-macos:
+    macos:
+      xcode: '10.0.0'
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          name: package app for macos
+          command: npm run pack:macos
 workflows:
   version: 2
-  "project-starter":
+  'project-starter':
     jobs:
       - install-dependencies
       - build:
+          requires: [install-dependencies]
+      - build-for-macos:
           requires: [install-dependencies]

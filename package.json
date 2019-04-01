@@ -63,6 +63,7 @@
     "test:cov": "jest --coverage --runInBand",
     "jest-cache": "jest --clearCache",
     "audit": "npm audit",
+    "pack-macos": "oclif-dev pack:macos",
     "prettier-test": "prettier -l \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "ci": "npm-run-all audit jest-cache prettier-test lint test",
