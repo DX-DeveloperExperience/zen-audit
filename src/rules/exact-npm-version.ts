@@ -12,6 +12,7 @@ export class ExactNpmVersion {
   readonly requiredFiles: string[] = ['package.json'];
   readonly rootPath: string;
   private packageJSONPath: string;
+  private packageFileExists: boolean;
   private parsedFile: any;
   // tslint:disable-next-line: max-line-length
   readonly semverRegex = /^(\^|\~)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/g;
@@ -34,10 +35,11 @@ export class ExactNpmVersion {
           encoding: 'utf8',
         }),
       );
+      this.packageFileExists = true;
     } catch (err) {
       if (err.code === 'ENOENT') {
-        throw new FileNotFoundError(this.packageJSONPath);
-      } else if (err.code === 'EACCESS') {
+        this.packageFileExists = false;
+      } else {
         throw new FileNotReadableError(this.packageJSONPath);
       }
     }
@@ -47,6 +49,9 @@ export class ExactNpmVersion {
    * Returns true if the project contains npm dependencies or devDependencies with semver that needs to be corrected.
    */
   shouldBeApplied() {
+    if (!this.packageFileExists) {
+      return false;
+    }
     this.jsonObjectsToCheck.map(jsonObjStr => {
       const jsonObj = this.parsedFile[jsonObjStr];
 
