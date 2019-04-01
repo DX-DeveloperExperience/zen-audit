@@ -1,8 +1,7 @@
 import { Stack } from './stack';
 import Rule from '../rules/rule';
-// import Rule from '../rules/rule';
 
-interface Constructor<T> {
+export interface Constructor<T> {
   new (...args: any[]): T;
   readonly prototype: T;
 }
@@ -25,6 +24,10 @@ export class StackRegister {
     return StackRegister.implementations;
   }
 
+  static getRulesByStack(stackName: string): Array<Constructor<Rule>> {
+    return this.rulesByStack[stackName];
+  }
+
   /**
    * This method is a class decorator that makes a class implement the Stack interface,
    * and registers this class in an array.
@@ -35,86 +38,14 @@ export class StackRegister {
     StackRegister.rulesByStack[ctor.name] = [];
   }
 
-  static registerRuleForStacks<P extends Constructor<Rule>>(
-    stackNames: string[],
-  ) {
-    return (ctor: P) => {
-      stackNames.forEach(stackName => {
-        StackRegister.rulesByStack[stackName].push(ctor);
+  static registerRuleForStacks<
+    P extends Constructor<Rule>,
+    T extends Constructor<Stack>
+  >(stackCtors: T[]) {
+    return (ruleCtor: P) => {
+      stackCtors.forEach(stackCtor => {
+        this.rulesByStack[stackCtor.name].push(ruleCtor);
       });
     };
   }
 }
-
-// export class RegisterFactory<T> {
-//   setUpForRegister() {
-//     const implementationsOfT: Array<Constructor<T>> = [];
-//     return {
-//       register(ctor: Constructor<T>) {
-//         implementationsOfT.push(ctor);
-//       },
-//       implementationsOfT,
-//     };
-//   }
-// }
-
-// export class RegisterMapFactory<T> {
-//   setUpForRegister() {
-//     const implementationsOfT: Array<Constructor<T>> = [];
-//     const mapClassesToT: { [stackName: string]: Array<Constructor<T>> } = {};
-//     return {
-//       register(ctor: Constructor<T>) {
-//         implementationsOfT.push(ctor);
-//       },
-//       implementationsOfT,
-//     };
-//   }
-// }
-
-// export class StackRegisterFactory extends RegisterMapFactory<Stack> {}
-
-// const registerFactory = new StackRegisterFactory();
-// const setUp = registerFactory.setUpForRegister();
-
-// export const stack = setUp.register;
-// export const implementations = setUp.implementationsOfT;
-
-// interface Register<T> {
-//   register(ctor: Constructor<T>): void;
-// }
-// export class RegisterGenerator<T> {
-//   setUpForRegister(reg: Register<T>) {
-//     return function register(ctor: Constructor<T>) {
-//       reg.register(ctor);
-//     };
-//   }
-// }
-
-// export class RuleRegisterGenerator extends RegisterGenerator<Rule> {}
-// export class StackRegisterGenerator extends RegisterGenerator<Stack> {}
-// const ruleRegisterGenerator = new RuleRegisterGenerator();
-// const stackRegisterGenerator = new StackRegisterGenerator();
-
-// class RuleRegister implements Register<Rule> {
-//   instances: Array<Constructor<Rule>> = [];
-//   register(ctor: Constructor<Rule>): void {
-//     this.instances.push(ctor);
-//   }
-// }
-
-// export class StackRegister implements Register<Stack> {
-//   instances: Array<Constructor<Stack>> = [];
-//   rulesByStack: { [StackName: string]: Array<Constructor<Rule>> } = {};
-//   register(ctor: Constructor<Stack>): void {
-//     this.instances.push(ctor);
-//   }
-//   registerRule(stackName: string) {
-//     return (ctor: Constructor<Rule>) => {
-//       this.rulesByStack[stackName].push(ctor);
-//     };
-//   }
-// }
-
-// const setUpRule = ruleRegisterGenerator.setUpForRegister(new RuleRegister());
-
-// const stack = stackRegisterGenerator.setUpForRegister(new StackRegister());
