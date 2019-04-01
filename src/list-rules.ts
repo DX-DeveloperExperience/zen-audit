@@ -3,9 +3,13 @@ import * as fs from 'fs';
 import Rule from './rules/rule';
 
 // import all rules files
-fs.readdirSync(`${__dirname}/rules`).forEach(path => {
-  require(`${__dirname}/rules/${path.replace('.ts', '')}`);
-});
+fs.readdirSync(`${__dirname}/rules`)
+  .filter(path => {
+    path.endsWith('.d.ts');
+  })
+  .forEach(path => {
+    require(`${__dirname}/rules/${path.replace('.ts', '')}`);
+  });
 
 /**
  * Returns an array of every stack instanciated object
