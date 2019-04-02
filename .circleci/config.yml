@@ -41,6 +41,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: ./
+      - run: sudo apt-get install p7zip-full
       - run:
           name: build binaries
           command: npm run oclif-pack
