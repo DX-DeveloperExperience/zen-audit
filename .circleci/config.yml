@@ -54,7 +54,6 @@ jobs:
       - run:
           name: run all scripts
           command: |
-            go get github.com/tcnksm/ghr
             VERSION=$(bin/run --version | cut -d' ' -f 1 | cut -d'/' -f 2)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./dist/project-starter-cli-v${VERSION}/
 workflows:
