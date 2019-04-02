@@ -43,7 +43,7 @@ jobs:
           at: ./
       - run:
           name: build binaries
-          command: oclif-dev pack
+          command: npm run oclif-pack
   deploy:
     docker:
       - image: cibuilds/github:0.10
