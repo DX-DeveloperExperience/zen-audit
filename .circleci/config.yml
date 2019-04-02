@@ -49,11 +49,14 @@ jobs:
     docker:
       - image: cibuilds/github:0.10
     steps:
+      - setup_remote_docker
+      - checkout
       - attach_workspace:
           at: ./
       - run:
           name: run all scripts
           command: |
+            ls
             VERSION=$(bin/run --version | cut -d' ' -f 1 | cut -d'/' -f 2)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./dist/project-starter-cli-v${VERSION}/
 workflows:
