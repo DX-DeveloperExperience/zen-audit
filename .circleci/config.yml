@@ -35,6 +35,17 @@ jobs:
       - run:
           name: coveralls test
           command: npm run test:cov && (cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js)
+  deploy:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - setup_remote_docker
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          name: run all scripts
+          command: .circleci/scripts/run_all.sh
 workflows:
   version: 2
   'project-starter':
@@ -42,3 +53,8 @@ workflows:
       - install-dependencies
       - build:
           requires: [install-dependencies]
+      - deploy:
+          requires: [build]
+          filters:
+            branches:
+              only: master
