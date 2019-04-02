@@ -1,4 +1,4 @@
-import { FileNotFoundError } from './../../errors/FileNotFoundError';
+import { FileNotReadableError } from './../../errors/FileNotReadableError';
 import { ExactNpmVersion } from '../../rules/exact-npm-version';
 
 const fs = require('fs');
@@ -7,16 +7,24 @@ jest.mock('fs');
 
 const rootPath = './src/tests/rules/';
 
-test('Must throw FileNotFoundError if package.json not found', () => {
-  function instanciate() {
-    return new ExactNpmVersion(rootPath);
+test('Constructor should throw FileNotReadable if package.json is not readable', () => {
+  function instantiate() {
+    return new ExactNpmVersion();
   }
 
+  fs.readFileSync.mockImplementation(() => {
+    throw { code: 'NOT_ENOENT' };
+  });
+
+  expect(instantiate).toThrowError(FileNotReadableError);
+});
+
+test('shouldBeApplied() should return false if package.json not found', () => {
   fs.readFileSync.mockImplementation(() => {
     throw { code: 'ENOENT' };
   });
 
-  expect(instanciate).toThrowError(FileNotFoundError);
+  expect(new ExactNpmVersion().shouldBeApplied()).toBeFalsy();
 });
 
 test('Should return false if no incorrect semver is found', () => {

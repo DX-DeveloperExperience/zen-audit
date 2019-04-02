@@ -1,5 +1,4 @@
 import { FileNotReadableError } from './../errors/FileNotReadableError';
-import { FileNotFoundError } from './../errors/FileNotFoundError';
 import { RuleRegister } from './rule-register';
 import * as fs from 'fs';
 
@@ -8,6 +7,7 @@ export class Husky {
   readonly requiredFiles: string[] = ['package.json'];
   readonly rootPath: string;
   private packageJSON: string;
+  private packageFileExists: boolean;
   private parsedFile: any;
 
   constructor(rootPath: string = './') {
@@ -19,10 +19,11 @@ export class Husky {
       this.parsedFile = JSON.parse(
         fs.readFileSync(this.packageJSON, { encoding: 'utf8' }),
       );
+      this.packageFileExists = true;
     } catch (err) {
       if (err.code === 'ENOENT') {
-        throw new FileNotFoundError(this.packageJSON);
-      } else if (err.code === 'EACCESS') {
+        this.packageFileExists = false;
+      } else {
         throw new FileNotReadableError(this.packageJSON);
       }
     }
@@ -33,7 +34,7 @@ export class Husky {
   }
 
   shouldBeApplied() {
-    return !this.isInDevDep();
+    return this.packageFileExists && !this.isInDevDep();
   }
 
   isInDevDep(): boolean {

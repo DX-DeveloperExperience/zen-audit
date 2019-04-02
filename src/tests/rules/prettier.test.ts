@@ -1,7 +1,28 @@
+import { FileNotReadableError } from './../../errors/FileNotReadableError';
 import { Prettier } from '../../rules/prettier';
 
 const fs = require('fs');
 jest.mock('fs');
+
+test('Constructor should throw FileNotReadableError if file cannot be read', () => {
+  function instantiate() {
+    return new Prettier();
+  }
+
+  fs.readFileSync.mockImplementation(() => {
+    throw { code: 'NOT_ENOENT' };
+  });
+
+  expect(instantiate).toThrowError(FileNotReadableError);
+});
+
+test('shouldBeApplied() should return false if package.json file does not exist', () => {
+  fs.readFileSync.mockImplementation(() => {
+    throw { code: 'ENOENT' };
+  });
+
+  expect(new Prettier().shouldBeApplied()).toBeFalsy();
+});
 
 test('Should return false if prettier is not in devDependencies', () => {
   const packageJSON = JSON.stringify({

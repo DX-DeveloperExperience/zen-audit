@@ -31,4 +31,22 @@ export default class FileUtils {
     });
     return true;
   }
+
+  static findFilesRecursively(path: string, fileName: string): boolean {
+    let found = false;
+    if (fs.lstatSync(path).isFile()) {
+      if (path.endsWith(fileName)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      fs.readdirSync(path).forEach(subPath => {
+        if (this.findFilesRecursively(`${path}/${subPath}`, fileName)) {
+          found = true;
+        }
+      });
+    }
+    return found;
+  }
 }

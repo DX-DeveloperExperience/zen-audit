@@ -1,6 +1,5 @@
 import { ListRules } from './list-rules';
 import { Command, flags } from '@oclif/command';
-import Rule from './rules/rule';
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
 

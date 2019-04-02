@@ -19,8 +19,20 @@ jobs:
       - persist_to_workspace:
           root: ./
           paths: [node_modules]
-      - run: ./bin/run --version
-      - run: ./bin/run --help
+  test-and-lint:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - setup_remote_docker
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+          name: run tests
+          command: npm run ci
+      - run:
+          name: coveralls
+          command: npm run test:cov && (cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js)
   build:
     docker:
       - image: circleci/node:8
@@ -30,16 +42,34 @@ jobs:
       - attach_workspace:
           at: ./
       - run:
-          name: npm run ci tests
-          command: npm run ci
+          name: build binaries
+          command: oclif-dev pack
+  deploy:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: ./
       - run:
-          name: coveralls test
-          command: npm run test:cov && (cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js)
-
+          name: run all scripts
+          command: |
+            go get github.com/tcnksm/ghr
+            VERSION=$(bin/run --version | cut -d' ' -f 1 | cut -d'/' -f 2)
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./dist/project-starter-cli-v${VERSION}/
 workflows:
   version: 2
-  "project-starter":
+  'project-starter':
     jobs:
       - install-dependencies
-      - build:
+      - test-and-lint:
           requires: [install-dependencies]
+      - build:
+          requires: [install-dependencies, test-and-lint]
+          filters:
+            branches:
+              only: master
+      - deploy:
+          requires: [build]
+          filters:
+            branches:
+              only: master

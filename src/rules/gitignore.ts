@@ -1,11 +1,16 @@
 import { RuleRegister } from './rule-register';
 import * as fs from 'fs';
 
+/**
+ * This Rule will look for a .gitignore file. If it doesn't exist, applying this rule will
+ * add this file, and fill it with rules corresponding to your project
+ * gathered from these sources: https://github.com/github/gitignore
+ */
 @RuleRegister.register
 export class GitIgnore {
   readonly requiredFiles: string[] = ['.gitignore'];
   readonly rootPath: string;
-  private gitIgnoreContent: string;
+  private gitIgnoreContent: string = '';
   private gitIgnorePath: string;
   private gitIgnoreExists: boolean;
 
@@ -16,14 +21,15 @@ export class GitIgnore {
       this.gitIgnoreContent = fs.readFileSync(this.gitIgnorePath, {
         encoding: 'utf8',
       });
-
       this.gitIgnoreExists = true;
     } catch (err) {
-      this.gitIgnoreContent = '';
       this.gitIgnoreExists = false;
     }
   }
 
+  /**
+   * Returns true if .gitignore
+   */
   shouldBeApplied() {
     return !this.gitIgnoreExists || this.gitIgnoreContent === '';
   }

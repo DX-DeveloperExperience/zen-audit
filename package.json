@@ -1,7 +1,7 @@
 {
   "name": "project-starter",
   "description": "A tool to gather everything you need to deploy a new project",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "Zenika - Demey Emmanuel - Lafrance Antoine",
   "bin": {
     "project-starter-cli": "./bin/run"
@@ -63,6 +63,7 @@
     "test:cov": "jest --coverage --runInBand",
     "jest-cache": "jest --clearCache",
     "audit": "npm audit",
+    "pack-macos": "oclif-dev pack:macos",
     "prettier-test": "prettier -l \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "ci": "npm-run-all audit jest-cache prettier-test lint test",
