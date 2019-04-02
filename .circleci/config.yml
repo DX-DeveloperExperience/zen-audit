@@ -61,7 +61,8 @@ workflows:
   'project-starter':
     jobs:
       - install-dependencies
-      - test-and-lint
+      - test-and-lint:
+          requires: [install-dependencies]
       - build:
           requires: [install-dependencies, test-and-lint]
           filters:
