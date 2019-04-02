@@ -47,7 +47,7 @@ jobs:
           command: npm run oclif-pack
   deploy:
     docker:
-      - image: cibuilds/github:0.10
+      - image: circleci/golang:1.8
     steps:
       - setup_remote_docker
       - checkout
@@ -56,7 +56,7 @@ jobs:
       - run:
           name: run all scripts
           command: |
-            ls
+            go get github.com/tcnksm/ghr
             VERSION=$(bin/run --version | cut -d' ' -f 1 | cut -d'/' -f 2)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./dist/project-starter-cli-v${VERSION}/
 workflows:
