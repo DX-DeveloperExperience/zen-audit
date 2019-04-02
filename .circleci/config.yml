@@ -21,7 +21,7 @@ jobs:
           paths: [node_modules]
   test-and-lint:
     docker:
-      - image: circlci/node:8
+      - image: circleci/node:8
     steps:
       - setup_remote_docker
       - checkout
