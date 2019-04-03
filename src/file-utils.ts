@@ -4,7 +4,7 @@ import * as fs from 'fs';
  * A tool class to check whether one or multiple files exist or not
  */
 export default class FileUtils {
-  static findFilesRecursively(path: string, fileName: string): boolean {
+  static findFileRecursively(path: string, fileName: string): boolean {
     let found = false;
     if (fs.lstatSync(path).isFile()) {
       if (path.endsWith(fileName)) {
@@ -14,7 +14,7 @@ export default class FileUtils {
       }
     } else {
       fs.readdirSync(path).forEach(subPath => {
-        if (this.findFilesRecursively(`${path}/${subPath}`, fileName)) {
+        if (this.findFileRecursively(`${path}/${subPath}`, fileName)) {
           found = true;
         }
       });
