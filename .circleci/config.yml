@@ -45,6 +45,9 @@ jobs:
       - run:
           name: build binaries
           command: npm run oclif-pack
+      - persist_to_workspace:
+          root: ./
+          paths: [dist]
   deploy:
     docker:
       - image: circleci/node:8
