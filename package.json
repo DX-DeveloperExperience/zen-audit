@@ -12,8 +12,9 @@
     "@oclif/config": "1.12.9",
     "@oclif/plugin-help": "2.1.6",
     "@types/inquirer": "0.0.44",
+    "axios": "0.18.0",
+    "check-node-version": "3.3.0",
     "inquirer": "6.2.2",
-    "list-files-in-dir": "0.1.5",
     "tslib": "1.9.3"
   },
   "devDependencies": {
@@ -61,7 +62,7 @@
     "posttest": "tslint -p . -t stylish",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
     "test": "jest",
-    "test:cov": "jest --coverage --runInBand",
+    "test:cov": "jest --watch --coverage --runInBand",
     "jest-cache": "jest --clearCache",
     "audit": "npm audit",
     "oclif-pack": "oclif-dev pack",
