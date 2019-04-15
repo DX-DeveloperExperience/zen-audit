@@ -23,17 +23,17 @@ export class NodeVersion {
     Axios.get(
       'https://raw.githubusercontent.com/nodejs/Release/master/schedule.json',
     )
-      .then(schedule => {
-        this.nodeVersionSchedule = schedule.data;
-        fs.writeFileSync('./../../etc/node-schedule.json', schedule.data);
-      })
-      .catch(err => {
-        this.nodeVersionSchedule = JSON.parse(
-          fs.readFileSync('./../../etc/node-schedule.json', {
-            encoding: 'utf-8',
-          }),
-        );
-      });
+    .then(schedule => {
+      this.nodeVersionSchedule = schedule.data;
+      fs.writeFileSync('./../../etc/node-schedule.json', schedule.data);
+    })
+    .catch(err => {
+      this.nodeVersionSchedule = JSON.parse(
+        fs.readFileSync('./../../etc/node-schedule.json', {
+          encoding: 'utf-8',
+        }),
+      );
+    });
   }
 
   shouldBeApplied() {
@@ -44,6 +44,7 @@ export class NodeVersion {
   }
 
   private isCritical() {
+    console.log(this.nodeVersionSchedule);
     const now = Date.now();
     const maintenance = Date.parse(
       this.nodeVersionSchedule[this.shortNodeVersion].maintenance,
