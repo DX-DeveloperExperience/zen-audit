@@ -15,7 +15,8 @@ export default class FileUtils {
 
   static findFileRecursively(path: string, fileName: string): boolean {
     let found = false;
-    if (fs.lstatSync(path).isFile()) {
+    const fileStat = fs.lstatSync(path);
+    if (fileStat.isFile() || fileStat.isSymbolicLink()) {
       if (path.endsWith(fileName)) {
         return true;
       } else {
@@ -23,7 +24,7 @@ export default class FileUtils {
       }
     } else {
       fs.readdirSync(path).forEach(subPath => {
-        if (this.findFileRecursively(`${path}/${subPath}`, fileName)) {
+        if (this.findFileRecursively(`${path.replace(/\/$/, '')}/${subPath}`, fileName)) {
           found = true;
         }
       });
