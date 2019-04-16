@@ -5,7 +5,7 @@ import Rule from './rules/rule';
 // import all rules files
 fs.readdirSync(`${__dirname}/rules`)
   .filter(path => {
-    path.endsWith('.d.ts');
+    return path.endsWith('.d.ts') || path.endsWith('.ts');
   })
   .forEach(path => {
     require(`${__dirname}/rules/${path.replace('.ts', '')}`);
