@@ -146,5 +146,10 @@ export class ExactNpmVersion {
   getDescription() {
     return 'Strict version: in order to avoid breaking changes when running "npm install", you should use a strict version for your dependencies. Would you like to do so ?';
   }
+
+  getPromptType() {
+    return 'confirm';
   }
+
+
 }

@@ -23,4 +23,5 @@ export default interface Rule {
    * Returns a description of the rule
    */
   getDescription(): string;
+  getPromptType(): string;
 }

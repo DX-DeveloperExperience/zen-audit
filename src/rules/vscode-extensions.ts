@@ -50,5 +50,8 @@ export class VSCodeExtensions {
   getDescription() {
     return 'This rule will add extension suggestions to your Visual Studio Code app. Please check the extensions you would like to install:';
   }
+
+  getPromptType() {
+    return 'list';
   }
 }

@@ -48,5 +48,8 @@ export class Husky {
   getDescription(): string {
     return 'Husky can prevent bad commits or bad push. Please select rules you would like to add.';
   }
+
+  getPromptType() {
+    return 'list'
   }
 }

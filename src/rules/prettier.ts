@@ -59,5 +59,8 @@ export class Prettier {
   getDescription() {
     return 'Prettier keeps your code well formatted. Would you like to install it ?';
   }
+
+  getPromptType() {
+    return 'confirm';
   }
 }

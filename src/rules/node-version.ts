@@ -75,4 +75,8 @@ export class NodeVersion {
       is not maintained anymore, you should consider updating it. Update it ?`;
 		}
 	}
+
+	getPromptType() {
+		return 'confirm';
+	}
 }

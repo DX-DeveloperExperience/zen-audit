@@ -47,5 +47,8 @@ export class GitIgnore {
   getDescription() {
     return `${this.description} Choose the rules you would like to apply: `;
   }
+
+  getPromptType() {
+    return 'list';
   }
 }
