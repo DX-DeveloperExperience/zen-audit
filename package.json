@@ -37,15 +37,24 @@
 	"engines": {
 		"node": ">=8.0.0"
 	},
-	"files": [ "/bin", "/lib", "/npm-shrinkwrap.json", "/oclif.manifest.json" ],
+	"files": [
+		"/bin",
+		"/lib",
+		"/npm-shrinkwrap.json",
+		"/oclif.manifest.json"
+	],
 	"homepage": "https://github.com/DX-DeveloperExperience/project-starter",
-	"keywords": [ "oclif" ],
+	"keywords": [
+		"oclif"
+	],
 	"license": "MIT",
 	"main": "lib/index.js",
 	"oclif": {
 		"commands": "./lib/commands",
 		"bin": "project-starter-cli",
-		"plugins": [ "@oclif/plugin-help" ]
+		"plugins": [
+			"@oclif/plugin-help"
+		]
 	},
 	"repository": "DX-DeveloperExperience/project-starter",
 	"scripts": {
@@ -64,12 +73,21 @@
 	},
 	"types": "lib/index.d.ts",
 	"jest": {
-		"roots": [ "<rootDir>/src" ],
+		"roots": [
+			"<rootDir>/src"
+		],
 		"transform": {
 			"^.+\\.tsx?$": "ts-jest"
 		},
 		"testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.tsx?$",
-		"moduleFileExtensions": [ "ts", "tsx", "js", "jsx", "json", "node" ]
+		"moduleFileExtensions": [
+			"ts",
+			"tsx",
+			"js",
+			"jsx",
+			"json",
+			"node"
+		]
 	},
 	"prettier": {
 		"singleQuote": true,
