@@ -139,11 +139,12 @@ export class ExactNpmVersion {
   /**
    * Returns the name of this rule.
    */
-  name() {
+  getName() {
     return 'Exact npm version';
   }
 
-  description() {
-    return 'Strict version: in order to avoid breaking changes, you should use a strict version for your dependencies.';
+  getDescription() {
+    return 'Strict version: in order to avoid breaking changes when running "npm install", you should use a strict version for your dependencies. Would you like to do so ?';
+  }
   }
 }

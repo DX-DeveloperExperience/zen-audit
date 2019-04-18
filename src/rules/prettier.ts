@@ -48,15 +48,16 @@ export class Prettier {
     return this.packageFileExists && !this.isInDevDep();
   }
 
-  isInDevDep(): boolean {
+  isInDevDep() {
     return this.parsedFile.devDependencies.prettier !== undefined;
   }
 
-  name(): string {
+  getName() {
     return 'Prettier';
   }
 
-  description(): string {
-    return 'Prettier keeps your code well formatted.';
+  getDescription() {
+    return 'Prettier keeps your code well formatted. Would you like to install it ?';
+  }
   }
 }

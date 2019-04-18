@@ -60,19 +60,19 @@ export class NodeVersion {
 		return end < now;
 	}
 
-	name() {
+	getName() {
 		return 'Node Version';
 	}
 
-	description() {
+	getDescription() {
 		if (this.isOutdated()) {
 			const endDate = this.nodeVersionSchedule[this.shortNodeVersion].end;
 			return `Your NodeJS version : ${this.nodeVersion}
-      is outdated (${endDate}), you should consider updating it.`;
+      is outdated (${endDate}), you really should update it. Update it ?`;
 		} else {
 			const maintenanceDate = this.nodeVersionSchedule[this.shortNodeVersion].maintenance;
 			return `Your NodeJS version : ${this.nodeVersion}
-      is not maintained anymore, you should conside updating it.`;
+      is not maintained anymore, you should consider updating it. Update it ?`;
 		}
 	}
 }

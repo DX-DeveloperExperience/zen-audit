@@ -13,6 +13,7 @@ export class GitIgnore {
   private gitIgnoreContent: string = '';
   private gitIgnorePath: string;
   private gitIgnoreExists: boolean;
+  private description: string = '';
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
@@ -24,6 +25,7 @@ export class GitIgnore {
       this.gitIgnoreExists = true;
     } catch (err) {
       this.gitIgnoreExists = false;
+      this.description = 'The .gitignore file was not found.'
     }
   }
 
@@ -38,11 +40,12 @@ export class GitIgnore {
     // TODO
   }
 
-  name() {
+  getName() {
     return 'GitIgnore';
   }
 
-  description() {
-    return 'GitIgnore: this rule will add a .gitignore file containing rules corresponding to your project.';
+  getDescription() {
+    return `${this.description} Choose the rules you would like to apply: `;
+  }
   }
 }

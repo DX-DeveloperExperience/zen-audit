@@ -43,11 +43,12 @@ export class VSCodeExtensions {
     // TODO
   }
 
-  name() {
+  getName() {
     return 'VSCode extensions.json';
   }
 
-  description() {
-    return 'This rule will add extension suggestions to your Visual Studio Code app.';
+  getDescription() {
+    return 'This rule will add extension suggestions to your Visual Studio Code app. Please check the extensions you would like to install:';
+  }
   }
 }

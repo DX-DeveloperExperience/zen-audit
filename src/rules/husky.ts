@@ -41,11 +41,12 @@ export class Husky {
     return this.parsedFile.devDependencies.husky !== undefined;
   }
 
-  name(): string {
+  getName(): string {
     return 'Husky';
   }
 
-  description(): string {
-    return 'Husky can prevent bad commits or bad push.';
+  getDescription(): string {
+    return 'Husky can prevent bad commits or bad push. Please select rules you would like to add.';
+  }
   }
 }
