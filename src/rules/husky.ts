@@ -50,6 +50,6 @@ export class Husky {
   }
 
   getPromptType() {
-    return 'list'
+    return 'list';
   }
 }

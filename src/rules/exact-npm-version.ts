@@ -1,4 +1,3 @@
-import { FileNotFoundError } from './../errors/FileNotFoundError';
 import { RuleRegister } from './rule-register';
 import * as fs from 'fs';
 import { FileNotReadableError } from '../errors/FileNotReadableError';
@@ -14,8 +13,10 @@ export class ExactNpmVersion {
   private packageJSONPath: string;
   private packageFileExists: boolean;
   private parsedFile: any;
-  // tslint:disable-next-line: max-line-length
-  readonly semverRegex = /^(\^|\~)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/g;
+  readonly semverRegex = new RegExp(
+    '^(\\^|\\~)((([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)$',
+    'g',
+  );
   readonly jsonObjectsToCheck: string[];
   private jsonObjToCheckFound: string[] = [];
 
@@ -144,12 +145,11 @@ export class ExactNpmVersion {
   }
 
   getDescription() {
-    return 'Strict version: in order to avoid breaking changes when running "npm install", you should use a strict version for your dependencies. Would you like to do so ?';
+    return `Strict version: in order to avoid breaking changes when running "npm install", \
+    you should use a strict version for your dependencies. Would you like to do so ?`;
   }
 
   getPromptType() {
     return 'confirm';
   }
-
-
 }

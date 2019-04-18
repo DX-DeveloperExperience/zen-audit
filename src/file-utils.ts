@@ -24,7 +24,12 @@ export default class FileUtils {
       }
     } else {
       fs.readdirSync(path).forEach(subPath => {
-        if (this.findFileRecursively(`${path.replace(/\/$/, '')}/${subPath}`, fileName)) {
+        if (
+          this.findFileRecursively(
+            `${path.replace(/\/$/, '')}/${subPath}`,
+            fileName,
+          )
+        ) {
           found = true;
         }
       });
