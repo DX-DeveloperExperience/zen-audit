@@ -1,6 +1,6 @@
-import { RuleRegister } from './rules/rule-register';
+import { RuleRegister } from './rule-register';
 import * as fs from 'fs';
-import Rule from './rules/rule';
+import Rule from './rule';
 
 // import all rules files
 fs.readdirSync(`${__dirname}/rules`)
