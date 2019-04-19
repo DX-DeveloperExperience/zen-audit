@@ -49,6 +49,10 @@ export class GitIgnore {
   }
 
   getPromptType() {
-    return 'list';
+    return 'checkbox';
+  }
+
+  getChoices() {
+    return [{ name: 'Rule1', value: 1 }, { name: 'Rule2', value: 2 }];
   }
 }

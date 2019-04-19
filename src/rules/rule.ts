@@ -24,4 +24,5 @@ export default interface Rule {
    */
   getDescription(): string;
   getPromptType(): string;
+  getChoices(): object[];
 }

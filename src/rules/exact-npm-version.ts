@@ -150,6 +150,10 @@ export class ExactNpmVersion {
   }
 
   getPromptType() {
-    return 'confirm';
+    return 'list';
+  }
+
+  getChoices() {
+    return [{ name: 'Yes', value: true }, { name: 'No', value: false }];
   }
 }
