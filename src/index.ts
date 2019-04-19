@@ -1,5 +1,7 @@
-import { ListRules } from './list-rules';
+import { ListRules } from './rules/list-rules';
 import { Command, flags } from '@oclif/command';
+import * as inquirer from 'inquirer';
+
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
 
@@ -24,21 +26,26 @@ class ProjectFillerCli extends Command {
   static args = [{ name: 'file' }];
 
   async run() {
-    const { args, flags: runFlags } = this.parse(ProjectFillerCli);
+    // const { args, flags: runFlags } = this.parse(ProjectFillerCli);
 
     this.log('Scanning your project...');
     const rules = ListRules.findRulesToApplyIn('./');
+    let responses;
 
-    if (runFlags.rules) {
-      rules.forEach(rule => {
-        this.log('Rule found: ' + rule.name());
-      });
-    }
-    if (runFlags.apply) {
-      rules.forEach(rule => {
-        rule.apply();
-      });
-    }
+    rules.forEach(async rule => {
+      this.log('Rule found: ' + rule.getName());
+      responses = await inquirer.prompt([
+        {
+          name: rule.getName(),
+          message: rule.getDescription(),
+          type: rule.getPromptType(),
+          choices: rule.getChoices(),
+        },
+      ]);
+    });
+    rules.forEach(rule => {
+      rule.apply();
+    });
   }
 }
 
