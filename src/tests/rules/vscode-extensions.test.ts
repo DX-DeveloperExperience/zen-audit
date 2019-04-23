@@ -1,7 +1,8 @@
 import { VSCodeExtensions } from '../../rules/vscode-extensions';
+import { ListStacks } from '../../stacks/list-stacks';
+jest.mock('../../stacks/list-stacks');
 
 const fs = require('fs');
-
 jest.mock('fs');
 
 test('Method shouldBeApplied() should return true if .vscode/extensions.json does not exist', () => {
