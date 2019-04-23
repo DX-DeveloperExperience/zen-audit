@@ -28,22 +28,11 @@ class ProjectFillerCli extends Command {
 
   async run() {
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
-
-    this.log('Scanning your project...');
-    const rules = ListRules.findRulesToApplyIn(args.file);
+    const path = args.file.endsWith('/') ? args.file : args.file + '/';
+    const rules = ListRules.findRulesToApplyIn(path);
     let responses;
-
-    // await rules.map(async rule => {
-    //   this.log('Rule found: ' + rule.getName());
-    //   responses = await inquirer.prompt([
-    //     {
-    //       name: rule.getName(),
-    //       message: rule.getDescription(),
-    //       type: rule.getPromptType(),
-    //       choices: rule.getChoices(),
-    //     },
-    //   ]);
-    // });
+    
+    this.log('Scanning your project...');
     this.asyncForEach(rules, async (rule: Rule) => {
       this.log(`Rule found: ${rule.getName()}`);
       responses = await inquirer.prompt([
