@@ -45,10 +45,14 @@ export class Linter {
   }
 
   isInDevDep(): boolean {
-    return (
+    return this.hasDevDep() && (
       this.parsedFile.devDependencies.tslint !== undefined ||
       this.parsedFile.devDependencies.eslint !== undefined
     );
+  }
+
+  hasDevDep(): boolean {
+    return this.parsedFile.devDependencies !== undefined;
   }
 
   getName() {

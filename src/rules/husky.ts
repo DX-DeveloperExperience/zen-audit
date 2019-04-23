@@ -38,7 +38,11 @@ export class Husky {
   }
 
   isInDevDep(): boolean {
-    return this.parsedFile.devDependencies.husky !== undefined;
+    return this.hasDevDep() && this.parsedFile.devDependencies.husky !== undefined;
+  }
+
+  hasDevDep(): boolean {
+    return this.parsedFile.devDependencies !== undefined;
   }
 
   getName(): string {

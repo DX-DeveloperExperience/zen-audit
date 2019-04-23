@@ -49,7 +49,11 @@ export class Prettier {
   }
 
   isInDevDep() {
-    return this.parsedFile.devDependencies.prettier !== undefined;
+    return this.hasDevDep() && this.parsedFile.devDependencies.prettier !== undefined;
+  }
+
+  hasDevDep() {
+    return this.parsedFile.devDependencies !== undefined;
   }
 
   getName() {
