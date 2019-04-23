@@ -1,6 +1,7 @@
 import { ListRules } from './rules/list-rules';
-import { Command, flags } from '@oclif/command';
+import { Command, flags, run } from '@oclif/command';
 import * as inquirer from 'inquirer';
+import Rule from './rules/rule';
 
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
@@ -26,27 +27,42 @@ class ProjectFillerCli extends Command {
   static args = [{ name: 'file' }];
 
   async run() {
-    // const { args, flags: runFlags } = this.parse(ProjectFillerCli);
+    const { args, flags: runFlags } = this.parse(ProjectFillerCli);
 
     this.log('Scanning your project...');
-    const rules = ListRules.findRulesToApplyIn('./');
+    const rules = ListRules.findRulesToApplyIn(args.file);
     let responses;
 
-    rules.forEach(async rule => {
-      this.log('Rule found: ' + rule.getName());
+    // await rules.map(async rule => {
+    //   this.log('Rule found: ' + rule.getName());
+    //   responses = await inquirer.prompt([
+    //     {
+    //       name: rule.getName(),
+    //       message: rule.getDescription(),
+    //       type: rule.getPromptType(),
+    //       choices: rule.getChoices(),
+    //     },
+    //   ]);
+    // });
+    this.asyncForEach(rules, async (rule: Rule) => {
+      this.log(`Rule found: ${rule.getName()}`);
       responses = await inquirer.prompt([
         {
           name: rule.getName(),
           message: rule.getDescription(),
           type: rule.getPromptType(),
           choices: rule.getChoices(),
-        },
-      ]);
-    });
-    rules.forEach(rule => {
-      rule.apply();
-    });
+        }
+      ])
+    })
+  }
+
+  async asyncForEach(array: any[], callback: any) {
+    for (let index = 0; index < array.length; index++) {
+      await callback(array[index], index, array);
+    }
   }
 }
+
 
 export = ProjectFillerCli;
