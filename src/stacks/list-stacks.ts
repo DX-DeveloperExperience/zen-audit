@@ -3,12 +3,12 @@ import * as fs from 'fs';
 import Stack from './stack';
 
 // import all stacks files
-fs.readdirSync(`${__dirname}/stacks`)
+fs.readdirSync(`${__dirname}`)
   .filter(path => {
     return path.endsWith('.d.ts') || path.endsWith('.ts');
   })
   .forEach(path => {
-    require(`${__dirname}/stacks/${path.replace('.ts', '')}`);
+    require(`${__dirname}/${path.replace('.ts', '')}`);
   });
 
 export class ListStacks {
