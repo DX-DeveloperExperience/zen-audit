@@ -15,6 +15,6 @@ export class ListStacks {
   static findStacksIn(rootPath: string): Stack[] {
     return StackRegister.getImplementations()
       .map(stack => new stack(rootPath))
-      .filter(stack => stack.isInPath());
+      .filter(stack => stack.isInPath(rootPath));
   }
 }
