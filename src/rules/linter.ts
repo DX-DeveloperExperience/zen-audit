@@ -62,4 +62,8 @@ export class Linter {
   getPromptType() {
     return 'confirm';
   }
+
+  getChoices() {
+    return [{ name: 'Yes', value: true }, {name: 'No', value: false }]
+  }
 }
