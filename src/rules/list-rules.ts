@@ -8,7 +8,7 @@ fs.readdirSync(`${__dirname}`)
     return path.endsWith('.d.ts') || path.endsWith('.ts');
   })
   .forEach(path => {
-    require(`${__dirname}/${path.replace('.ts', '')}`);
+    require(`${__dirname}/${path.replace(/.d.ts|.ts/, '')}`);
   });
 
 /**
