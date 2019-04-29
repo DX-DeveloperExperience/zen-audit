@@ -54,9 +54,13 @@ export class VSCodeExtensions {
       [''],
     );
 
-    const extensionsJson = {
+    const extensionsJson = JSON.stringify(
+      {
       recommendations: extensionsList,
-    };
+      },
+      null,
+      '\t',
+    );
 
     try {
       fs.writeFileSync(
