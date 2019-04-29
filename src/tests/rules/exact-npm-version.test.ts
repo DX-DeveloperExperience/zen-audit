@@ -28,16 +28,20 @@ test('shouldBeApplied() should return false if package.json not found', () => {
 });
 
 test('Should return false if no incorrect semver is found', () => {
-  const packageJSON = JSON.stringify({
-    firstObjectToCheck: {
-      dep1: '0.3.4',
-      dep2: '0.5.4',
+  const packageJSON = JSON.stringify(
+    {
+      firstObjectToCheck: {
+        dep1: '0.3.4',
+        dep2: '0.5.4',
+      },
+      secondObjectToCheck: {
+        dep3: '1.3.4',
+        dep4: '1.2.5',
+      },
     },
-    secondObjectToCheck: {
-      dep3: '1.3.4',
-      dep4: '1.2.5',
-    },
-  });
+    null,
+    '\t',
+  );
   fs.readFileSync.mockReturnValue(packageJSON);
 
   expect(
@@ -46,16 +50,20 @@ test('Should return false if no incorrect semver is found', () => {
 });
 
 test('Should return true if incorrect semver with ^ is found', () => {
-  const packageJSON = JSON.stringify({
-    firstObjectToCheck: {
-      dep1: '0.3.4',
-      dep2: '0.5.4',
+  const packageJSON = JSON.stringify(
+    {
+      firstObjectToCheck: {
+        dep1: '0.3.4',
+        dep2: '0.5.4',
+      },
+      secondObjectToCheck: {
+        dep3: '^1.3.4',
+        dep4: '1.2.5',
+      },
     },
-    secondObjectToCheck: {
-      dep3: '^1.3.4',
-      dep4: '1.2.5',
-    },
-  });
+    null,
+    '\t',
+  );
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
@@ -65,16 +73,20 @@ test('Should return true if incorrect semver with ^ is found', () => {
 });
 
 test('Should return true if incorrect semver with ~ is found', () => {
-  const packageJSON = JSON.stringify({
-    firstObjectToCheck: {
-      dep1: '0.3.4',
-      dep2: '0.5.4',
+  const packageJSON = JSON.stringify(
+    {
+      firstObjectToCheck: {
+        dep1: '0.3.4',
+        dep2: '0.5.4',
+      },
+      secondObjectToCheck: {
+        dep3: '~1.3.4',
+        dep4: '1.2.5',
+      },
     },
-    secondObjectToCheck: {
-      dep3: '~1.3.4',
-      dep4: '1.2.5',
-    },
-  });
+    null,
+    '\t',
+  );
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
@@ -84,20 +96,24 @@ test('Should return true if incorrect semver with ~ is found', () => {
 });
 
 test('Should return false if incorrect semver is in json object that does not need to be checked', () => {
-  const packageJSON = JSON.stringify({
-    firstObjectToCheck: {
-      dep1: '0.3.4',
-      dep2: '0.5.4',
+  const packageJSON = JSON.stringify(
+    {
+      firstObjectToCheck: {
+        dep1: '0.3.4',
+        dep2: '0.5.4',
+      },
+      secondObjectToCheck: {
+        dep3: '1.3.4',
+        dep4: '1.2.5',
+      },
+      dummyObject: {
+        dep5: '^1.3.4',
+        dep6: '~1.3.4',
+      },
     },
-    secondObjectToCheck: {
-      dep3: '1.3.4',
-      dep4: '1.2.5',
-    },
-    dummyObject: {
-      dep5: '^1.3.4',
-      dep6: '~1.3.4',
-    },
-  });
+    null,
+    '\t',
+  );
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
@@ -107,27 +123,35 @@ test('Should return false if incorrect semver is in json object that does not ne
 });
 
 test('Should replace ^ or ~ in package.json', () => {
-  const packageJSON = JSON.stringify({
-    firstObjectToCheck: {
-      dep1: '^0.3.4',
-      dep2: '0.5.4',
+  const packageJSON = JSON.stringify(
+    {
+      firstObjectToCheck: {
+        dep1: '^0.3.4',
+        dep2: '0.5.4',
+      },
+      secondObjectToCheck: {
+        dep3: '~1.3.4',
+        dep4: '1.2.5',
+      },
     },
-    secondObjectToCheck: {
-      dep3: '~1.3.4',
-      dep4: '1.2.5',
-    },
-  });
+    null,
+    '\t',
+  );
 
-  const correctedJSON = JSON.stringify({
-    firstObjectToCheck: {
-      dep1: '0.3.4',
-      dep2: '0.5.4',
+  const correctedJSON = JSON.stringify(
+    {
+      firstObjectToCheck: {
+        dep1: '0.3.4',
+        dep2: '0.5.4',
+      },
+      secondObjectToCheck: {
+        dep3: '1.3.4',
+        dep4: '1.2.5',
+      },
     },
-    secondObjectToCheck: {
-      dep3: '1.3.4',
-      dep4: '1.2.5',
-    },
-  });
+    null,
+    '\t',
+  );
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
@@ -137,35 +161,43 @@ test('Should replace ^ or ~ in package.json', () => {
 });
 
 test('Should not replace ^ or ~ in package.json for object that does not need to be corrected', () => {
-  const packageJSON = JSON.stringify({
-    firstObjectToCheck: {
-      dep1: '0.3.4',
-      dep2: '~0.5.4',
+  const packageJSON = JSON.stringify(
+    {
+      firstObjectToCheck: {
+        dep1: '0.3.4',
+        dep2: '~0.5.4',
+      },
+      secondObjectToCheck: {
+        dep3: '^1.3.4',
+        dep4: '1.2.5',
+      },
+      dummyObject: {
+        dep5: '^1.3.4',
+        dep6: '~1.3.4',
+      },
     },
-    secondObjectToCheck: {
-      dep3: '^1.3.4',
-      dep4: '1.2.5',
-    },
-    dummyObject: {
-      dep5: '^1.3.4',
-      dep6: '~1.3.4',
-    },
-  });
+    null,
+    '\t',
+  );
 
-  const correctedJSON = JSON.stringify({
-    firstObjectToCheck: {
-      dep1: '0.3.4',
-      dep2: '0.5.4',
+  const correctedJSON = JSON.stringify(
+    {
+      firstObjectToCheck: {
+        dep1: '0.3.4',
+        dep2: '0.5.4',
+      },
+      secondObjectToCheck: {
+        dep3: '1.3.4',
+        dep4: '1.2.5',
+      },
+      dummyObject: {
+        dep5: '^1.3.4',
+        dep6: '~1.3.4',
+      },
     },
-    secondObjectToCheck: {
-      dep3: '1.3.4',
-      dep4: '1.2.5',
-    },
-    dummyObject: {
-      dep5: '^1.3.4',
-      dep6: '~1.3.4',
-    },
-  });
+    null,
+    '\t',
+  );
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
