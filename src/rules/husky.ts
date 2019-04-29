@@ -38,7 +38,9 @@ export class Husky {
   }
 
   isInDevDep(): boolean {
-    return this.hasDevDep() && this.parsedFile.devDependencies.husky !== undefined;
+    return (
+      this.hasDevDep() && this.parsedFile.devDependencies.husky !== undefined
+    );
   }
 
   hasDevDep(): boolean {

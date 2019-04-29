@@ -32,13 +32,13 @@ test('shouldBeApplied() should return true if package.json does not contain devD
     },
     dummy: {
       dep1: 'dep1',
-    }
+    },
   });
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
   expect(new Husky().shouldBeApplied()).toBeTruthy();
-})
+});
 
 test('shouldBeApplied() should return true if husky is not in devDependencies', () => {
   const packageJSON = JSON.stringify({

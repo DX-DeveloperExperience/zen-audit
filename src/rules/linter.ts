@@ -45,9 +45,10 @@ export class Linter {
   }
 
   isInDevDep(): boolean {
-    return this.hasDevDep() && (
-      this.parsedFile.devDependencies.tslint !== undefined ||
-      this.parsedFile.devDependencies.eslint !== undefined
+    return (
+      this.hasDevDep() &&
+      (this.parsedFile.devDependencies.tslint !== undefined ||
+        this.parsedFile.devDependencies.eslint !== undefined)
     );
   }
 
@@ -68,6 +69,6 @@ export class Linter {
   }
 
   getChoices() {
-    return [{ name: 'Yes', value: true }, {name: 'No', value: false }]
+    return [{ name: 'Yes', value: true }, { name: 'No', value: false }];
   }
 }
