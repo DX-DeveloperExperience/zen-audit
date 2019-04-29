@@ -1,4 +1,5 @@
-import { ListRules } from './rules/list-rules';
+import { ListRules, importRules } from './rules/list-rules';
+import { ListStacks, importStacks } from './stacks/list-stacks';
 import { Command, flags, run } from '@oclif/command';
 import * as inquirer from 'inquirer';
 import Rule from './rules/rule';
@@ -31,7 +32,11 @@ class ProjectFillerCli extends Command {
     const path = args.file.endsWith('/') ? args.file : args.file + '/';
     const rules = ListRules.findRulesToApplyIn(path);
     let responses;
-    
+
+    // call methods that import rules and stacks classes files
+    await importRules();
+    await importStacks();
+
     this.log('Scanning your project...');
     this.asyncForEach(rules, async (rule: Rule) => {
       this.log(`Rule found: ${rule.getName()}`);
@@ -41,9 +46,9 @@ class ProjectFillerCli extends Command {
           message: rule.getDescription(),
           type: rule.getPromptType(),
           choices: rule.getChoices(),
-        }
-      ])
-    })
+        },
+      ]);
+    });
   }
 
   async asyncForEach(array: any[], callback: any) {
@@ -52,6 +57,5 @@ class ProjectFillerCli extends Command {
     }
   }
 }
-
 
 export = ProjectFillerCli;
