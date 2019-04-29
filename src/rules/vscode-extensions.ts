@@ -37,6 +37,13 @@ export class VSCodeExtensions {
   }
 
   shouldBeApplied() {
+    return (
+      (this.dotVSCodeExists() && !this.extensionsFileExists) ||
+      (this.extensionsFileExists && !this.hasRecommendations()) ||
+      (!this.extensionsFileExists && this.codeIsInPath())
+    );
+  }
+
   dotVSCodeExists(): boolean {
     let fileStat;
     try {
