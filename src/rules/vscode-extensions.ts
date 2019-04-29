@@ -1,5 +1,4 @@
 import { RuleRegister } from './rule-register';
-import * as fs from 'fs';
 import { StackRegister, Constructor } from '../stacks/stack-register';
 import { Angular } from '../stacks/angular';
 import { VueJS } from '../stacks/vue-js';
@@ -29,7 +28,6 @@ export class VSCodeExtensions {
           encoding: 'utf8',
         }),
       );
-
       this.extensionsFileExists = true;
     } catch (err) {
       this.extensionsFileExists = false;
@@ -85,7 +83,7 @@ export class VSCodeExtensions {
 
     const extensionsJson = JSON.stringify(
       {
-      recommendations: extensionsList,
+        recommendations: extensionsList,
       },
       null,
       '\t',
