@@ -66,14 +66,14 @@ jobs:
   publish:
     docker:
       - image: circleci/node:8
-      steps:
-        - setup_remote_docker
-        - checkout
-        - attach_workspace:
-            at: ./
-        - run:
-          name: publish release on npm registry
-          command: npm run publish
+    steps:
+      - setup_remote_docker
+      - checkout
+      - attach_workspace:
+          at: ./
+      - run:
+        name: publish release on npm registry
+        command: npm run publish
 workflows:
   version: 2
   'project-starter':
