@@ -100,7 +100,7 @@ export class ExactNpmVersion {
         this.semverRegex,
       );
     });
-    return JSON.stringify(this.parsedFile);
+    return JSON.stringify(this.parsedFile, null, '\t');
   }
 
   /**
