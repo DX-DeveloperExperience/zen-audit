@@ -5,6 +5,8 @@ import { Angular } from '../stacks/angular';
 import { VueJS } from '../stacks/vue-js';
 import { ListStacks } from '../stacks/list-stacks';
 import Choice from '../choice';
+import * as fs from 'fs';
+import * as cp from 'child_process';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Angular, VueJS])
@@ -35,7 +37,27 @@ export class VSCodeExtensions {
   }
 
   shouldBeApplied() {
-    return !(this.extensionsFileExists && this.hasRecommendations());
+  dotVSCodeExists(): boolean {
+    let fileStat;
+    try {
+      fileStat = fs.lstatSync(`${this.rootPath}.vscode`);
+      if (fileStat.isDirectory()) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      return false;
+    }
+  }
+
+  codeIsInPath() {
+    try {
+      cp.execSync('code -v');
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 
   hasRecommendations() {
