@@ -1,4 +1,4 @@
-import Rule from './rule';
+import Rule from '../rule';
 
 interface Constructor<T> {
   new (...args: any[]): T;

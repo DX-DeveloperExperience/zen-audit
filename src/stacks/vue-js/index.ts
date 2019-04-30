@@ -1,4 +1,4 @@
-import { StackRegister } from './stack-register';
+import { StackRegister } from '../stack-register';
 
 @StackRegister.register
 export class VueJS {

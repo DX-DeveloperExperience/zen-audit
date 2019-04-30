@@ -1,4 +1,4 @@
-import { RuleRegister } from './rule-register';
+import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
 
 /**

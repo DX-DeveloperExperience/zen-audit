@@ -1,8 +1,8 @@
-import { TypeScript } from './../stacks/typescript';
-import { JavaScript } from './../stacks/javascript';
-import { StackRegister } from './../stacks/stack-register';
-import { FileNotReadableError } from './../errors/FileNotReadableError';
-import { RuleRegister } from './rule-register';
+import { TypeScript } from '../../stacks/typescript';
+import { JavaScript } from '../../stacks/javascript';
+import { StackRegister } from '../../stacks/stack-register';
+import { FileNotReadableError } from '../../errors/FileNotReadableError';
+import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
 
 /**

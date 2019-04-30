@@ -1,15 +1,16 @@
-import { StackRegister } from './stack-register';
+import { StackRegister } from '../stack-register';
 import * as fs from 'fs';
-import Stack from './stack';
+import Stack from '../stack';
 
 export function importStacks() {
   // import all stacks files
-  fs.readdirSync(`${__dirname}`)
+  const stacksDirPath = `${__dirname}/..`;
+  fs.readdirSync(stacksDirPath)
     .filter(path => {
       return path.endsWith('.d.ts') || path.endsWith('.ts');
     })
     .forEach(path => {
-      require(`${__dirname}/${path.replace(/.d.ts|.ts/, '')}`);
+      require(`${stacksDirPath}/${path.replace(/.d.ts|.ts/, '')}`);
     });
 }
 

@@ -1,7 +1,7 @@
-import { JavaScript } from './../stacks/javascript';
-import { RuleRegister } from './rule-register';
-import { StackRegister } from '../stacks/stack-register';
-import { TypeScript } from '../stacks/typescript';
+import { JavaScript } from '../../stacks/javascript';
+import { RuleRegister } from '../rule-register';
+import { StackRegister } from '../../stacks/stack-register';
+import { TypeScript } from '../../stacks/typescript';
 import request from 'sync-request';
 import * as cp from 'child_process';
 import * as fs from 'fs';

@@ -1,5 +1,5 @@
-import { ExactNpmVersion } from './../../rules/exact-npm-version';
-import { FileNotReadableError } from './../../errors/FileNotReadableError';
+import { ExactNpmVersion } from '.';
+import { FileNotReadableError } from '../../errors/FileNotReadableError';
 
 const fs = require('fs');
 

@@ -1,5 +1,5 @@
-import Rule from '../rules/rule';
-import Stack from './stack';
+import Rule from '../../rules/rule';
+import Stack from '../stack';
 
 export interface Constructor<T> {
   new (...args: any[]): T;

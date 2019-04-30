@@ -1,9 +1,9 @@
-import { RuleRegister } from './rule-register';
-import { StackRegister, Constructor } from '../stacks/stack-register';
-import { Angular } from '../stacks/angular';
-import { VueJS } from '../stacks/vue-js';
-import { ListStacks } from '../stacks/list-stacks';
-import Choice from '../choice';
+import { RuleRegister } from '../rule-register';
+import { StackRegister, Constructor } from '../../stacks/stack-register';
+import { Angular } from '../../stacks/angular';
+import { VueJS } from '../../stacks/vue-js';
+import { ListStacks } from '../../stacks/list-stacks';
+import Choice from '../../choice';
 import * as fs from 'fs';
 import * as cp from 'child_process';
 

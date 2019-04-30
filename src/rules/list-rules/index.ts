@@ -1,15 +1,17 @@
-import { RuleRegister } from './rule-register';
+import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
-import Rule from './rule';
+import Rule from '../rule';
 
 export function importRules() {
   // import all rules files
-  fs.readdirSync(`${__dirname}`)
-    .filter(path => {
-      return path.endsWith('.d.ts') || path.endsWith('.ts');
-    })
+  const rulesDirPath = `${__dirname}/..`;
+  fs.readdirSync(rulesDirPath)
+    // .filter(path => {
+    //   return path.endsWith('.d.ts') || path.endsWith('.ts');
+    // })
     .forEach(path => {
-      require(`${__dirname}/${path.replace(/.d.ts|.ts/, '')}`);
+      console.log(`${rulesDirPath}/${path.replace(/.d.ts|.ts/, '')}`);
+      require(`${rulesDirPath}/${path.replace(/.d.ts|.ts/, '')}`);
     });
 }
 

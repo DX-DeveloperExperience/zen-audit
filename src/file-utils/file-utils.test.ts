@@ -1,4 +1,4 @@
-import FileUtils from '../file-utils';
+import FileUtils from '.';
 
 const mockFS = require('mock-fs');
 

@@ -1,5 +1,5 @@
-import { FileNotReadableError } from './../errors/FileNotReadableError';
-import { RuleRegister } from './rule-register';
+import { FileNotReadableError } from '../../errors/FileNotReadableError';
+import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
 
 @RuleRegister.register

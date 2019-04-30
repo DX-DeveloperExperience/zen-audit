@@ -1,6 +1,6 @@
-import { RuleRegister } from './rule-register';
+import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
-import { FileNotReadableError } from '../errors/FileNotReadableError';
+import { FileNotReadableError } from '../../errors/FileNotReadableError';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
