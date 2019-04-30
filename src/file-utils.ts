@@ -17,11 +17,7 @@ export default class FileUtils {
     let found = false;
     const fileStat = fs.lstatSync(path);
     if (fileStat.isFile() || fileStat.isSymbolicLink()) {
-      if (path.endsWith(fileName)) {
-        return true;
-      } else {
-        return false;
-      }
+      return path.endsWith(fileName);
     } else {
       fs.readdirSync(path).forEach(subPath => {
         if (
