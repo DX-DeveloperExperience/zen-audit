@@ -95,6 +95,8 @@
     "trailingComma": "all"
   },
   "husky": {
-    "hooks": {}
+    "hooks": {
+      "pre-push": "npm run ci"
+    }
   }
 }
