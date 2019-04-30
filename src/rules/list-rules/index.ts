@@ -10,7 +10,6 @@ export function importRules() {
     //   return path.endsWith('.d.ts') || path.endsWith('.ts');
     // })
     .forEach(path => {
-      console.log(`${rulesDirPath}/${path.replace(/.d.ts|.ts/, '')}`);
       require(`${rulesDirPath}/${path.replace(/.d.ts|.ts/, '')}`);
     });
 }
