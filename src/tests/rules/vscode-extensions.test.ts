@@ -1,19 +1,57 @@
 import { VSCodeExtensions } from '../../rules/vscode-extensions';
 
 const fs = require('fs');
-
 jest.mock('fs');
 
-test('Method shouldBeApplied() should return true if .vscode/extensions.json does not exist', () => {
+const cp = require('child_process');
+jest.mock('child_process');
+
+afterEach(() => {
+  jest.resetAllMocks();
+});
+
+test('Method shouldBeApplied() should return true if .vscode/extensions.json and .vscode folder do not exist but vscode is installed', () => {
   fs.readFileSync.mockImplementation(() => {
     throw { code: 'ENOENT' };
+  });
+
+  fs.lstatSync.mockImplementation(() => {
+    return {
+      isDirectory() {
+        return false;
+      },
+    };
+  });
+
+  cp.execSync.mockImplementation(() => {
+    return '';
+  });
+
+  expect(new VSCodeExtensions().shouldBeApplied()).toBeTruthy();
+});
+
+test('Method shouldBeApplied() should return true if .vscode/extension.json does not exist but .vscode folder do', () => {
+  fs.readFileSync.mockImplementation(() => {
+    throw { code: 'ENOENT' };
+  });
+
+  fs.lstatSync.mockImplementation(() => {
+    return {
+      isDirectory() {
+        return true;
+      },
+    };
+  });
+
+  cp.execSync.mockImplementation(() => {
+    throw new Error();
   });
 
   expect(new VSCodeExtensions().shouldBeApplied()).toBeTruthy();
 });
 
 test('Method shouldBeApplied() should return true if .vscode/extensions.json is empty', () => {
-  fs.readFileSync.mockReturnValue('');
+  fs.readFileSync.mockReturnValue('{}');
 
   expect(new VSCodeExtensions().shouldBeApplied()).toBeTruthy();
 });

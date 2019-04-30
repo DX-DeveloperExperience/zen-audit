@@ -1,4 +1,3 @@
-import { FileNotFoundError } from './../errors/FileNotFoundError';
 import { RuleRegister } from './rule-register';
 import * as fs from 'fs';
 import { FileNotReadableError } from '../errors/FileNotReadableError';
@@ -14,19 +13,25 @@ export class ExactNpmVersion {
   private packageJSONPath: string;
   private packageFileExists: boolean;
   private parsedFile: any;
-  // tslint:disable-next-line: max-line-length
-  readonly semverRegex = /^(\^|\~)((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/g;
-  readonly jsonObjectsToCheck: string[] = [
-    'dependencies',
-    'devDependencies',
-    'bundledDependencies',
-    'optionalDependencies',
-    'peerDependencies',
-  ];
+  readonly semverRegex = new RegExp(
+    '^(\\^|\\~)((([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)$',
+    'g',
+  );
+  readonly jsonObjectsToCheck: string[];
+  private jsonObjToCheckFound: string[] = [];
 
-  constructor(rootPath: string = './') {
+  constructor(
+    rootPath: string = './',
+    jsonObjectsToCheck: string[] = [
+      'dependencies',
+      'devDependencies',
+      'bundledDependencies',
+      'optionalDependencies',
+      'peerDependencies',
+    ],
+  ) {
     this.rootPath = rootPath;
-
+    this.jsonObjectsToCheck = jsonObjectsToCheck;
     this.packageJSONPath = `${this.rootPath}package.json`;
 
     try {
@@ -36,6 +41,7 @@ export class ExactNpmVersion {
         }),
       );
       this.packageFileExists = true;
+      this.jsonObjToCheckFound = this.findJsonObjectsToCheck();
     } catch (err) {
       if (err.code === 'ENOENT') {
         this.packageFileExists = false;
@@ -49,21 +55,21 @@ export class ExactNpmVersion {
    * Returns true if the project contains npm dependencies or devDependencies with semver that needs to be corrected.
    */
   shouldBeApplied() {
+    let result = false;
     if (!this.packageFileExists) {
       return false;
     }
-    this.jsonObjectsToCheck.map(jsonObjStr => {
+    this.jsonObjectsToCheck.forEach(jsonObjStr => {
       const jsonObj = this.parsedFile[jsonObjStr];
 
       if (jsonObj !== undefined) {
         const jsonObjValues: string[] = Object.values(jsonObj);
-
         if (this.valuesMatches(jsonObjValues, this.semverRegex)) {
-          return true;
+          result = true;
         }
       }
     });
-    return false;
+    return result;
   }
 
   /**
@@ -71,13 +77,8 @@ export class ExactNpmVersion {
    * @param values An array of string containing the values to match the regexp
    * @param regex A RegExp that will try to match with values
    */
-  valuesMatches(values: string[], regex: RegExp) {
-    values.map((val: string) => {
-      if (val.match(regex)) {
-        return true;
-      }
-    });
-    return false;
+  valuesMatches(values: string[], regex: RegExp): boolean {
+    return values.some(val => !!val.match(regex));
   }
 
   /**
@@ -93,29 +94,27 @@ export class ExactNpmVersion {
    * The replacement function that returns the semver without the tild or circumflex accents
    */
   correctSemverNotation(): string {
-    const depEntries: string[][] = Object.entries(this.parsedFile.dependencies);
-    const devDepEntries: string[][] = Object.entries(
-      this.parsedFile.devDependencies,
-    );
-
-    this.parsedFile.dependencies = this.replaceMatchingEntries(
-      depEntries,
-      this.semverRegex,
-    );
-    this.parsedFile.devDependencies = this.replaceMatchingEntries(
-      devDepEntries,
-      this.semverRegex,
-    );
-
-    return JSON.stringify(this.parsedFile);
+    this.jsonObjToCheckFound.forEach(jsonObjName => {
+      this.parsedFile[jsonObjName] = this.replaceMatchingEntriesForObj(
+        jsonObjName,
+        this.semverRegex,
+      );
+    });
+    return JSON.stringify(this.parsedFile, null, '\t');
   }
 
-  replaceMatchingEntries(entries: string[][], regex: RegExp) {
+  /**
+   * The replacement occurs in this object's parsedFile json object.
+   * @param jsonObjName
+   * @param regex
+   */
+  replaceMatchingEntriesForObj(jsonObjName: string, regex: RegExp) {
+    const entries: string[][] = Object.entries(this.parsedFile[jsonObjName]);
     const changedEntries = entries.map(([dep, val]) => {
-      if (val.match(this.semverRegex)) {
+      if (val.match(regex)) {
         return [
           dep,
-          val.replace(this.semverRegex, (_A: string, b: string, c: string) => {
+          val.replace(regex, (_A: string, _B: string, c: string) => {
             return c;
           }),
         ];
@@ -132,14 +131,29 @@ export class ExactNpmVersion {
     return result;
   }
 
+  findJsonObjectsToCheck() {
+    return this.jsonObjectsToCheck.filter(val => {
+      return Object.keys(this.parsedFile).includes(val);
+    });
+  }
+
   /**
    * Returns the name of this rule.
    */
-  name() {
+  getName() {
     return 'Exact npm version';
   }
 
-  description() {
-    return 'Strict version: in order to avoid breaking changes, you should use a strict version for your dependencies.';
+  getDescription() {
+    return `Strict version: in order to avoid breaking changes when running "npm install", \
+    you should use a strict version for your dependencies. Would you like to do so ?`;
+  }
+
+  getPromptType() {
+    return 'list';
+  }
+
+  getChoices() {
+    return [{ name: 'Yes', value: true }, { name: 'No', value: false }];
   }
 }

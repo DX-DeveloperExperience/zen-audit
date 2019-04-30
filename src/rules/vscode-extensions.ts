@@ -1,18 +1,26 @@
 import { RuleRegister } from './rule-register';
+import { StackRegister, Constructor } from '../stacks/stack-register';
+import { Angular } from '../stacks/angular';
+import { VueJS } from '../stacks/vue-js';
+import { ListStacks } from '../stacks/list-stacks';
+import Choice from '../choice';
 import * as fs from 'fs';
+import * as cp from 'child_process';
 
 @RuleRegister.register
+@StackRegister.registerRuleForStacks([Angular, VueJS])
 export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
   readonly rootPath: string;
   private extensionsJSON: string;
   private parsedExtensionsFile: any;
   private extensionsFileExists: boolean;
+  private choices: Choice[];
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
-
     this.extensionsJSON = `${this.rootPath}.vscode/extensions.json`;
+    this.choices = [{ name: 'GitLens', value: 'eamodio.gitlens' }];
 
     try {
       this.parsedExtensionsFile = JSON.parse(
@@ -20,7 +28,6 @@ export class VSCodeExtensions {
           encoding: 'utf8',
         }),
       );
-
       this.extensionsFileExists = true;
     } catch (err) {
       this.extensionsFileExists = false;
@@ -28,7 +35,34 @@ export class VSCodeExtensions {
   }
 
   shouldBeApplied() {
-    return !(this.extensionsFileExists && this.hasRecommendations());
+    return (
+      (this.dotVSCodeExists() && !this.extensionsFileExists) ||
+      (this.extensionsFileExists && !this.hasRecommendations()) ||
+      (!this.extensionsFileExists && this.codeIsInPath())
+    );
+  }
+
+  dotVSCodeExists(): boolean {
+    let fileStat;
+    try {
+      fileStat = fs.lstatSync(`${this.rootPath}.vscode`);
+      if (fileStat.isDirectory()) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      return false;
+    }
+  }
+
+  codeIsInPath() {
+    try {
+      cp.execSync('code -v');
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 
   hasRecommendations() {
@@ -40,14 +74,61 @@ export class VSCodeExtensions {
   }
 
   apply() {
-    // TODO
+    const extensionsList = this.choices.reduce(
+      (prev, curr) => {
+        return [...prev, ...curr.value];
+      },
+      [''],
+    );
+
+    const extensionsJson = JSON.stringify(
+      {
+        recommendations: extensionsList,
+      },
+      null,
+      '\t',
+    );
+
+    try {
+      fs.writeFileSync(
+        `${this.rootPath}/.vscode/extensions.json`,
+        extensionsJson,
+        { encoding: 'utf8' },
+      );
+    } catch (err) {
+      //
+    }
   }
 
-  name() {
+  getName() {
     return 'VSCode extensions.json';
   }
 
-  description() {
-    return 'This rule will add extension suggestions to your Visual Studio Code app.';
+  getDescription() {
+    return 'This rule will add extension suggestions to your Visual Studio Code app. Please check the extensions you would like to install:';
+  }
+
+  getPromptType() {
+    return 'checkbox';
+  }
+
+  getChoices() {
+    const foundStacks = ListStacks.findStacksIn(this.rootPath);
+    if (foundStacks.includes(Angular.prototype)) {
+      this.choices.push(
+        { name: 'Angular Language Service', value: 'angular.ng-template' },
+        { name: 'TSLint', value: 'ms-vscode.vscode-typescript-tslint-plugin' },
+        { name: 'Angular Console', value: 'nrwl.angular-console' },
+        { name: 'Prettier', value: 'esbenp.prettier-vscode' },
+      );
+    } else if (foundStacks.includes(VueJS.prototype)) {
+      this.choices.push(
+        { name: 'Vetur', value: 'octref.vetur' },
+        { name: 'ESLint', value: 'dbaeumer.vscode-eslint' },
+        { name: 'Prettier', value: 'esbenp.prettier-vscode' },
+      );
+    }
+
+    return this.choices;
   }
 }

@@ -46,16 +46,29 @@ export class Linter {
 
   isInDevDep(): boolean {
     return (
-      this.parsedFile.devDependencies.tslint !== undefined ||
-      this.parsedFile.devDependencies.eslint !== undefined
+      this.hasDevDep() &&
+      (this.parsedFile.devDependencies.tslint !== undefined ||
+        this.parsedFile.devDependencies.eslint !== undefined)
     );
   }
 
-  name() {
+  hasDevDep(): boolean {
+    return this.parsedFile.devDependencies !== undefined;
+  }
+
+  getName() {
     return 'Linter';
   }
 
-  description() {
-    return 'Linter: you may use a linter (tslint or eslint) to keep your code error free and syntaxically correct.';
+  getDescription() {
+    return 'Linter: you may use a linter (tslint or eslint) to keep your code error free and syntaxically correct. Would you like to add it ?';
+  }
+
+  getPromptType() {
+    return 'confirm';
+  }
+
+  getChoices() {
+    return [{ name: 'Yes', value: true }, { name: 'No', value: false }];
   }
 }

@@ -18,9 +18,11 @@ export default interface Rule {
   /**
    * Returns the name of the Rule.
    */
-  name(): string;
+  getName(): string;
   /**
    * Returns a description of the rule
    */
-  description(): string;
+  getDescription(): string;
+  getPromptType(): string;
+  getChoices(): object[];
 }

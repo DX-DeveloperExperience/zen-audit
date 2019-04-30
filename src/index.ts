@@ -1,5 +1,9 @@
-import { ListRules } from './list-rules';
-import { Command, flags } from '@oclif/command';
+import { ListRules, importRules } from './rules/list-rules';
+import { ListStacks, importStacks } from './stacks/list-stacks';
+import { Command, flags, run } from '@oclif/command';
+import * as inquirer from 'inquirer';
+import Rule from './rules/rule';
+
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
 
@@ -24,20 +28,32 @@ class ProjectFillerCli extends Command {
   static args = [{ name: 'file' }];
 
   async run() {
+    // call methods that import rules and stacks classes files
+    await importRules();
+    await importStacks();
+
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
+    const path = args.file.endsWith('/') ? args.file : args.file + '/';
+    const rules = ListRules.findRulesToApplyIn(path);
+    let responses;
 
     this.log('Scanning your project...');
-    const rules = ListRules.findRulesToApplyIn('./');
+    this.asyncForEach(rules, async (rule: Rule) => {
+      this.log(`Rule found: ${rule.getName()}`);
+      responses = await inquirer.prompt([
+        {
+          name: rule.getName(),
+          message: rule.getDescription(),
+          type: rule.getPromptType(),
+          choices: rule.getChoices(),
+        },
+      ]);
+    });
+  }
 
-    if (runFlags.rules) {
-      rules.forEach(rule => {
-        this.log('Rule found: ' + rule.name());
-      });
-    }
-    if (runFlags.apply) {
-      rules.forEach(rule => {
-        rule.apply();
-      });
+  async asyncForEach(array: any[], callback: any) {
+    for (let index = 0; index < array.length; index++) {
+      await callback(array[index], index, array);
     }
   }
 }

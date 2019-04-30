@@ -24,6 +24,22 @@ test('shouldBeApplied() should return false if package.json does not exist', () 
   expect(new Husky().shouldBeApplied()).toBeFalsy();
 });
 
+test('shouldBeApplied() should return true if package.json does not contain devDependencies', () => {
+  const packageJSON = JSON.stringify({
+    dependencies: {
+      dep1: 'dep1',
+      dep2: 'dep2',
+    },
+    dummy: {
+      dep1: 'dep1',
+    },
+  });
+
+  fs.readFileSync.mockReturnValue(packageJSON);
+
+  expect(new Husky().shouldBeApplied()).toBeTruthy();
+});
+
 test('shouldBeApplied() should return true if husky is not in devDependencies', () => {
   const packageJSON = JSON.stringify({
     devDependencies: {

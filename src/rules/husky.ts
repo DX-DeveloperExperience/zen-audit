@@ -38,14 +38,28 @@ export class Husky {
   }
 
   isInDevDep(): boolean {
-    return this.parsedFile.devDependencies.husky !== undefined;
+    return (
+      this.hasDevDep() && this.parsedFile.devDependencies.husky !== undefined
+    );
   }
 
-  name(): string {
+  hasDevDep(): boolean {
+    return this.parsedFile.devDependencies !== undefined;
+  }
+
+  getName(): string {
     return 'Husky';
   }
 
-  description(): string {
-    return 'Husky can prevent bad commits or bad push.';
+  getDescription(): string {
+    return 'Husky can prevent bad commits or bad push. Please select rules you would like to add.';
+  }
+
+  getPromptType() {
+    return 'checkbox';
+  }
+
+  getChoices() {
+    return [{ name: 'Rule1', value: 1 }, { name: 'Rule2', value: 2 }];
   }
 }
