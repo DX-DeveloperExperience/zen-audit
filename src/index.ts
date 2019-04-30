@@ -28,14 +28,14 @@ class ProjectFillerCli extends Command {
   static args = [{ name: 'file' }];
 
   async run() {
+    // call methods that import rules and stacks classes files
+    await importRules();
+    await importStacks();
+
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
     const path = args.file.endsWith('/') ? args.file : args.file + '/';
     const rules = ListRules.findRulesToApplyIn(path);
     let responses;
-
-    // call methods that import rules and stacks classes files
-    await importRules();
-    await importStacks();
 
     this.log('Scanning your project...');
     this.asyncForEach(rules, async (rule: Rule) => {
