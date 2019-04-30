@@ -1,8 +1,8 @@
 # Project Filler CLI
 
-## What is it ?
+## What is it for ?
 
-This project aims to help developers to fill most programming projects (JavaScript, TypeScript, Angular, JAVA..) with tools and good practices proposed by Zenika. It is a command line interface that will detect your project's stack and will search for rules to apply corresponding to this stack.
+This project aims to help developers to fill most programming projects (JavaScript, TypeScript, Angular, JAVA..) with tools and good practices proposed by Zenika. It is a command line interface that will detect your project's stack and will search for rules to apply corresponding to these stacks.
 
 ## How can I use it ?
 
