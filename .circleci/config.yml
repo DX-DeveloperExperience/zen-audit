@@ -72,8 +72,8 @@ jobs:
       - attach_workspace:
           at: ./
       - run:
-        name: publish release on npm registry
-        command: npm run publish
+          name: publish release on npm registry
+          command: npm run publish
 workflows:
   version: 2
   'project-starter':
