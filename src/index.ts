@@ -33,7 +33,12 @@ class ProjectFillerCli extends Command {
     await importStacks();
 
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
-    const path = args.file.endsWith('/') ? args.file : args.file + '/';
+    let path;
+    if (args.file !== undefined) {
+      path = args.file.endsWith('/') ? args.file : args.file + '/';
+    } else {
+      path = './';
+    }
     const rules = ListRules.findRulesToApplyIn(path);
     let responses;
 
