@@ -1,6 +1,8 @@
 import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
 import Rule from '../rule';
+import { StackRegister, Constructor } from '../../stacks/stack-register/index';
+import { ListStacks } from '../../stacks/list-stacks/index';
 
 // export function importRules() {
 //   // import all rules files
@@ -23,10 +25,13 @@ export class ListRules {
 
   static getRulesToApplyIn(rootPath: string): Rule[] {
     if (this.rules.length === 0 || this.path !== rootPath) {
-      this.rules = RuleRegister.getImplementations()
-        .map(rule => new rule(rootPath))
-        .filter(rule => rule.shouldBeApplied());
-    }
+      // this.rules = RuleRegister.getImplementations()
+        // .map(rule => new rule(rootPath))
+        // .filter(rule => rule.shouldBeApplied());
+        ListStacks.getStacksIn(rootPath).forEach(stack => {
+          this.rules.push(StackRegister.getRulesByStack(stack.))
+        })
+      }
 
     if (this.path === '' || this.path !== rootPath) {
       this.path = rootPath;
