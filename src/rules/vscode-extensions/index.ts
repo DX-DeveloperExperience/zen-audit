@@ -20,7 +20,6 @@ export class VSCodeExtensions {
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
     this.extensionsJSON = `${this.rootPath}.vscode/extensions.json`;
-    this.choices = [{ name: 'GitLens', value: 'eamodio.gitlens' }];
 
     try {
       this.parsedExtensionsFile = JSON.parse(
@@ -113,20 +112,9 @@ export class VSCodeExtensions {
   }
 
   getChoices() {
-    const foundStacks = ListStacks.findStacksIn(this.rootPath);
+    const foundStacks = ListStacks.getStacksIn(this.rootPath);
     if (foundStacks.includes(Angular.prototype)) {
-      this.choices.push(
-        { name: 'Angular Language Service', value: 'angular.ng-template' },
-        { name: 'TSLint', value: 'ms-vscode.vscode-typescript-tslint-plugin' },
-        { name: 'Angular Console', value: 'nrwl.angular-console' },
-        { name: 'Prettier', value: 'esbenp.prettier-vscode' },
-      );
     } else if (foundStacks.includes(VueJS.prototype)) {
-      this.choices.push(
-        { name: 'Vetur', value: 'octref.vetur' },
-        { name: 'ESLint', value: 'dbaeumer.vscode-eslint' },
-        { name: 'Prettier', value: 'esbenp.prettier-vscode' },
-      );
     }
 
     return this.choices;

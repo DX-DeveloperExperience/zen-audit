@@ -1,8 +1,9 @@
-import { ListRules, importRules } from './rules/list-rules';
-import { ListStacks, importStacks } from './stacks/list-stacks';
+import { ListRules } from './rules/list-rules';
+import { ListStacks } from './stacks/list-stacks';
 import { Command, flags, run } from '@oclif/command';
 import * as inquirer from 'inquirer';
 import Rule from './rules/rule';
+import './init';
 
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
@@ -29,8 +30,8 @@ class ProjectFillerCli extends Command {
 
   async run() {
     // call methods that import rules and stacks classes files
-    await importRules();
-    await importStacks();
+    //await importRules();
+    //await importStacks();
 
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
     let path;
@@ -39,11 +40,12 @@ class ProjectFillerCli extends Command {
     } else {
       path = './';
     }
-    const rules = ListRules.findRulesToApplyIn(path);
+
+    const rules = ListRules.getRulesToApplyIn(path);
     let responses;
 
     this.log('Scanning your project...');
-    this.asyncForEach(rules, async (rule: Rule) => {
+    await this.asyncForEach(rules, async (rule: Rule) => {
       this.log(`Rule found: ${rule.getName()}`);
       responses = await inquirer.prompt([
         {
@@ -54,6 +56,8 @@ class ProjectFillerCli extends Command {
         },
       ]);
     });
+
+    await console.log(responses);
   }
 
   async asyncForEach(array: any[], callback: any) {
