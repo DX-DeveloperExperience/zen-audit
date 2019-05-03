@@ -48,7 +48,7 @@ export class VSCodeExtensions {
     );
   }
 
-  dotVSCodeExists(): boolean {
+  private dotVSCodeExists(): boolean {
     let fileStat;
     try {
       fileStat = fs.lstatSync(`${this.rootPath}.vscode`);
@@ -62,7 +62,7 @@ export class VSCodeExtensions {
     }
   }
 
-  codeIsInPath() {
+  private codeIsInPath(): boolean {
     try {
       cp.execSync('code -v');
       return true;
@@ -71,7 +71,7 @@ export class VSCodeExtensions {
     }
   }
 
-  hasRecommendations() {
+  private hasRecommendations(): boolean {
     return (
       this.parsedExtensionsFile.recommendations !== undefined &&
       Array.isArray(this.parsedExtensionsFile.recommendations) &&
