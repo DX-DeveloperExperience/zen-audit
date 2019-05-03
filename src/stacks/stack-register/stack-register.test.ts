@@ -21,8 +21,8 @@ test('getRulesByStack(stackName) should return an array containing the Rule cons
   );
   StackRegister.registerRuleForStacks([Stack1 as any])(Rule2 as any);
 
-  const rulesArray1 = StackRegister.getRulesByStack('Stack1');
-  const rulesArray2 = StackRegister.getRulesByStack('Stack2');
+  const rulesArray1 = StackRegister.getRulesByStack(Stack1.name);
+  const rulesArray2 = StackRegister.getRulesByStack(Stack2.name);
 
   expect(rulesArray1.length).toBe(2);
   expect(rulesArray2.length).toBe(1);
