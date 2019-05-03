@@ -15,13 +15,7 @@ export default interface Rule {
    * A function that applies the recommendations.
    */
   apply(): void;
-  /**
-   * Returns the name of the Rule.
-   */
   getName(): string;
-  /**
-   * Returns a description of the rule
-   */
   getDescription(): string;
   getPromptType(): string;
   getChoices(): object[];
