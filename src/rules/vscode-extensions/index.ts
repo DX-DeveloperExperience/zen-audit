@@ -141,7 +141,7 @@ export class VSCodeExtensions {
         parsedChoicesFile[stack.constructor.name],
       ),
     );
-    }
+  }
 
   getChoices() {
     return this.choices;

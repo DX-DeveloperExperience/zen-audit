@@ -1,12 +1,14 @@
 import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
 import { FileNotReadableError } from '../../errors/FileNotReadableError';
+import { StackRegister } from '../../stacks/stack-register';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
  * accent in Semver of every dependency.
  */
 @RuleRegister.register
+@StackRegister.registerRuleForAll
 export class ExactNpmVersion {
   readonly requiredFiles: string[] = ['package.json'];
   readonly rootPath: string;

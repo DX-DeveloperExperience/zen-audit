@@ -1,5 +1,6 @@
 import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
+import { StackRegister } from '../../stacks/stack-register';
 
 /**
  * This Rule will look for a .gitignore file. If it doesn't exist, applying this rule will
@@ -7,6 +8,7 @@ import * as fs from 'fs';
  * gathered from these sources: https://github.com/github/gitignore
  */
 @RuleRegister.register
+@StackRegister.registerRuleForAll
 export class GitIgnore {
   readonly requiredFiles: string[] = ['.gitignore'];
   readonly rootPath: string;
