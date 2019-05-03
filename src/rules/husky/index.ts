@@ -1,8 +1,12 @@
 import { FileNotReadableError } from '../../errors/FileNotReadableError';
 import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
+import { JavaScript } from '../../stacks/javascript';
+import { TypeScript } from '../../stacks/typescript';
+import { StackRegister } from '../../stacks/stack-register';
 
 @RuleRegister.register
+@StackRegister.registerRuleForStacks([JavaScript, TypeScript])
 export class Husky {
   readonly requiredFiles: string[] = ['package.json'];
   readonly rootPath: string;
