@@ -15,13 +15,20 @@ export class VSCodeExtensions {
   private extensionsJSON: string;
   private parsedExtensionsFile: any;
   private extensionsFileExists: boolean;
-  private choices: Choice[];
+  private choices: Choice[] = [];
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
     this.extensionsJSON = `${this.rootPath}.vscode/extensions.json`;
 
     try {
+      const parsedChoicesFile = JSON.parse(
+        fs.readFileSync(`${__dirname}/choices.json`, {
+          encoding: 'utf8',
+        }),
+      );
+      this.setChoices(parsedChoicesFile);
+
       this.parsedExtensionsFile = JSON.parse(
         fs.readFileSync(this.extensionsJSON, {
           encoding: 'utf8',
@@ -111,10 +118,16 @@ export class VSCodeExtensions {
     return 'checkbox';
   }
 
-  getChoices() {
-    const foundStacks = ListStacks.getStacksIn(this.rootPath);
-    if (foundStacks.includes(Angular.prototype)) {
-    } else if (foundStacks.includes(VueJS.prototype)) {
+  private setChoices(parsedChoicesFile: any) {
+    Array.prototype.push.apply(this.choices, parsedChoicesFile['default']);
+
+    const stacks = ListStacks.getStacksIn(this.rootPath);
+    stacks.forEach(stack =>
+      Array.prototype.push.apply(
+        this.choices,
+        parsedChoicesFile[stack.constructor.name],
+      ),
+    );
     }
 
     return this.choices;
