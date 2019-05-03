@@ -1,20 +1,6 @@
-import { RuleRegister } from '../rule-register';
-import * as fs from 'fs';
 import Rule from '../rule';
 import { StackRegister, Constructor } from '../../stacks/stack-register/index';
 import { ListStacks } from '../../stacks/list-stacks/index';
-
-// export function importRules() {
-//   // import all rules files
-//   const rulesDirPath = `${__dirname}/..`;
-//   fs.readdirSync(rulesDirPath)
-//     // .filter(path => {
-//     //   return path.endsWith('.d.ts') || path.endsWith('.ts');
-//     // })
-//     .forEach(path => {
-//       require(`${rulesDirPath}/${path.replace(/.d.ts|.ts/, '')}`);
-//     });
-// }
 
 /**
  * Returns an array of every stack instanciated object
@@ -24,19 +10,30 @@ export class ListRules {
   private static path = '';
 
   static getRulesToApplyIn(rootPath: string): Rule[] {
-    if (this.rules.length === 0 || this.path !== rootPath) {
-      // this.rules = RuleRegister.getImplementations()
-        // .map(rule => new rule(rootPath))
-        // .filter(rule => rule.shouldBeApplied());
-        ListStacks.getStacksIn(rootPath).forEach(stack => {
-          this.rules.push(StackRegister.getRulesByStack(stack.))
-        })
-      }
+    let rulesObject = {};
 
-    if (this.path === '' || this.path !== rootPath) {
+    if (this.rules.length === 0 || this.path !== rootPath) {
       this.path = rootPath;
+
+      ListStacks.getStacksIn(rootPath).forEach(stack => {
+        let rules = StackRegister.getRulesByStack(stack.constructor.name)
+          .map(rule => new rule(rootPath))
+          .filter(rule => rule.shouldBeApplied())
+          .reduce((acc, current) => {
+            return {
+              ...acc,
+              [current.getName()]: current,
+            };
+          }, {});
+
+        rulesObject = {
+          ...rulesObject,
+          ...rules,
+        };
+      });
+      ListRules.rules = Object.values(rulesObject);
     }
 
-    return this.rules;
+    return ListRules.rules;
   }
 }
