@@ -44,7 +44,8 @@ export class VSCodeExtensions {
     return (
       (this.dotVSCodeExists() && !this.extensionsFileExists) ||
       (this.extensionsFileExists && !this.hasRecommendations()) ||
-      (!this.extensionsFileExists && this.codeIsInPath())
+      (!this.extensionsFileExists && this.codeIsInPath()) ||
+      this.missRecommendations()
     );
   }
 
