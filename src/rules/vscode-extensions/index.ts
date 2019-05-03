@@ -79,6 +79,18 @@ export class VSCodeExtensions {
     );
   }
 
+  private missRecommendations(): boolean {
+    this.getChoices().forEach(choice => {
+      if (
+        !this.parsedExtensionsFile['recommendations'].includes(choice.value)
+      ) {
+        return true;
+      }
+    });
+
+    return false;
+  }
+
   apply() {
     const extensionsList = this.choices.reduce(
       (prev, curr) => {
