@@ -130,6 +130,7 @@ export class VSCodeExtensions {
     );
     }
 
+  getChoices() {
     return this.choices;
   }
 }
