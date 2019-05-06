@@ -51,7 +51,7 @@ class ProjectFillerCli extends Command {
       ]);
     });
 
-    await console.log(responses);
+    await this.log(responses);
   }
 
   async asyncForEach(array: any[], callback: any) {
