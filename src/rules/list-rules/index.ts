@@ -16,7 +16,7 @@ export class ListRules {
       this.path = rootPath;
 
       ListStacks.getStacksIn(rootPath).forEach(stack => {
-        let rules = StackRegister.getRulesByStack(stack.constructor.name)
+        const rules = StackRegister.getRulesByStack(stack.constructor.name)
           .map(rule => new rule(rootPath))
           .filter(rule => rule.shouldBeApplied())
           .reduce((acc, current) => {
