@@ -1,6 +1,7 @@
 import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
 import { StackRegister } from '../../stacks/stack-register';
+import { YesNo } from '../../choice';
 
 /**
  * This Rule will look for a .gitignore file. If it doesn't exist, applying this rule will
@@ -57,6 +58,6 @@ export class GitIgnore {
   }
 
   getChoices() {
-    return [{ name: 'Rule1', value: 1 }, { name: 'Rule2', value: 2 }];
+    return YesNo;
   }
 }
