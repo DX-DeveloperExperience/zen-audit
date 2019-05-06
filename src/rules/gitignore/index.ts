@@ -2,6 +2,8 @@ import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
 import { StackRegister } from '../../stacks/stack-register';
 import { YesNo } from '../../choice';
+import { ListStacks } from '../../stacks/list-stacks';
+import request from 'sync-request';
 
 /**
  * This Rule will look for a .gitignore file. If it doesn't exist, applying this rule will
@@ -36,7 +38,35 @@ export class GitIgnore {
    * Returns true if .gitignore
    */
   shouldBeApplied() {
-    return !this.gitIgnoreExists || this.gitIgnoreContent === '';
+    return (
+      !this.gitIgnoreExists ||
+      this.gitIgnoreContent === '' ||
+      this.missGitRules()
+    );
+  }
+
+  private missGitRules() {
+    let addedRules;
+    const gitignore = ListStacks.getStacksIn(this.rootPath).reduce(
+      (prev, curr) => {
+        const stackName = curr.name().toLowerCase();
+
+        const newRules = request(
+          'GET',
+          `https://gitignore.io/api/${stackName}`,
+          {
+            timeout: 5000,
+          },
+        )
+          .getBody()
+          .toString();
+
+        newRules.split('\n').forEach(newRule => {
+          this.gitIgnoreContent.split('\n').forEach(currRule => {});
+        });
+      },
+      '',
+    );
   }
 
   apply() {
