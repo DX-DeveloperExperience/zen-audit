@@ -2,6 +2,7 @@ import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
 import { FileNotReadableError } from '../../errors/FileNotReadableError';
 import { StackRegister } from '../../stacks/stack-register';
+import { YesNo } from '../../choice';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
@@ -156,6 +157,6 @@ export class ExactNpmVersion {
   }
 
   getChoices() {
-    return [{ name: 'Yes', value: true }, { name: 'No', value: false }];
+    return YesNo;
   }
 }
