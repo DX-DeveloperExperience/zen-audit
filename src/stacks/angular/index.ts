@@ -5,4 +5,8 @@ export class Angular {
   isInPath() {
     return true;
   }
+
+  name() {
+    return this.constructor.name;
+  }
 }

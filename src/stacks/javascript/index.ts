@@ -5,4 +5,8 @@ export class JavaScript {
   isInPath(path: string) {
     return false;
   }
+
+  name() {
+    return this.constructor.name;
+  }
 }

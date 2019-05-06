@@ -5,4 +5,8 @@ export class VueJS {
   isInPath() {
     return true;
   }
+
+  name() {
+    return this.constructor.name;
+  }
 }
