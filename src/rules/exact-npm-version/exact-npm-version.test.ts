@@ -1,11 +1,15 @@
 import { ExactNpmVersion } from '.';
 import { FileNotReadableError } from '../../errors/FileNotReadableError';
+import { jsonObjectsToCheck } from './constants';
 
 const fs = require('fs');
 
 jest.mock('fs');
+jest.mock('./constants');
 
-const objToCheck = ['firstObjectToCheck', 'secondObjectToCheck'];
+afterEach(() => {
+  jest.resetAllMocks();
+});
 
 test('Constructor should throw FileNotReadable if package.json is not readable', () => {
   function instantiate() {
@@ -30,11 +34,11 @@ test('shouldBeApplied() should return false if package.json not found', () => {
 test('Should return false if no incorrect semver is found', () => {
   const packageJSON = JSON.stringify(
     {
-      firstObjectToCheck: {
-        dep1: '0.3.4',
-        dep2: '0.5.4',
+      mockDep1: {
+        dep1: '0.2.3',
+        dep2: '0.3.0',
       },
-      secondObjectToCheck: {
+      mockDep2: {
         dep3: '1.3.4',
         dep4: '1.2.5',
       },
@@ -44,19 +48,17 @@ test('Should return false if no incorrect semver is found', () => {
   );
   fs.readFileSync.mockReturnValue(packageJSON);
 
-  expect(
-    new ExactNpmVersion(undefined, objToCheck).shouldBeApplied(),
-  ).toBeFalsy();
+  expect(new ExactNpmVersion().shouldBeApplied()).toBeFalsy();
 });
 
 test('Should return true if incorrect semver with ^ is found', () => {
   const packageJSON = JSON.stringify(
     {
-      firstObjectToCheck: {
+      mockDep1: {
         dep1: '0.3.4',
         dep2: '0.5.4',
       },
-      secondObjectToCheck: {
+      mockDep2: {
         dep3: '^1.3.4',
         dep4: '1.2.5',
       },
@@ -67,19 +69,17 @@ test('Should return true if incorrect semver with ^ is found', () => {
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
-  expect(
-    new ExactNpmVersion(undefined, objToCheck).shouldBeApplied(),
-  ).toBeTruthy();
+  expect(new ExactNpmVersion().shouldBeApplied()).toBeTruthy();
 });
 
 test('Should return true if incorrect semver with ~ is found', () => {
   const packageJSON = JSON.stringify(
     {
-      firstObjectToCheck: {
+      mockDep1: {
         dep1: '0.3.4',
         dep2: '0.5.4',
       },
-      secondObjectToCheck: {
+      mockDep2: {
         dep3: '~1.3.4',
         dep4: '1.2.5',
       },
@@ -90,19 +90,17 @@ test('Should return true if incorrect semver with ~ is found', () => {
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
-  expect(
-    new ExactNpmVersion(undefined, objToCheck).shouldBeApplied(),
-  ).toBeTruthy();
+  expect(new ExactNpmVersion().shouldBeApplied()).toBeTruthy();
 });
 
 test('Should return false if incorrect semver is in json object that does not need to be checked', () => {
   const packageJSON = JSON.stringify(
     {
-      firstObjectToCheck: {
+      mockDep1: {
         dep1: '0.3.4',
         dep2: '0.5.4',
       },
-      secondObjectToCheck: {
+      mockDep2: {
         dep3: '1.3.4',
         dep4: '1.2.5',
       },
@@ -117,19 +115,17 @@ test('Should return false if incorrect semver is in json object that does not ne
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
-  expect(
-    new ExactNpmVersion(undefined, objToCheck).shouldBeApplied(),
-  ).toBeFalsy();
+  expect(new ExactNpmVersion().shouldBeApplied()).toBeFalsy();
 });
 
 test('Should replace ^ or ~ in package.json', () => {
   const packageJSON = JSON.stringify(
     {
-      firstObjectToCheck: {
+      mockDep1: {
         dep1: '^0.3.4',
         dep2: '0.5.4',
       },
-      secondObjectToCheck: {
+      mockDep2: {
         dep3: '~1.3.4',
         dep4: '1.2.5',
       },
@@ -140,11 +136,11 @@ test('Should replace ^ or ~ in package.json', () => {
 
   const correctedJSON = JSON.stringify(
     {
-      firstObjectToCheck: {
+      mockDep1: {
         dep1: '0.3.4',
         dep2: '0.5.4',
       },
-      secondObjectToCheck: {
+      mockDep2: {
         dep3: '1.3.4',
         dep4: '1.2.5',
       },
@@ -155,19 +151,22 @@ test('Should replace ^ or ~ in package.json', () => {
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
-  expect(
-    new ExactNpmVersion(undefined, objToCheck).correctSemverNotation(),
-  ).toEqual(correctedJSON);
+  let correctSemverNotation;
+  fs.writeFileSync.mockImplementation((_path: string, correct: string) => {
+    correctSemverNotation = correct;
+  });
+  new ExactNpmVersion().apply();
+  expect(correctSemverNotation).toEqual(correctedJSON);
 });
 
 test('Should not replace ^ or ~ in package.json for object that does not need to be corrected', () => {
   const packageJSON = JSON.stringify(
     {
-      firstObjectToCheck: {
+      mockDep1: {
         dep1: '0.3.4',
         dep2: '~0.5.4',
       },
-      secondObjectToCheck: {
+      mockDep2: {
         dep3: '^1.3.4',
         dep4: '1.2.5',
       },
@@ -182,11 +181,11 @@ test('Should not replace ^ or ~ in package.json for object that does not need to
 
   const correctedJSON = JSON.stringify(
     {
-      firstObjectToCheck: {
+      mockDep1: {
         dep1: '0.3.4',
         dep2: '0.5.4',
       },
-      secondObjectToCheck: {
+      mockDep2: {
         dep3: '1.3.4',
         dep4: '1.2.5',
       },
@@ -201,13 +200,11 @@ test('Should not replace ^ or ~ in package.json for object that does not need to
 
   fs.readFileSync.mockReturnValue(packageJSON);
 
-  expect(
-    new ExactNpmVersion(undefined, objToCheck).correctSemverNotation(),
-  ).toEqual(correctedJSON);
-});
+  let correctSemverNotation;
+  fs.writeFileSync.mockImplementation((_path: string, correct: string) => {
+    correctSemverNotation = correct;
+  });
 
-test('valuesMatches should return true', () => {
-  const values = ['value', 'test'];
-
-  expect(new ExactNpmVersion().valuesMatches(values, /test/)).toBeTruthy();
+  new ExactNpmVersion().apply();
+  expect(correctSemverNotation).toEqual(correctedJSON);
 });
