@@ -54,7 +54,7 @@ export class GitIgnore {
   }
 
   getPromptType() {
-    return 'checkbox';
+    return 'list';
   }
 
   getChoices() {
