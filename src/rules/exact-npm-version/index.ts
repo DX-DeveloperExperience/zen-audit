@@ -21,12 +21,10 @@ export class ExactNpmVersion {
     '^(\\^|\\~)((([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)$',
     'g',
   );
-  readonly jsonObjectsToCheck: string[];
   private jsonObjToCheckFound: string[] = [];
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
-    this.jsonObjectsToCheck = jsonObjectsToCheck;
     this.packageJSONPath = `${this.rootPath}package.json`;
 
     try {
@@ -72,7 +70,7 @@ export class ExactNpmVersion {
    * @param values An array of string containing the values to match the regexp
    * @param regex A RegExp that will try to match with values
    */
-  valuesMatches(values: string[], regex: RegExp): boolean {
+  private valuesMatches(values: string[], regex: RegExp): boolean {
     return values.some(val => !!val.match(regex));
   }
 
@@ -88,7 +86,7 @@ export class ExactNpmVersion {
   /**
    * The replacement function that returns the semver without the tild or circumflex accents
    */
-  correctSemverNotation(): string {
+  private correctSemverNotation(): string {
     this.jsonObjToCheckFound.forEach(jsonObjName => {
       this.parsedFile[jsonObjName] = this.replaceMatchingEntriesForObj(
         jsonObjName,
@@ -103,7 +101,7 @@ export class ExactNpmVersion {
    * @param jsonObjName
    * @param regex
    */
-  replaceMatchingEntriesForObj(jsonObjName: string, regex: RegExp) {
+  private replaceMatchingEntriesForObj(jsonObjName: string, regex: RegExp) {
     const entries: string[][] = Object.entries(this.parsedFile[jsonObjName]);
     const changedEntries = entries.map(([dep, val]) => {
       if (val.match(regex)) {
@@ -126,6 +124,7 @@ export class ExactNpmVersion {
     return result;
   }
 
+  private findJsonObjectsToCheck() {
     return jsonObjectsToCheck.filter(val => {
       return Object.keys(this.parsedFile).includes(val);
     });
