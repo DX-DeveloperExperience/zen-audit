@@ -47,7 +47,9 @@ export class GitIgnore {
   }
 
   getDescription() {
-    return `${this.description} Choose the rules you would like to apply: `;
+    return `${
+      this.description
+    }This rule will add rules to your .gitignore, corresponding to found stacks. Would you like to apply it ?`;
   }
 
   getPromptType() {
