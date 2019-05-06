@@ -2,6 +2,7 @@ import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
 import { FileNotReadableError } from '../../errors/FileNotReadableError';
 import { StackRegister } from '../../stacks/stack-register';
+import { jsonObjectsToCheck } from './constants';
 import { YesNo } from '../../choice';
 
 /**
@@ -23,16 +24,7 @@ export class ExactNpmVersion {
   readonly jsonObjectsToCheck: string[];
   private jsonObjToCheckFound: string[] = [];
 
-  constructor(
-    rootPath: string = './',
-    jsonObjectsToCheck: string[] = [
-      'dependencies',
-      'devDependencies',
-      'bundledDependencies',
-      'optionalDependencies',
-      'peerDependencies',
-    ],
-  ) {
+  constructor(rootPath: string = './') {
     this.rootPath = rootPath;
     this.jsonObjectsToCheck = jsonObjectsToCheck;
     this.packageJSONPath = `${this.rootPath}package.json`;
@@ -62,7 +54,7 @@ export class ExactNpmVersion {
     if (!this.packageFileExists) {
       return false;
     }
-    this.jsonObjectsToCheck.forEach(jsonObjStr => {
+    jsonObjectsToCheck.forEach(jsonObjStr => {
       const jsonObj = this.parsedFile[jsonObjStr];
 
       if (jsonObj !== undefined) {
@@ -134,8 +126,7 @@ export class ExactNpmVersion {
     return result;
   }
 
-  findJsonObjectsToCheck() {
-    return this.jsonObjectsToCheck.filter(val => {
+    return jsonObjectsToCheck.filter(val => {
       return Object.keys(this.parsedFile).includes(val);
     });
   }
