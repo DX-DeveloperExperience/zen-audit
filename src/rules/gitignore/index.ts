@@ -28,7 +28,7 @@ export class GitIgnore {
       this.gitIgnoreExists = true;
     } catch (err) {
       this.gitIgnoreExists = false;
-      this.description = 'The .gitignore file was not found.';
+      this.description = 'The .gitignore file was not found. ';
     }
   }
 
