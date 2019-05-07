@@ -19,6 +19,7 @@ export class GitIgnore {
   private gitIgnorePath: string;
   private gitIgnoreExists: boolean;
   private description: string = '';
+  private missingRules: string = '';
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
@@ -46,10 +47,9 @@ export class GitIgnore {
   }
 
   private missGitRules() {
-    let addedRules;
-    const gitignore = ListStacks.getStacksIn(this.rootPath).reduce(
-      (prev, curr) => {
-        const stackName = curr.name().toLowerCase();
+    this.missingRules = ListStacks.getStacksIn(this.rootPath).reduce(
+      (keptRules, currStack) => {
+        const stackName = currStack.name().toLowerCase();
 
         const newRules = request(
           'GET',
@@ -61,16 +61,33 @@ export class GitIgnore {
           .getBody()
           .toString();
 
+        let addedRules: string = '';
         newRules.split('\n').forEach(newRule => {
-          this.gitIgnoreContent.split('\n').forEach(currRule => {});
+          let addRule: boolean = true;
+
+          // if a line from the gitignore api starts with a #, ignore it and go to next line
+          if (newRule.trim().startsWith('#')) return;
+
+          this.gitIgnoreContent.split('\n').forEach(currRule => {
+            if (newRule.trim() === currRule.trim()) {
+              addRule = false;
+            }
+          });
+          addedRules += addRule ? newRule + '\n' : '';
         });
+        return keptRules + addedRules;
       },
       '',
     );
+    return this.missingRules !== '';
   }
 
   apply() {
-    // TODO
+    fs.writeFileSync(
+      this.gitIgnorePath,
+      this.gitIgnoreContent + '\n' + this.missingRules.trim(),
+      { encoding: 'utf8' },
+    );
   }
 
   getName() {
