@@ -1,6 +1,5 @@
 import { ExactNpmVersion } from '.';
 import { FileNotReadableError } from '../../errors/FileNotReadableError';
-import { jsonObjectsToCheck } from './constants';
 
 const fs = require('fs');
 
