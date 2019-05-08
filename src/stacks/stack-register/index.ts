@@ -51,7 +51,7 @@ export class StackRegister {
 
   static registerRuleForAll<P extends Constructor<Rule>>(ruleCtor: P) {
     StackRegister.getImplementations().forEach(stackCtor => {
-      this.rulesByStack[stackCtor.name].push(ruleCtor);
+      StackRegister.rulesByStack[stackCtor.name].push(ruleCtor);
     });
   }
 }
