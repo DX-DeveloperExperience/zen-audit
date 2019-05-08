@@ -13,7 +13,7 @@ export class ListStacks {
     if (this.stacks.length === 0 || this.path !== rootPath) {
       this.stacks = StackRegister.getImplementations()
         .map(stack => new stack(rootPath))
-        .filter(stack => stack.isInPath(rootPath));
+        .filter(stack => stack.isAvailable(rootPath));
     }
 
     return this.stacks;

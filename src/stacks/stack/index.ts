@@ -1,4 +1,4 @@
 export default interface Stack {
-  isInPath(path: string): boolean;
+  isAvailable(path: string): boolean;
   name(): string;
 }
