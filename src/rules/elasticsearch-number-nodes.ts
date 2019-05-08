@@ -1,6 +1,6 @@
-import { RuleRegister } from '../rule-register';
-import { Elasticsearch } from '../../stacks/elasticsearch';
-import { StackRegister } from '../../stacks/stack-register';
+import { RuleRegister } from './rule-register';
+import { Elasticsearch } from '../stacks/elasticsearch';
+import { StackRegister } from '../stacks/stack-register';
 import request from 'sync-request';
 
 @RuleRegister.register
