@@ -27,7 +27,7 @@ export class GitIgnore {
     try {
       this.gitIgnoreContent = fs.readFileSync(this.gitIgnorePath, {
         encoding: 'utf8',
-      });
+      }).trim();
       this.gitIgnoreExists = true;
     } catch (err) {
       this.gitIgnoreExists = false;
@@ -66,7 +66,7 @@ export class GitIgnore {
           let addRule: boolean = true;
 
           // if a line from the gitignore api starts with a #, ignore it and go to next line
-          if (newRule.trim().startsWith('#')) return;
+          if (newRule.trim().startsWith('#')) { return; }
 
           this.gitIgnoreContent.split('\n').forEach(currRule => {
             if (newRule.trim() === currRule.trim()) {
