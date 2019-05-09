@@ -40,9 +40,10 @@ export class GitIgnore {
    */
   shouldBeApplied() {
     return (
-      !this.gitIgnoreExists ||
-      this.gitIgnoreContent === '' ||
-      this.missGitRules()
+      !this.rootPath.startsWith('http') &&
+      (!this.gitIgnoreExists ||
+        this.gitIgnoreContent === '' ||
+        this.missGitRules())
     );
   }
 
