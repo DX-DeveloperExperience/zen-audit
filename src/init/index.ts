@@ -1,28 +1,15 @@
 import * as fs from 'fs';
 
-function importRules() {
-  // import all rules files
-  const rulesDirPath = `${__dirname}/../rules/`;
-  fs.readdirSync(rulesDirPath)
-    // .filter(path => {
-    //   return path.endsWith('.d.ts') || path.endsWith('.ts');
-    // })
+function importClassesIn(rootPath: string) {
+  fs.readdirSync(rootPath)
     .forEach(path => {
-      require(`${rulesDirPath}/${path.replace(/.d.ts|.ts/, '')}`);
+      const fStat = fs.lstatSync(path);
+      if (fStat.isFile() || fStat.isSymbolicLink()) {
+        importClassesIn(path);
+      }
+      require(`${rootPath}/${path.replace(/.d.ts|.ts/, '')}`);
     });
 }
 
-function importStacks() {
-  // import all stacks files
-  const stacksDirPath = `${__dirname}/../stacks/`;
-  fs.readdirSync(stacksDirPath)
-    .filter(path => {
-      return path.endsWith('.d.ts') || path.endsWith('.ts');
-    })
-    .forEach(path => {
-      require(`${stacksDirPath}/${path.replace(/.d.ts|.ts/, '')}`);
-    });
-}
-
-importRules();
-importStacks();
+importClassesIn(`${__dirname}/../rules/`);
+importClassesIn(`${__dirname}/../stacks/`);
