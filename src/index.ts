@@ -25,13 +25,13 @@ class ProjectFillerCli extends Command {
     }),
   };
 
-  static args = [{ name: 'file' }];
+  static args = [{ name: 'path' }];
 
   async run() {
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
     let path;
-    if (args.file !== undefined) {
-      path = args.file.endsWith('/') ? args.file : args.file + '/';
+    if (args.path !== undefined) {
+      path = args.path.endsWith('/') ? args.path : args.path + '/';
     } else {
       path = './';
     }

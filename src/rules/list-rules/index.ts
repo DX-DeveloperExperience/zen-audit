@@ -15,7 +15,13 @@ export class ListRules {
     if (this.rules.length === 0 || this.path !== rootPath) {
       this.path = rootPath;
 
-      ListStacks.getStacksIn(rootPath).forEach(stack => {
+      const stacks = ListStacks.getStacksIn(rootPath);
+
+      console.log(
+        `Stacks found : ` + stacks.map(stack => stack.name()).join(', '),
+      );
+
+      stacks.forEach(stack => {
         const rules = StackRegister.getRulesByStack(stack.constructor.name)
           .map(rule => new rule(rootPath))
           .filter(rule => rule.shouldBeApplied())
