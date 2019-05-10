@@ -7,3 +7,5 @@ export const YesNo = [
   { name: 'Yes', value: true },
   { name: 'No', value: false },
 ];
+
+export const Ok = [{ name: 'Understood', value: true }];
