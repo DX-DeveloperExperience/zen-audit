@@ -24,21 +24,11 @@ export class ElasticsearchNodes {
     return Object.keys(elasticsearchResponse.nodes).length < 3;
   }
 
-  apply() {}
-
   getName() {
     return 'Elasticsearch Nodes';
   }
 
   getDescription() {
     return 'An Elasticsearch cluster should at least has 3 nodes';
-  }
-
-  getPromptType() {
-    return '';
-  }
-
-  getChoices() {
-    return [];
   }
 }

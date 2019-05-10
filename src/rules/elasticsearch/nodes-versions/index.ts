@@ -28,21 +28,11 @@ export class ElasticsearchNodes {
     return set.size > 1;
   }
 
-  apply() {}
-
   getName() {
     return 'Elasticsearch Version';
   }
 
   getDescription() {
     return 'An Elasticsearch cluster should have all nodes using the same version of Elasticsearch';
-  }
-
-  getPromptType() {
-    return '';
-  }
-
-  getChoices() {
-    return [];
   }
 }
