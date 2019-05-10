@@ -2,6 +2,7 @@ import { RuleRegister } from '../../rule-register';
 import { Elasticsearch } from '../../../stacks/elasticsearch';
 import { StackRegister } from '../../../stacks/stack-register';
 import request from 'sync-request';
+import { Ok } from '../../../choice';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
@@ -34,5 +35,13 @@ export class ElasticsearchNodes {
 
   getDescription() {
     return 'An Elasticsearch cluster should have all nodes using the same version of Elasticsearch';
+  }
+
+  getPromptType() {
+    return 'list';
+  }
+
+  getChoices() {
+    return Ok;
   }
 }
