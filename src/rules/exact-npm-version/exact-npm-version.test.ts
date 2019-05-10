@@ -151,7 +151,7 @@ test('Should replace ^ or ~ in package.json', () => {
   fs.readFileSync.mockReturnValue(packageJSON);
 
   let correctSemverNotation;
-  fs.writeFileSync.mockImplementation((_path: string, correct: string) => {
+  fs.writeFileSync.mockImplementation((_P: string, correct: string) => {
     correctSemverNotation = correct;
   });
   new ExactNpmVersion().apply();
@@ -200,7 +200,7 @@ test('Should not replace ^ or ~ in package.json for object that does not need to
   fs.readFileSync.mockReturnValue(packageJSON);
 
   let correctSemverNotation;
-  fs.writeFileSync.mockImplementation((_path: string, correct: string) => {
+  fs.writeFileSync.mockImplementation((_P: string, correct: string) => {
     correctSemverNotation = correct;
   });
 

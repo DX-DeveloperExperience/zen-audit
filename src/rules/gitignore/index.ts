@@ -67,7 +67,9 @@ export class GitIgnore {
           let addRule: boolean = true;
 
           // if a line from the gitignore api starts with a #, ignore it and go to next line
-          if (newRule.trim().startsWith('#')) { return; }
+          if (newRule.trim().startsWith('#')) {
+            return;
+          }
 
           this.gitIgnoreContent.split('\n').forEach(currRule => {
             if (newRule.trim() === currRule.trim()) {

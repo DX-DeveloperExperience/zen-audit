@@ -63,7 +63,7 @@ test('shouldBeApplied should return true if .gitignore file does not contain eve
   });
 
   let resultGitignore;
-  fs.writeFileSync.mockImplementation((_path: string, result: string) => {
+  fs.writeFileSync.mockImplementation((_P: string, result: string) => {
     resultGitignore = result;
   });
 

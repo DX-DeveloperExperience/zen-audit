@@ -17,9 +17,9 @@ export class ListRules {
 
       const stacks = ListStacks.getStacksIn(rootPath);
 
-      console.log(
-        `Stacks found : ` + stacks.map(stack => stack.name()).join(', '),
-      );
+      // console.log(
+      //   `Stacks found : ` + stacks.map(stack => stack.name()).join(', '),
+      // );
 
       stacks.forEach(stack => {
         const rules = StackRegister.getRulesByStack(stack.constructor.name)
