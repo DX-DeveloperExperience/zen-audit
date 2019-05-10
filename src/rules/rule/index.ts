@@ -8,6 +8,6 @@ export default interface Rule {
   apply?: (choices: Choice[]) => void;
   getName(): string;
   getDescription(): string;
-  getPromptType?: () => string;
-  getChoices?: () => object[];
+  getPromptType(): string;
+  getChoices(): object[];
 }
