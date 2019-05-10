@@ -1,6 +1,6 @@
-import { RuleRegister } from './rule-register';
-import { Elasticsearch } from '../stacks/elasticsearch';
-import { StackRegister } from '../stacks/stack-register';
+import { RuleRegister } from '../../rule-register';
+import { Elasticsearch } from '../../../stacks/elasticsearch';
+import { StackRegister } from '../../../stacks/stack-register';
 import request from 'sync-request';
 
 @RuleRegister.register
@@ -21,17 +21,21 @@ export class ElasticsearchNodes {
         .getBody()
         .toString(),
     );
-    return Object.keys(elasticsearchResponse.nodes).length < 3;
+    const versions = Object.values(elasticsearchResponse.nodes).map(
+      (node: any) => node.version,
+    );
+    const set = new Set(versions);
+    return set.size > 1;
   }
 
   apply() {}
 
   getName() {
-    return 'Elasticsearch Nodes';
+    return 'Elasticsearch Version';
   }
 
   getDescription() {
-    return 'An Elasticsearch cluster should at least has 3 nodes';
+    return 'An Elasticsearch cluster should have all nodes using the same version of Elasticsearch';
   }
 
   getPromptType() {
