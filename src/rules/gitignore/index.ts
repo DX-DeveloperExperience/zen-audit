@@ -54,15 +54,14 @@ export class GitIgnore {
       (keptRules, currStack) => {
         const stackName = currStack.name().toLowerCase();
 
-        const newRules = request(
-          'GET',
-          `https://gitignore.io/api/${stackName}`,
-          {
+        let newRules = '';
+        try {
+          newRules = request('GET', `https://gitignore.io/api/${stackName}`, {
             timeout: 5000,
-          },
-        )
+          })
           .getBody()
           .toString();
+        } catch (err) {}
 
         let addedRules: string = '';
         newRules.split('\n').forEach((newRule: string) => {
