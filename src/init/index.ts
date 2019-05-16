@@ -1,14 +1,18 @@
 import * as fs from 'fs';
 
-function importClassesIn(rootPath: string) {
+export function importClassesIn(rootPath: string) {
   fs.readdirSync(rootPath).forEach(path => {
-    const stat = fs.lstatSync(path);
+    const fullPath = rootPath + '/' + path;
+    const stat = fs.lstatSync(fullPath);
     if (stat.isDirectory()) {
-      importClassesIn(path);
+      importClassesIn(fullPath);
+    } else if (path.startsWith('index.')) {
+      require(`${rootPath}`);
     }
-    require(`${rootPath}/${path.replace(/.d.ts|.ts/, '')}`);
   });
 }
 
-importClassesIn(`${__dirname}/../rules/`);
-importClassesIn(`${__dirname}/../stacks/`);
+export function init() {
+  importClassesIn(`${__dirname}/../rules/`);
+  importClassesIn(`${__dirname}/../stacks/`);
+}

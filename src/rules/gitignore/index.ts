@@ -25,9 +25,11 @@ export class GitIgnore {
     this.rootPath = rootPath;
     this.gitIgnorePath = `${this.rootPath}.gitignore`;
     try {
-      this.gitIgnoreContent = fs.readFileSync(this.gitIgnorePath, {
-        encoding: 'utf8',
-      });
+      this.gitIgnoreContent = fs
+        .readFileSync(this.gitIgnorePath, {
+          encoding: 'utf8',
+        })
+        .trim();
       this.gitIgnoreExists = true;
     } catch (err) {
       this.gitIgnoreExists = false;

@@ -37,21 +37,25 @@ class ProjectFillerCli extends Command {
     }
 
     const rules = ListRules.getRulesToApplyIn(path);
-    let responses;
+    const responses: object[] = [];
     this.log('Scanning your project...');
     await this.asyncForEach(rules, async (rule: Rule) => {
       this.log(`Rule found: ${rule.getName()}`);
-      responses = await inquirer.prompt([
-        {
-          name: rule.getName(),
-          message: rule.getDescription(),
-          type: rule.getPromptType(),
-          choices: rule.getChoices(),
-        },
-      ]);
+      responses.push(
+        await inquirer.prompt([
+          {
+            name: rule.getName(),
+            message: rule.getDescription(),
+            type: rule.getPromptType(),
+            choices: rule.getChoices(),
+          },
+        ]),
+      );
     });
 
-    await this.log(responses);
+    await this.asyncForEach(responses, async (resp: object) => {
+      // console.log(resp);
+    });
   }
 
   async asyncForEach(array: any[], callback: any) {
