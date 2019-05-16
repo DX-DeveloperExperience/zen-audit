@@ -1,5 +1,5 @@
 import { TypeScript } from '../../stacks/typescript';
-import { JavaScript } from '../../stacks/javascript';
+import { Node } from '../../stacks/node';
 import { StackRegister } from '../../stacks/stack-register';
 import { FileNotReadableError } from '../../errors/FileNotReadableError';
 import { RuleRegister } from '../rule-register';
@@ -9,7 +9,7 @@ import * as fs from 'fs';
  * Looks for Prettier dependency in package.json, and add it if necessary.
  */
 @RuleRegister.register
-@StackRegister.registerRuleForStacks([JavaScript, TypeScript])
+@StackRegister.registerRuleForStacks([Node, TypeScript])
 export class Prettier {
   readonly requiredFiles: string[] = ['package.json'];
   readonly rootPath: string;
