@@ -2,7 +2,9 @@ import { ListRules } from './rules/list-rules';
 import { Command, flags, run } from '@oclif/command';
 import * as inquirer from 'inquirer';
 import Rule from './rules/rule';
-import './init';
+import { init } from './init/index';
+
+init();
 
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
