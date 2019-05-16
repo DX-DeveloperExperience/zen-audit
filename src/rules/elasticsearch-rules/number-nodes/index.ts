@@ -24,8 +24,6 @@ export class ElasticsearchNodes {
     return Object.keys(elasticsearchResponse.nodes).length < 3;
   }
 
-  apply() {}
-
   getName() {
     return 'Elasticsearch Nodes';
   }
