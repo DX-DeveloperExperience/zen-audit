@@ -1,8 +1,10 @@
 import { ListRules } from './rules/list-rules';
 import { Command, flags, run } from '@oclif/command';
 import * as inquirer from 'inquirer';
+import * as Path from 'path';
 import Rule from './rules/rule';
 import { init } from './init/index';
+import { ListStacks } from './stacks/list-stacks/index';
 
 init();
 
@@ -31,16 +33,21 @@ class ProjectFillerCli extends Command {
 
   async run() {
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
-    let path;
+    let path = './';
+
     if (args.path !== undefined) {
       path = args.path.endsWith('/') ? args.path : args.path + '/';
-    } else {
-      path = './';
+    }
+
+    if (!Path.isAbsolute(path)) {
+      path = Path.resolve(path);
     }
 
     const rules = ListRules.getRulesToApplyIn(path);
     const responses: object[] = [];
     this.log('Scanning your project...');
+    ListStacks.getStacksIn;
+
     await this.asyncForEach(rules, async (rule: Rule) => {
       this.log(`Rule found: ${rule.getName()}`);
       responses.push(
