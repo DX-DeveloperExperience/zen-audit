@@ -5,6 +5,7 @@ import { TypeScript } from '../../stacks/typescript';
 import request from 'sync-request';
 import * as cp from 'child_process';
 import * as fs from 'fs';
+import { YesNo } from '../../choice';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([JavaScript, TypeScript])
@@ -43,9 +44,6 @@ export class NodeVersion {
 
   shouldBeApplied() {
     return this.isCritical() || this.isOutdated();
-  }
-  apply() {
-    //
   }
 
   private isCritical() {
@@ -87,6 +85,6 @@ export class NodeVersion {
   }
 
   getChoices() {
-    return [{ name: 'Yes', value: true }, { name: 'No', value: false }];
+    return YesNo;
   }
 }

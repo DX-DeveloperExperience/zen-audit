@@ -82,9 +82,7 @@ export class VSCodeExtensions {
 
   private missRecommendations(): boolean {
     this.getChoices().forEach(choice => {
-      if (
-        !this.parsedExtensionsFile['recommendations'].includes(choice.value)
-      ) {
+      if (!this.parsedExtensionsFile.recommendations.includes(choice.value)) {
         return true;
       }
     });
@@ -132,7 +130,7 @@ export class VSCodeExtensions {
   }
 
   private setChoices(parsedChoicesFile: any) {
-    Array.prototype.push.apply(this.choices, parsedChoicesFile['default']);
+    Array.prototype.push.apply(this.choices, parsedChoicesFile.default);
 
     const stacks = ListStacks.getStacksIn(this.rootPath);
     stacks.forEach(stack =>
