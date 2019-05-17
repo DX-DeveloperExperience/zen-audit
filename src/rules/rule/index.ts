@@ -5,7 +5,7 @@ import Choice from '../../choice';
  */
 export default interface Rule {
   shouldBeApplied(): boolean;
-  apply?: (choices: Choice[]) => void;
+  apply?: (answers?: string[]) => void;
   getName(): string;
   getDescription(): string;
   getPromptType(): string;
