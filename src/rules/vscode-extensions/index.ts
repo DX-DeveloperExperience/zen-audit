@@ -6,6 +6,7 @@ import { ListStacks } from '../../stacks/list-stacks';
 import Choice from '../../choice';
 import * as fs from 'fs';
 import * as cp from 'child_process';
+import { choices } from './constants';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Angular, VueJS])
@@ -15,20 +16,13 @@ export class VSCodeExtensions {
   private extensionsJSON: string;
   private parsedExtensionsFile: any;
   private extensionsFileExists: boolean;
-  private choices: Choice[] = [];
+  private missingRecommendations: string[] = [];
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
     this.extensionsJSON = `${this.rootPath}.vscode/extensions.json`;
 
     try {
-      const parsedChoicesFile = JSON.parse(
-        fs.readFileSync(`${__dirname}/choices.json`, {
-          encoding: 'utf8',
-        }),
-      );
-      this.setChoices(parsedChoicesFile);
-
       this.parsedExtensionsFile = JSON.parse(
         fs.readFileSync(this.extensionsJSON, {
           encoding: 'utf8',
@@ -45,7 +39,7 @@ export class VSCodeExtensions {
       (this.dotVSCodeExists() && !this.extensionsFileExists) ||
       (this.extensionsFileExists && !this.hasRecommendations()) ||
       (!this.extensionsFileExists && this.codeIsInPath()) ||
-      this.missRecommendations()
+      this.getMissingRecommendations().length != 0
     );
   }
 
@@ -80,36 +74,27 @@ export class VSCodeExtensions {
     );
   }
 
-  private missRecommendations(): boolean {
-    this.getChoices().forEach(choice => {
-      if (!this.parsedExtensionsFile.recommendations.includes(choice.value)) {
-        return true;
-      }
-    });
+  private getMissingRecommendations(): string[] {
+    if (this.missingRecommendations.length == 0) {
+      this.getExtensionsList().forEach(choice => {
+        if (!this.parsedExtensionsFile.recommendations.includes(choice)) {
+          this.missingRecommendations.push(choice);
+        }
+      });
+    }
 
-    return false;
+    return this.missingRecommendations;
   }
 
   apply() {
-    const extensionsList = this.choices.reduce(
-      (prev, curr) => {
-        return [...prev, ...curr.value];
-      },
-      [''],
-    );
-
-    const extensionsJson = JSON.stringify(
-      {
-        recommendations: extensionsList,
-      },
-      null,
-      '\t',
-    );
+    this.getMissingRecommendations().forEach(mr => {
+      this.parsedExtensionsFile.recommendations.push(mr);
+    });
 
     try {
       fs.writeFileSync(
         `${this.rootPath}/.vscode/extensions.json`,
-        extensionsJson,
+        this.parsedExtensionsFile,
         { encoding: 'utf8' },
       );
     } catch (err) {
@@ -129,19 +114,19 @@ export class VSCodeExtensions {
     return 'checkbox';
   }
 
-  private setChoices(parsedChoicesFile: any) {
-    Array.prototype.push.apply(this.choices, parsedChoicesFile.default);
-
-    const stacks = ListStacks.getStacksIn(this.rootPath);
-    stacks.forEach(stack =>
-      Array.prototype.push.apply(
-        this.choices,
-        parsedChoicesFile[stack.constructor.name],
-      ),
-    );
+  getExtensionsList(): string[] {
+    return this.getChoices().map(choice => choice.value as string);
   }
 
-  getChoices() {
-    return this.choices;
+  getChoices(): Choice[] {
+    const stacks = ListStacks.getStacksIn(this.rootPath);
+
+    return stacks.reduce(
+      (keptChoices, stack) => {
+        const choicesByStack: Choice[] = choices[stack.name()];
+        return [...keptChoices, ...choicesByStack];
+      },
+      [{} as Choice],
+    );
   }
 }
