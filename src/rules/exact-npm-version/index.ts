@@ -10,7 +10,7 @@ import { YesNo } from '../../choice';
  * accent in Semver of every dependency.
  */
 @RuleRegister.register
-@StackRegister.registerRuleForAll
+@StackRegister.registerRuleForAll()
 export class ExactNpmVersion {
   readonly requiredFiles: string[] = ['package.json'];
   readonly rootPath: string;

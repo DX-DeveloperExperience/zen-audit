@@ -1,10 +1,12 @@
 import Rule from '../../rules/rule';
 import Stack from '../stack';
+import { Class } from '@babel/types';
 
 export interface Constructor<T> {
   new (...args: any[]): T;
   readonly prototype: T;
 }
+type RegisterRuleForAllOptions = { excludes?: Constructor<Stack>[] };
 
 /**
  * This class is a register for all implementations of the Stack interface.
@@ -49,9 +51,16 @@ export class StackRegister {
     };
   }
 
-  static registerRuleForAll<P extends Constructor<Rule>>(ruleCtor: P) {
-    StackRegister.getImplementations().forEach(stackCtor => {
-      StackRegister.rulesByStack[stackCtor.name].push(ruleCtor);
-    });
+  static registerRuleForAll(options: RegisterRuleForAllOptions = {}) {
+    return function<P extends Constructor<Rule>>(ruleCtor: P) {
+      StackRegister.getImplementations()
+        .filter(
+          stackCtor =>
+            options.excludes && !options.excludes.includes(stackCtor),
+        )
+        .forEach(stackCtor => {
+          StackRegister.rulesByStack[stackCtor.name].push(ruleCtor);
+        });
+    };
   }
 }

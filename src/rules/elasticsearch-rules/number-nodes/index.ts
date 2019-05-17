@@ -5,7 +5,7 @@ import request from 'sync-request';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
-export class ElasticsearchNodes {
+export class ElasticsearchNodesNumber {
   requiredFiles = [''];
   rootPath: string;
 
