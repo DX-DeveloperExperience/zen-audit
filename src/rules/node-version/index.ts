@@ -1,4 +1,4 @@
-import { JavaScript } from '../../stacks/javascript';
+import { Node } from '../../stacks/node';
 import { RuleRegister } from '../rule-register';
 import { StackRegister } from '../../stacks/stack-register';
 import { TypeScript } from '../../stacks/typescript';
@@ -8,7 +8,7 @@ import * as fs from 'fs';
 import { YesNo } from '../../choice';
 
 @RuleRegister.register
-@StackRegister.registerRuleForStacks([JavaScript, TypeScript])
+@StackRegister.registerRuleForStacks([Node, TypeScript])
 export class NodeVersion {
   readonly requiredFiles: string[] = [];
   readonly rootPath: string;

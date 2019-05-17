@@ -13,6 +13,6 @@ export function importClassesIn(rootPath: string) {
 }
 
 export function init() {
-  importClassesIn(`${__dirname}/../rules/`);
   importClassesIn(`${__dirname}/../stacks/`);
+  importClassesIn(`${__dirname}/../rules/`);
 }
