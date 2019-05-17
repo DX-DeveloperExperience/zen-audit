@@ -77,12 +77,10 @@ export class ExactNpmVersion {
   /**
    * Removes tilds or circumflex inside package.json's dependencies' Semvers
    */
-  apply(choices: Choice[]) {
-    if (choices[0].value === true) {
-      fs.writeFileSync(this.packageJSONPath, this.correctSemverNotation(), {
-        encoding: 'utf8',
-      });
-    }
+  apply() {
+    fs.writeFileSync(this.packageJSONPath, this.correctSemverNotation(), {
+      encoding: 'utf8',
+    });
   }
 
   /**

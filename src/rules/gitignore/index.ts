@@ -86,14 +86,12 @@ export class GitIgnore {
     return this.missingRules !== '';
   }
 
-  apply(choices: Choice[]) {
-    if (choices[0].value === true) {
-      fs.writeFileSync(
-        this.gitIgnorePath,
-        this.gitIgnoreContent + '\n' + this.missingRules.trim(),
-        { encoding: 'utf8' },
-      );
-    }
+  apply() {
+    fs.writeFileSync(
+      this.gitIgnorePath,
+      this.gitIgnoreContent + '\n' + this.missingRules.trim(),
+      { encoding: 'utf8' },
+    );
   }
 
   getName() {
