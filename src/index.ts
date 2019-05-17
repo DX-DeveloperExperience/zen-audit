@@ -69,10 +69,6 @@ class ProjectFillerCli extends Command {
     }
 
     const rules = ListRules.getRulesToApplyIn(path);
-    const responses: object[] = [];
-    this.log('Scanning your project...');
-    ListStacks.getStacksIn;
-
     await this.asyncForEach(rules, async (rule: Rule) => {
       this.log(`Rule found: ${rule.getName()}`);
       // responses.push(
@@ -90,7 +86,7 @@ class ProjectFillerCli extends Command {
             const answer = Object.values(answers)[0];
             if (Array.isArray(answer) && answer.length !== 0) {
               rule.apply(answer);
-            } else if (answer) {
+            } else if (answer === true) {
               rule.apply();
             }
           }
