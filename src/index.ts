@@ -40,7 +40,7 @@ class ProjectFillerCli extends Command {
     }
 
     if (!Path.isAbsolute(path)) {
-      path = Path.resolve(path);
+      path = Path.resolve(path) + '/';
     }
 
     const rules = ListRules.getRulesToApplyIn(path);
