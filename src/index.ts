@@ -1,8 +1,14 @@
 import { ListRules } from './rules/list-rules';
 import { Command, flags, run } from '@oclif/command';
+import { cli } from 'cli-ux';
 import * as inquirer from 'inquirer';
 import Rule from './rules/rule';
 import { init } from './init/index';
+import { flagUsages } from '@oclif/parser';
+import { boolean } from '@oclif/parser/lib/flags';
+import { ListStacks } from './stacks/list-stacks';
+import { StackRegister } from './stacks/stack-register';
+import { RuleRegister } from './rules/rule-register';
 
 init();
 
@@ -25,12 +31,32 @@ class ProjectFillerCli extends Command {
       char: 'r',
       description: 'Search for rules that may apply to your project',
     }),
+    list: flags.boolean({
+      char: 'l',
+      description: 'List all rules and stacks available',
+    }),
   };
 
   static args = [{ name: 'path' }];
 
   async run() {
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
+
+    if (runFlags.list) {
+      this.log('Stacks available:');
+      const stacks = StackRegister.getImplementations();
+      cli.table(stacks, {
+        name: {},
+        rules: {
+          get: stack =>
+            StackRegister.getRulesByStack(stack.name)
+              .map(rule => rule.name)
+              .join(', '),
+        },
+      });
+      return;
+    }
+
     let path;
     if (args.path !== undefined) {
       path = args.path.endsWith('/') ? args.path : args.path + '/';
