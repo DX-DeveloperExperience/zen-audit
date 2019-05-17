@@ -1,4 +1,10 @@
-export const choices: any = {
+import Choice from '../../choice';
+
+type ChoiceList = {
+  [stack: string]: Choice[];
+};
+
+export const choices: ChoiceList = {
   default: [{ name: 'GitLens', value: 'eamodio.gitlens' }],
   Angular: [
     { name: 'Angular Language Service', value: 'angular.ng-template' },

@@ -9,5 +9,5 @@ export default interface Rule {
   getName(): string;
   getDescription(): string;
   getPromptType(): string;
-  getChoices(): object[];
+  getChoices(): Choice[];
 }

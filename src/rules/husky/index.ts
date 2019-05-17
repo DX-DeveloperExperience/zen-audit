@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import { Node } from '../../stacks/node';
 import { TypeScript } from '../../stacks/typescript';
 import { StackRegister } from '../../stacks/stack-register';
+import { YesNo } from '../../choice/index';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
@@ -64,6 +65,6 @@ export class Husky {
   }
 
   getChoices() {
-    return [{ name: 'Rule1', value: 1 }, { name: 'Rule2', value: 2 }];
+    return YesNo;
   }
 }

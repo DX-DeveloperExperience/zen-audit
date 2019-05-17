@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import { FileNotReadableError } from '../../errors/FileNotReadableError';
 import { StackRegister } from '../../stacks/stack-register';
 import { jsonObjectsToCheck } from './constants';
-import { YesNo } from '../../choice';
+import Choice, { YesNo } from '../../choice';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
@@ -77,10 +77,12 @@ export class ExactNpmVersion {
   /**
    * Removes tilds or circumflex inside package.json's dependencies' Semvers
    */
-  apply() {
-    fs.writeFileSync(this.packageJSONPath, this.correctSemverNotation(), {
-      encoding: 'utf8',
-    });
+  apply(choices: Choice[]) {
+    if (choices[0].value === true) {
+      fs.writeFileSync(this.packageJSONPath, this.correctSemverNotation(), {
+        encoding: 'utf8',
+      });
+    }
   }
 
   /**
