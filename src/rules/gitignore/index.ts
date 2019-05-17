@@ -1,7 +1,7 @@
 import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
 import { StackRegister } from '../../stacks/stack-register';
-import { YesNo } from '../../choice';
+import Choice, { YesNo } from '../../choice';
 import { ListStacks } from '../../stacks/list-stacks';
 import request from 'sync-request';
 
@@ -59,8 +59,8 @@ export class GitIgnore {
           newRules = request('GET', `https://gitignore.io/api/${stackName}`, {
             timeout: 5000,
           })
-          .getBody()
-          .toString();
+            .getBody()
+            .toString();
         } catch (err) {}
 
         let addedRules: string = '';
@@ -86,12 +86,14 @@ export class GitIgnore {
     return this.missingRules !== '';
   }
 
-  apply() {
-    fs.writeFileSync(
-      this.gitIgnorePath,
-      this.gitIgnoreContent + '\n' + this.missingRules.trim(),
-      { encoding: 'utf8' },
-    );
+  apply(choices: Choice[]) {
+    if (choices[0].value === true) {
+      fs.writeFileSync(
+        this.gitIgnorePath,
+        this.gitIgnoreContent + '\n' + this.missingRules.trim(),
+        { encoding: 'utf8' },
+      );
+    }
   }
 
   getName() {
