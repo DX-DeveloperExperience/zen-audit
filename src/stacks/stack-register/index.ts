@@ -6,7 +6,9 @@ export interface Constructor<T> {
   new (...args: any[]): T;
   readonly prototype: T;
 }
-type RegisterRuleForAllOptions = { excludes?: Constructor<Stack>[] };
+interface RegisterRuleForAllOptions {
+  excludes?: Array<Constructor<Stack>>;
+}
 
 /**
  * This class is a register for all implementations of the Stack interface.
@@ -52,7 +54,7 @@ export class StackRegister {
   }
 
   static registerRuleForAll(options: RegisterRuleForAllOptions = {}) {
-    return function<P extends Constructor<Rule>>(ruleCtor: P) {
+    return <P extends Constructor<Rule>>(ruleCtor: P) => {
       StackRegister.getImplementations()
         .filter(
           stackCtor =>
