@@ -1,7 +1,5 @@
 import { RuleRegister } from '../rule-register';
 import { StackRegister } from '../../stacks/stack-register';
-import { Angular } from '../../stacks/angular';
-import { VueJS } from '../../stacks/vue-js';
 import { ListStacks } from '../../stacks/list-stacks';
 import Choice from '../../choice';
 import * as fs from 'fs';
@@ -9,7 +7,7 @@ import * as cp from 'child_process';
 import { choices } from './constants';
 
 @RuleRegister.register
-@StackRegister.registerRuleForStacks([Angular, VueJS])
+@StackRegister.registerRuleForAll({ excludes: [] })
 export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
   readonly rootPath: string;
@@ -86,15 +84,21 @@ export class VSCodeExtensions {
     return this.missingRecommendations;
   }
 
-  apply() {
-    this.getMissingRecommendations().forEach(mr => {
+  apply(answers: string[]) {
+    if (this.parsedExtensionsFile === undefined) {
+      this.parsedExtensionsFile = {
+        recommendations: [],
+      };
+    }
+
+    answers.forEach(mr => {
       this.parsedExtensionsFile.recommendations.push(mr);
     });
 
     try {
       fs.writeFileSync(
         `${this.rootPath}/.vscode/extensions.json`,
-        this.parsedExtensionsFile,
+        JSON.stringify(this.parsedExtensionsFile, null, '\t'),
         { encoding: 'utf8' },
       );
     } catch (err) {
@@ -124,9 +128,13 @@ export class VSCodeExtensions {
     return stacks.reduce(
       (keptChoices, stack) => {
         const choicesByStack: Choice[] = choices[stack.name()];
-        return [...keptChoices, ...choicesByStack];
+        if (choicesByStack !== undefined) {
+          return [...keptChoices, ...choicesByStack];
+        }
+
+        return [...keptChoices];
       },
-      [{} as Choice],
+      [...choices.default],
     );
   }
 }
