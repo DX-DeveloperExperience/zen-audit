@@ -4,6 +4,7 @@ import { StackRegister } from '../../stacks/stack-register';
 import { YesNo } from '../../choice';
 import { ListStacks } from '../../stacks/list-stacks';
 import request from 'sync-request';
+import { Elasticsearch } from '../../stacks/elasticsearch';
 
 /**
  * This Rule will look for a .gitignore file. If it doesn't exist, applying this rule will
@@ -11,7 +12,7 @@ import request from 'sync-request';
  * gathered from these sources: https://github.com/github/gitignore
  */
 @RuleRegister.register
-@StackRegister.registerRuleForAll
+@StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
 export class GitIgnore {
   readonly requiredFiles: string[] = ['.gitignore'];
   readonly rootPath: string;
