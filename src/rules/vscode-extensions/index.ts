@@ -133,17 +133,37 @@ export class VSCodeExtensions {
 
   getChoices(): Choice[] {
     const stacks = ListStacks.getStacksIn(this.rootPath);
-
+    const existingRecommendations = this.parsedExtensionsFile.recommendations;
     return stacks.reduce(
       (keptChoices, stack) => {
-        const choicesByStack: Choice[] = choices[stack.name()];
+        let choicesByStack: Choice[];
+
+        // If some recommendations are existing...
+        if (
+          existingRecommendations !== undefined &&
+          existingRecommendations.length === 0
+        ) {
+          // ...remove them from recommendations to add
+          choicesByStack = choices[stack.name()].reduce(
+            (kept, curr) => {
+              if (!this.parsedExtensionsFile.includes(curr)) {
+                return [...kept, curr];
+              } else {
+                return [...kept];
+              }
+            },
+            [{} as Choice],
+          );
+        } else {
+          choicesByStack = choices[stack.name()];
+        }
         if (choicesByStack !== undefined) {
           return [...keptChoices, ...choicesByStack];
         }
 
         return [...keptChoices];
       },
-      [...choices.default],
+      [{} as Choice],
     );
   }
 }
