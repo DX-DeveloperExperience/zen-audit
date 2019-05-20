@@ -1,4 +1,4 @@
-import { VSCodeExtensions } from '../../rules/vscode-extensions';
+import { VSCodeExtensions } from '.';
 
 const fs = require('fs');
 jest.mock('fs');
