@@ -92,7 +92,9 @@ export class VSCodeExtensions {
     }
 
     answers.forEach(mr => {
-      this.parsedExtensionsFile.recommendations.push(mr);
+      if (!this.parsedExtensionsFile.recommendations.includes(mr)) {
+        this.parsedExtensionsFile.recommendations.push(mr);
+      }
     });
 
     // Create .vscode directory if it does not exist
@@ -132,38 +134,46 @@ export class VSCodeExtensions {
   }
 
   getChoices(): Choice[] {
-    const stacks = ListStacks.getStacksIn(this.rootPath);
-    const existingRecommendations = this.parsedExtensionsFile.recommendations;
-    return stacks.reduce(
-      (keptChoices, stack) => {
+    const stackNames = ListStacks.getStacksIn(this.rootPath).map(stack => {
+      return stack.name();
+    });
+
+    let existingRecommendations: string[] = [];
+    if (this.parsedExtensionsFile !== undefined) {
+      existingRecommendations = this.parsedExtensionsFile.recommendations;
+    }
+
+    return stackNames.reduce(
+      (keptChoices, stackName) => {
         let choicesByStack: Choice[];
 
-        // If some recommendations are existing...
-        if (
-          existingRecommendations !== undefined &&
-          existingRecommendations.length === 0
-        ) {
-          // ...remove them from recommendations to add
-          choicesByStack = choices[stack.name()].reduce(
-            (kept, curr) => {
-              if (!this.parsedExtensionsFile.includes(curr)) {
-                return [...kept, curr];
-              } else {
+        if (choices[stackName] !== undefined) {
+          // If some recommendations are existing...
+          if (
+            existingRecommendations !== undefined &&
+            existingRecommendations.length !== 0
+          ) {
+            // ...do not add choices that are included in these recommendations
+            choicesByStack = choices[stackName].reduce(
+              (kept, curr) => {
+                if (!existingRecommendations.includes(curr.value as string)) {
+                  return [...kept, curr];
+                }
                 return [...kept];
-              }
-            },
-            [{} as Choice],
-          );
-        } else {
-          choicesByStack = choices[stack.name()];
-        }
-        if (choicesByStack !== undefined) {
-          return [...keptChoices, ...choicesByStack];
+              },
+              [] as Choice[],
+            );
+          } else {
+            choicesByStack = choices[stackName];
+          }
+          if (choicesByStack !== undefined) {
+            return [...keptChoices, ...choicesByStack];
+          }
         }
 
         return [...keptChoices];
       },
-      [{} as Choice],
+      [] as Choice[],
     );
   }
 }
