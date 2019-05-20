@@ -37,7 +37,7 @@ export class VSCodeExtensions {
       (this.dotVSCodeExists() && !this.extensionsFileExists) ||
       (this.extensionsFileExists && !this.hasRecommendations()) ||
       (!this.extensionsFileExists && this.codeIsInPath()) ||
-      this.getMissingRecommendations().length != 0
+      this.getMissingRecommendations().length !== 0
     );
   }
 
@@ -73,7 +73,7 @@ export class VSCodeExtensions {
   }
 
   private getMissingRecommendations(): string[] {
-    if (this.missingRecommendations.length == 0) {
+    if (this.missingRecommendations.length === 0) {
       this.getExtensionsList().forEach(choice => {
         if (!this.parsedExtensionsFile.recommendations.includes(choice)) {
           this.missingRecommendations.push(choice);
