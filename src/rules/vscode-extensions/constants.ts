@@ -1,8 +1,8 @@
 import Choice from '../../choice';
 
-type ChoiceList = {
+interface ChoiceList {
   [stack: string]: Choice[];
-};
+}
 
 export const choices: ChoiceList = {
   default: [{ name: 'GitLens', value: 'eamodio.gitlens' }],
