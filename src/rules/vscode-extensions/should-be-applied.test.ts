@@ -103,13 +103,11 @@ test('Method shouldBeApplied() should return true if .vscode/extension.json does
   });
 
   fs.lstatSync.mockImplementation((param: string) => {
-    if (param === `${rootPath}.vscode`) {
-      return {
-        isDirectory() {
-          return true;
-        },
-      };
-    }
+    return {
+      isDirectory() {
+        return true;
+      },
+    };
   });
 
   cp.execSync.mockImplementation((param: string) => {
@@ -123,12 +121,11 @@ test('Method shouldBeApplied() should return true if .vscode/extension.json does
   vsCodeExtension.getChoices = jest.fn(() => {
     return [
       { name: 'extension1', value: 'ext1' },
-      { name: 'extension2', value: 'ext2' },
       { name: 'extension3', value: 'ext3' },
     ];
   });
 
-  expect(new VSCodeExtensions(rootPath).shouldBeApplied()).toBeTruthy();
+  expect(vsCodeExtension.shouldBeApplied()).toBeTruthy();
 });
 
 test('Method shouldBeApplied() should return false if .vscode/extension.json contains all recommended extensions', () => {
@@ -137,11 +134,7 @@ test('Method shouldBeApplied() should return false if .vscode/extension.json con
   });
 
   fs.readFileSync.mockImplementation((param: string) => {
-    if (param === `${rootPath}.vscode/extensions.json`) {
-      return extensionsJSON;
-    } else if (param === `${__dirname}/choices.json`) {
-      return '{}';
-    }
+    return extensionsJSON;
   });
 
   fs.lstatSync.mockImplementation((param: string) => {
