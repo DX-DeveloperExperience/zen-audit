@@ -1,7 +1,7 @@
 import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
 import { StackRegister } from '../../stacks/stack-register';
-import Choice, { YesNo } from '../../choice';
+import { YesNo } from '../../choice';
 import { ListStacks } from '../../stacks/list-stacks';
 import request from 'sync-request';
 import { Elasticsearch } from '../../stacks/elasticsearch';
@@ -56,14 +56,19 @@ export class GitIgnore {
         const stackName = currStack.name().toLowerCase();
 
         let newRules = '';
+
+        // Get new rules from gitignore.io API
         try {
           newRules = request('GET', `https://gitignore.io/api/${stackName}`, {
             timeout: 5000,
           })
             .getBody()
             .toString();
-        } catch (err) {}
+        } catch (err) {
+          // TODO
+        }
 
+        // Keep only rules that are not already in the .gitignore file
         let addedRules: string = '';
         newRules.split('\n').forEach((newRule: string) => {
           let addRule: boolean = true;
