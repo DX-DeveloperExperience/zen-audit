@@ -1,7 +1,7 @@
 {
   "name": "@dxdeveloperexperience/project-starter",
   "description": "A tool to gather everything you need to deploy a new project",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "author": "Zenika - Demey Emmanuel - Lafrance Antoine",
   "bin": {
     "project-starter-cli": "./bin/run"
@@ -18,7 +18,7 @@
     "tslib": "1.9.3"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "1.21.2",
+    "@oclif/dev-cli": "1.22.0",
     "@oclif/tslint": "3.1.1",
     "@types/jest": "24.0.9",
     "@types/node": "10.12.29",
@@ -61,9 +61,9 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p . -t stylish",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "test:cov": "jest --coverage --runInBand",
-    "jest-cache": "jest --clearCache",
+    "jest-cache": "jest --clearCache --detectOpenHandles",
     "audit": "npm audit",
     "oclif-pack": "oclif-dev pack",
     "prettier-test": "prettier -l \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -88,6 +88,9 @@
       "jsx",
       "json",
       "node"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.*/__mocks__"
     ]
   },
   "prettier": {
