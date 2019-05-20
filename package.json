@@ -70,7 +70,7 @@
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "ci": "npm-run-all audit jest-cache prettier-test lint test",
     "version": "oclif-dev readme && git add README.md",
-    "publish": "npm publish --access public"
+    "publish-npm": "npm publish --access public"
   },
   "types": "lib/index.d.ts",
   "jest": {
