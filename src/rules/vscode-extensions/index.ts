@@ -95,6 +95,15 @@ export class VSCodeExtensions {
       this.parsedExtensionsFile.recommendations.push(mr);
     });
 
+    // Create .vscode directory if it does not exist
+    if (!fs.existsSync(`${this.rootPath}/.vscode`)) {
+      try {
+        fs.mkdirSync(`${this.rootPath}/.vscode`);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
     try {
       fs.writeFileSync(
         `${this.rootPath}/.vscode/extensions.json`,
