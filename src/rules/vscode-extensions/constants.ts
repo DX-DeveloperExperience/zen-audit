@@ -17,4 +17,6 @@ export const choices: ChoiceList = {
     { name: 'ESLint', value: 'dbaeumer.vscode-eslint' },
     { name: 'Prettier', value: 'esbenp.prettier-vscode' },
   ],
+  TypeScript: [{ name: 'Prettier', value: 'esbenp.prettier-vscode' }],
+  Node: [{ name: 'Prettier', value: 'esbenp.prettier-vscode' }],
 };
