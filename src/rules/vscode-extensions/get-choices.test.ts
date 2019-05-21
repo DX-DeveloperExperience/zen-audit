@@ -58,5 +58,7 @@ test('Method getChoices should not add already existing extensions in choice lis
   const vsCodeExtensions = new VSCodeExtensions(rootPath);
 
   const choices = vsCodeExtensions.getChoices();
+
   expect(choices.length).toEqual(1);
+  expect(choices[0].value).toEqual('ext2');
 });
