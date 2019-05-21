@@ -1,0 +1,9 @@
+{
+  "extends": ["config:base"],
+  "assignees": ["@ig1na"],
+  "baseBranches": ["develop"],
+  "vulnerabilityAlerts": {
+    "labels": ["security"],
+    "assignees": ["@develop"]
+  }
+}
