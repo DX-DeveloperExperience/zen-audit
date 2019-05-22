@@ -1,12 +1,23 @@
 import { StackRegister } from '../stack-register';
+import * as fs from 'fs';
 
 @StackRegister.register
 export class Node {
-  isAvailable(path: string) {
+  constructor(readonly rootPath: string = './') {}
+
+  isAvailable() {
     try {
-      return require(`${path}/package.json`);
+      require(`${this.rootPath}package.json`);
+      return true;
     } catch (e) {
+      console.log(e);
       return false;
+    }
+  }
+
+  parsedPackage() {
+    if (this.isAvailable()) {
+      return require(`${this.rootPath}package.json`);
     }
   }
 

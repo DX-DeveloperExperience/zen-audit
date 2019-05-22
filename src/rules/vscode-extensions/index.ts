@@ -102,7 +102,7 @@ export class VSCodeExtensions {
       try {
         fs.mkdirSync(`${this.rootPath}/.vscode`);
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     }
 
