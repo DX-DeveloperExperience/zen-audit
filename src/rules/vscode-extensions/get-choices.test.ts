@@ -14,7 +14,7 @@ afterEach(() => {
   jest.resetAllMocks();
 });
 
-test('Method getChoices should give us a list of choices corresponding to stacks', () => {
+test('should give us a list of choices corresponding to stacks', () => {
   ListStacks.getStacksIn = jest.fn(() => {
     return [
       {
@@ -36,13 +36,13 @@ test('Method getChoices should give us a list of choices corresponding to stacks
   expect(choices.length).toEqual(2);
 });
 
-test('Method getChoices should not add already existing extensions in choice list', () => {
-  const extensionsJSON = JSON.stringify({
+test('should not add already existing extensions in choice list', () => {
+  const extensionsJSON = {
     recommendations: ['ext1'],
-  });
+  };
 
-  fs.readFileSync.mockImplementation(() => {
-    return extensionsJSON;
+  jest.mock('root/.vscode/extensions.json', () => extensionsJSON, {
+    virtual: true,
   });
 
   ListStacks.getStacksIn = jest.fn(() => {

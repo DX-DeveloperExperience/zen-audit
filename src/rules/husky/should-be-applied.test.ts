@@ -1,9 +1,4 @@
-import { FileNotReadableError } from '../../errors/FileNotReadableError';
 import { Husky } from '.';
-import { Node } from '../../stacks/node/index';
-
-const fs = require('fs');
-jest.mock('fs');
 
 test('shouldBeApplied() should return true if package.json does not contain devDependencies', () => {
   const packageJSON = {
@@ -16,11 +11,9 @@ test('shouldBeApplied() should return true if package.json does not contain devD
     },
   };
 
-  const husky = new Husky();
-  husky.parsedPackage = jest.fn(() => {
-    return packageJSON;
-  });
+  jest.mock('./package.json', () => packageJSON, { virtual: true });
 
+  const husky = new Husky();
   expect(husky.shouldBeApplied()).toBeTruthy();
 });
 
@@ -32,11 +25,9 @@ test('shouldBeApplied() should return true if husky is not in devDependencies', 
     },
   };
 
-  const husky = new Husky();
-  husky.parsedPackage = jest.fn(() => {
-    return packageJSON;
-  });
+  jest.mock('./package.json', () => packageJSON, { virtual: true });
 
+  const husky = new Husky();
   expect(husky.shouldBeApplied()).toBeTruthy();
 });
 
@@ -48,11 +39,9 @@ test('shouldBeApplied should return false if husky is in devDependencies', () =>
     },
   };
 
-  const husky = new Husky();
-  husky.parsedPackage = jest.fn(() => {
-    return packageJSON;
-  });
+  jest.mock('./package.json', () => packageJSON, { virtual: true });
 
+  const husky = new Husky();
   expect(husky.shouldBeApplied()).toBeTruthy();
 });
 
@@ -67,10 +56,8 @@ test('shouldBeApplied should return true if husky is something else than a depen
     },
   };
 
-  const husky = new Husky();
-  husky.parsedPackage = jest.fn(() => {
-    return packageJSON;
-  });
+  jest.mock('./package.json', () => packageJSON, { virtual: true });
 
+  const husky = new Husky();
   expect(husky.shouldBeApplied()).toBeTruthy();
 });
