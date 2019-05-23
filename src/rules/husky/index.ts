@@ -3,27 +3,27 @@ import { Node } from '../../stacks/node';
 import { TypeScript } from '../../stacks/typescript';
 import { StackRegister } from '../../stacks/stack-register';
 import { YesNo } from '../../choice/index';
-import { exec } from 'child_process';
+import * as fs from 'fs-extra';
 import * as util from 'util';
-import * as fs from 'fs';
+import * as cp from 'child_process';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class Husky {
   private packagePath: string;
+  private parsedPackage: any;
 
   constructor(readonly rootPath: string = './') {
     this.packagePath = `${this.rootPath}package.json`;
+    this.parsedPackage = require(this.packagePath);
   }
 
   apply() {
-    const asyncExec = util.promisify(exec);
-    const asyncWriteFile = util.promisify(fs.writeFile);
-    const asyncReadFile = util.promisify(fs.readFile);
+    const exec = util.promisify(cp.exec);
 
-    return asyncExec('npm i -DE husky', { cwd: this.rootPath })
+    return exec('npm i -DE husky', { cwd: this.rootPath })
       .then(out => {
-        return asyncReadFile(this.packagePath, { encoding: 'utf-8' });
+        return fs.readFile(this.packagePath, { encoding: 'utf-8' });
       })
       .then(data => {
         const parsed = JSON.parse(data);
@@ -33,7 +33,7 @@ export class Husky {
           },
         };
 
-        return asyncWriteFile(
+        return fs.writeFile(
           this.packagePath,
           JSON.stringify(parsed, null, '\t'),
           {
@@ -42,7 +42,6 @@ export class Husky {
         );
       })
       .catch((err: Error) => {
-        // console.log(err);
         return err;
       });
   }
@@ -53,13 +52,9 @@ export class Husky {
 
   isInDevDep(): boolean {
     return (
-      this.parsedPackage().devDependencies !== undefined &&
-      this.parsedPackage().husky !== undefined
+      this.parsedPackage.devDependencies !== undefined &&
+      this.parsedPackage.husky !== undefined
     );
-  }
-
-  parsedPackage(): any {
-    return require(this.packagePath);
   }
 
   getName(): string {

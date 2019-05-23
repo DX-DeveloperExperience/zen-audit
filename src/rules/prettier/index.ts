@@ -11,33 +11,12 @@ import * as fs from 'fs';
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class Prettier {
-  readonly requiredFiles: string[] = ['package.json'];
-  readonly rootPath: string;
-  private packageJSON: string;
-  private packageFileExists: boolean;
-  private parsedFile: any;
+  private packagePath: string;
+  private parsedPackage: any;
 
-  constructor(rootPath?: string) {
-    if (rootPath === undefined) {
-      this.rootPath = './';
-    } else {
-      this.rootPath = rootPath;
-    }
-
-    this.packageJSON = `${this.rootPath}package.json`;
-
-    try {
-      this.parsedFile = JSON.parse(
-        fs.readFileSync(this.packageJSON, { encoding: 'utf8' }),
-      );
-      this.packageFileExists = true;
-    } catch (err) {
-      if (err.code === 'ENOENT') {
-        this.packageFileExists = false;
-      } else {
-        throw new FileNotReadableError(this.packageJSON);
-      }
-    }
+  constructor(private readonly path: string = './') {
+    this.packagePath = `${path}package.json`;
+    this.parsedPackage = require(this.packagePath);
   }
 
   apply() {
@@ -45,17 +24,18 @@ export class Prettier {
   }
 
   shouldBeApplied() {
-    return this.packageFileExists && !this.isInDevDep();
+    return !this.isInDevDep();
   }
 
   isInDevDep() {
     return (
-      this.hasDevDep() && this.parsedFile.devDependencies.prettier !== undefined
+      this.hasDevDep() &&
+      this.parsedPackage.devDependencies.prettier !== undefined
     );
   }
 
   hasDevDep() {
-    return this.parsedFile.devDependencies !== undefined;
+    return this.parsedPackage.devDependencies !== undefined;
   }
 
   getName() {

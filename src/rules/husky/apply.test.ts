@@ -1,8 +1,7 @@
 import { Node } from '../../stacks/node/index';
 import { Husky } from './index';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as Path from 'path';
-import FileUtils from '../../file-utils/index';
 
 const rootPath = Path.resolve('./src/rules/husky/__mocks__/') + '/';
 
@@ -12,15 +11,12 @@ const packageJSON = {
 };
 
 beforeEach(() => {
-  fs.mkdirSync(rootPath);
-  fs.writeFileSync(
-    `${rootPath}package.json`,
-    JSON.stringify(packageJSON, null, '\t'),
-  );
+  fs.ensureFileSync(`${rootPath}package.json`);
+  fs.writeJSONSync(`${rootPath}package.json`, packageJSON, { spaces: '\t' });
 });
 
 afterEach(() => {
-  FileUtils.deleteRecursively(rootPath);
+  fs.removeSync(rootPath);
 });
 
 jest.setTimeout(60000);
@@ -28,6 +24,7 @@ jest.setTimeout(60000);
 test('Method apply() should add husky to devDependencies', () => {
   const husky = new Husky(rootPath);
   const node = new Node(rootPath);
+
   expect(node.isAvailable()).toBeTruthy();
 
   return husky.apply().then(() => {

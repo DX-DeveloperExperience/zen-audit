@@ -2,7 +2,7 @@ import { RuleRegister } from '../rule-register';
 import { StackRegister } from '../../stacks/stack-register';
 import { ListStacks } from '../../stacks/list-stacks';
 import Choice from '../../choice';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import { choices } from './constants';
 
@@ -11,24 +11,21 @@ import { choices } from './constants';
 export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
   readonly rootPath: string;
-  private extensionsJSON: string;
+  private extensionsJSONPath: string;
   private parsedExtensionsFile: any;
   private extensionsFileExists: boolean;
   private missingRecommendations: string[] = [];
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
-    this.extensionsJSON = `${this.rootPath}.vscode/extensions.json`;
+    this.extensionsJSONPath = `${this.rootPath}.vscode/extensions.json`;
 
     try {
-      this.parsedExtensionsFile = JSON.parse(
-        fs.readFileSync(this.extensionsJSON, {
-          encoding: 'utf8',
-        }),
-      );
+      this.parsedExtensionsFile = require(this.extensionsJSONPath);
       this.extensionsFileExists = true;
-    } catch (err) {
+    } catch (e) {
       this.extensionsFileExists = false;
+      // console.log(e);
     }
   }
 
