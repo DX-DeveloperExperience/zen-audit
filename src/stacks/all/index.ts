@@ -6,6 +6,12 @@ export default class All {
     return true;
   }
 
+  isAvailableProm(): Promise<boolean> {
+    return new Promise<boolean>(resolve => {
+      resolve(true);
+    });
+  }
+
   name() {
     return this.constructor.name;
   }
