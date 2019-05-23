@@ -33,15 +33,17 @@ export class Husky {
           },
         };
 
-        console.log(data);
-        console.log(parsed);
-
-        asyncWriteFile(this.packagePath, JSON.stringify(parsed, null, '\t'), {
-          encoding: 'utf-8',
-        });
+        return asyncWriteFile(
+          this.packagePath,
+          JSON.stringify(parsed, null, '\t'),
+          {
+            encoding: 'utf-8',
+          },
+        );
       })
       .catch((err: Error) => {
-        console.log(err);
+        // console.log(err);
+        return err;
       });
   }
 
