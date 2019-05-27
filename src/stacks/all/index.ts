@@ -2,14 +2,8 @@ import { StackRegister } from '../stack-register';
 
 @StackRegister.register
 export default class All {
-  isAvailable() {
+  async isAvailable(): Promise<boolean> {
     return true;
-  }
-
-  isAvailableProm(): Promise<boolean> {
-    return new Promise<boolean>(resolve => {
-      resolve(true);
-    });
   }
 
   name() {

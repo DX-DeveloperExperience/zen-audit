@@ -19,17 +19,10 @@ export class Elasticsearch {
     }
   }
 
-  isAvailable() {
+  async isAvailable(): Promise<boolean> {
     return this.rootPath.startsWith(`http`) && this.isElasticsearchResponse();
   }
 
-  isAvailableProm(): Promise<boolean> {
-    return new Promise<boolean>(resolve => {
-      resolve(
-        this.rootPath.startsWith('http') && this.isElasticsearchResponse(),
-      );
-    });
-  }
   name() {
     return this.constructor.name;
   }

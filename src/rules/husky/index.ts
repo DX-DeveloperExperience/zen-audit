@@ -46,7 +46,7 @@ export class Husky {
       });
   }
 
-  shouldBeApplied() {
+  async shouldBeApplied() {
     return !this.isInDevDep();
   }
 

@@ -23,7 +23,7 @@ export class Prettier {
     // TODO
   }
 
-  shouldBeApplied() {
+  async shouldBeApplied() {
     return !this.isInDevDep();
   }
 

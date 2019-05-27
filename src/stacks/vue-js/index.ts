@@ -2,12 +2,17 @@ import { StackRegister } from '../stack-register';
 
 @StackRegister.register
 export class VueJS {
-  isAvailable(path: string) {
+  constructor(private readonly rootPath: string = './') {}
+
+  async isAvailable(): Promise<boolean> {
     try {
-      const packageJson = require(`${path}/package.json`);
+      const packageJson = require(`${this.rootPath}/package.json`);
       return Object.keys(packageJson.dependencies).includes('vue');
     } catch (e) {
-      return false;
+      if (e.code === 'MODULE_NOT_FOUND') {
+        return false;
+      }
+      throw e;
     }
   }
 

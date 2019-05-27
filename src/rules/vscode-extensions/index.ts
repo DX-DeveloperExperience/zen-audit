@@ -29,12 +29,12 @@ export class VSCodeExtensions {
     }
   }
 
-  shouldBeApplied() {
+  async shouldBeApplied() {
     return (
       (this.dotVSCodeExists() && !this.extensionsFileExists) ||
       (this.extensionsFileExists && !this.hasRecommendations()) ||
       (!this.extensionsFileExists && this.codeIsInPath()) ||
-      this.getMissingRecommendations().length !== 0
+      (await this.getMissingRecommendations().length) !== 0
     );
   }
 
@@ -71,10 +71,12 @@ export class VSCodeExtensions {
 
   private getMissingRecommendations(): string[] {
     if (this.missingRecommendations.length === 0) {
-      this.getExtensionsList().forEach(choice => {
-        if (!this.parsedExtensionsFile.recommendations.includes(choice)) {
-          this.missingRecommendations.push(choice);
-        }
+      this.getExtensionsList().then(extensionsList => {
+        extensionsList.forEach(choice => {
+          if (!this.parsedExtensionsFile.recommendations.includes(choice)) {
+            this.missingRecommendations.push(choice);
+          }
+        });
       });
     }
 
@@ -126,51 +128,58 @@ export class VSCodeExtensions {
     return 'checkbox';
   }
 
-  getExtensionsList(): string[] {
-    return this.getChoices().map(choice => choice.value as string);
+  getExtensionsList(): Promise<string[]> {
+    return this.getChoices().then((choices: Choice[]) => {
+      return choices.map(choice => choice.value as string);
+    });
   }
 
-  getChoices(): Choice[] {
-    const stackNames = ListStacks.getStacksIn(this.rootPath).map(stack => {
-      return stack.name();
-    });
-
-    let existingRecommendations: string[] = [];
-    if (this.parsedExtensionsFile !== undefined) {
-      existingRecommendations = this.parsedExtensionsFile.recommendations;
-    }
-
-    return stackNames.reduce(
-      (keptChoices, stackName) => {
-        let choicesByStack: Choice[];
-
-        if (choices[stackName] !== undefined) {
-          // If some recommendations are existing...
-          if (
-            existingRecommendations !== undefined &&
-            existingRecommendations.length !== 0
-          ) {
-            // ...do not add choices that are included in these recommendations
-            choicesByStack = choices[stackName].reduce(
-              (kept, curr) => {
-                if (!existingRecommendations.includes(curr.value as string)) {
-                  return [...kept, curr];
-                }
-                return [...kept];
-              },
-              [] as Choice[],
-            );
-          } else {
-            choicesByStack = choices[stackName];
-          }
-          if (choicesByStack !== undefined) {
-            return [...keptChoices, ...choicesByStack];
-          }
-        }
-
-        return [...keptChoices];
-      },
-      [] as Choice[],
+  getChoices(): Promise<Choice[]> {
+    const stackNamesPromise = ListStacks.getStacksIn(this.rootPath).then(
+      stacks =>
+        stacks.map(stack => {
+          return stack.name();
+        }),
     );
+
+    return stackNamesPromise.then(stackNames => {
+      let existingRecommendations: string[] = [];
+      if (this.parsedExtensionsFile !== undefined) {
+        existingRecommendations = this.parsedExtensionsFile.recommendations;
+      }
+
+      return stackNames.reduce(
+        (keptChoices, stackName) => {
+          let choicesByStack: Choice[];
+
+          if (choices[stackName] !== undefined) {
+            // If some recommendations are existing...
+            if (
+              existingRecommendations !== undefined &&
+              existingRecommendations.length !== 0
+            ) {
+              // ...do not add choices that are included in these recommendations
+              choicesByStack = choices[stackName].reduce(
+                (kept, curr) => {
+                  if (!existingRecommendations.includes(curr.value as string)) {
+                    return [...kept, curr];
+                  }
+                  return [...kept];
+                },
+                [] as Choice[],
+              );
+            } else {
+              choicesByStack = choices[stackName];
+            }
+            if (choicesByStack !== undefined) {
+              return [...keptChoices, ...choicesByStack];
+            }
+          }
+
+          return [...keptChoices];
+        },
+        [] as Choice[],
+      );
+    });
   }
 }

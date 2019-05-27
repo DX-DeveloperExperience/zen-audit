@@ -9,17 +9,16 @@ export class Node {
     this.packagePath = `${this.rootPath}package.json`;
   }
 
-  isAvailable() {
-    try {
-      require(this.packagePath);
-      return true;
-    } catch (e) {
-      console.log(e);
-      return false;
-    }
-  }
+  // async isAvailable() {
+  //   try {
+  //     require(this.packagePath);
+  //     return true;
+  //   } catch (e) {
+  //     return false;
+  //   }
+  // }
 
-  isAvailableProm(): Promise<boolean> {
+  isAvailable(): Promise<boolean> {
     return fs
       .readFile(this.packagePath, 'utf-8')
       .then(() => {

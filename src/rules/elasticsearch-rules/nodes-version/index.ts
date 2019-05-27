@@ -1,7 +1,8 @@
 import { RuleRegister } from '../../rule-register';
 import { Elasticsearch } from '../../../stacks/elasticsearch';
 import { StackRegister } from '../../../stacks/stack-register';
-import request from 'sync-request';
+import * as request from 'request-promise';
+import * as PromiseBlu from 'bluebird';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
@@ -13,19 +14,15 @@ export class ElasticsearchNodesVersion {
     this.rootPath = rootPath;
   }
 
-  shouldBeApplied() {
-    const elasticsearchResponse = JSON.parse(
-      request('GET', this.rootPath + '_nodes', {
-        timeout: 3000,
-      })
-        .getBody()
-        .toString(),
-    );
-    const versions = Object.values(elasticsearchResponse.nodes).map(
-      (node: any) => node.version,
-    );
-    const set = new Set(versions);
-    return set.size > 1;
+  async shouldBeApplied(): Promise<boolean> {
+    return request(`${this.rootPath}_nodes`).then(data => {
+      const versions = Object.values(JSON.parse(data).nodes).map(
+        (node: any) => node.version,
+      );
+
+      const set = new Set(versions);
+      return set.size > 1;
+    });
   }
 
   getName() {

@@ -5,11 +5,8 @@ import * as inquirer from 'inquirer';
 import * as Path from 'path';
 import Rule from './rules/rule';
 import { init } from './init/index';
-import { flagUsages } from '@oclif/parser';
-import { boolean } from '@oclif/parser/lib/flags';
-import { ListStacks } from './stacks/list-stacks';
 import { StackRegister } from './stacks/stack-register';
-import { RuleRegister } from './rules/rule-register';
+import * as PromiseBlu from 'bluebird';
 
 init();
 
@@ -45,7 +42,7 @@ class ProjectFillerCli extends Command {
 
     if (runFlags.list) {
       this.log('Stacks available:');
-      const stacks = StackRegister.getImplementations();
+      const stacks = StackRegister.getConstructors();
       cli.table(stacks, {
         name: {},
         rules: {
@@ -68,17 +65,16 @@ class ProjectFillerCli extends Command {
       path = Path.resolve(path) + '/';
     }
 
-    const rules = ListRules.getRulesToApplyIn(path);
-    await this.asyncForEach(rules, async (rule: Rule) => {
+    const rules = await ListRules.getRulesToApplyIn(path);
+    await PromiseBlu.each(rules, async (rule: Rule) => {
       this.log(`Rule found: ${rule.getName()}`);
-      // responses.push(
       await inquirer
         .prompt([
           {
             name: rule.constructor.name,
             message: rule.getDescription(),
             type: rule.getPromptType(),
-            choices: rule.getChoices(),
+            choices: await rule.getChoices(),
           },
         ])
         .then(answers => {
@@ -91,22 +87,7 @@ class ProjectFillerCli extends Command {
             }
           }
         });
-      // );
     });
-
-    // await this.asyncForEach(responses, async (resp: {Rule: any}) => {
-    //   console.log(resp);
-
-    //   const rule = Object.
-
-    //   if(Object.keys(resp)[0].getPromptType())
-    // });
-  }
-
-  async asyncForEach(array: any[], callback: any) {
-    for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array);
-    }
   }
 }
 

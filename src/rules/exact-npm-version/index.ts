@@ -1,9 +1,9 @@
 import { RuleRegister } from '../rule-register';
 import * as fs from 'fs';
-import { FileNotReadableError } from '../../errors/FileNotReadableError';
 import { StackRegister } from '../../stacks/stack-register';
 import { jsonObjectsToCheck } from './constants';
-import Choice, { YesNo } from '../../choice';
+import { YesNo } from '../../choice';
+import * as PromiseBlu from 'bluebird';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
@@ -28,41 +28,33 @@ export class ExactNpmVersion {
     this.packageJSONPath = `${this.rootPath}package.json`;
 
     try {
-      this.parsedFile = JSON.parse(
-        fs.readFileSync(this.packageJSONPath, {
-          encoding: 'utf8',
-        }),
-      );
+      this.parsedFile = require(this.packageJSONPath);
       this.packageFileExists = true;
       this.jsonObjToCheckFound = this.findJsonObjectsToCheck();
     } catch (err) {
-      if (err.code === 'ENOENT') {
-        this.packageFileExists = false;
-      } else {
-        throw new FileNotReadableError(this.packageJSONPath);
-      }
+      this.packageFileExists = false;
     }
   }
 
   /**
    * Returns true if the project contains npm dependencies or devDependencies with semver that needs to be corrected.
    */
-  shouldBeApplied() {
+  async shouldBeApplied(): Promise<boolean> {
     let result = false;
     if (!this.packageFileExists) {
       return false;
     }
-    jsonObjectsToCheck.forEach(jsonObjStr => {
+
+    return PromiseBlu.each(this.jsonObjToCheckFound, jsonObjStr => {
       const jsonObj = this.parsedFile[jsonObjStr];
 
-      if (jsonObj !== undefined) {
-        const jsonObjValues: string[] = Object.values(jsonObj);
-        if (this.valuesMatches(jsonObjValues, this.semverRegex)) {
-          result = true;
-        }
+      const jsonObjValues: string[] = Object.values(jsonObj);
+      if (this.valuesMatches(jsonObjValues, this.semverRegex)) {
+        result = true;
       }
+    }).then(() => {
+      return result;
     });
-    return result;
   }
 
   /**

@@ -30,7 +30,7 @@ export class Linter {
     }
   }
 
-  shouldBeApplied() {
+  async shouldBeApplied() {
     return (
       this.packageFileExists &&
       !(

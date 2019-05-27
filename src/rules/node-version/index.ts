@@ -42,7 +42,7 @@ export class NodeVersion {
     }
   }
 
-  shouldBeApplied() {
+  async shouldBeApplied() {
     return this.isCritical() || this.isOutdated();
   }
 
