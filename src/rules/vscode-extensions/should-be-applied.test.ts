@@ -97,10 +97,10 @@ test('should return true if .vscode/extension.json does not contains all recomme
   const vsCodeExtension = new VSCodeExtensions(rootPath);
 
   vsCodeExtension.getChoices = jest.fn(() => {
-    return [
+    return Promise.resolve([
       { name: 'extension1', value: 'ext1' },
       { name: 'extension3', value: 'ext3' },
-    ];
+    ]);
   });
 
   expect(vsCodeExtension.shouldBeApplied()).toBeTruthy();
@@ -124,11 +124,13 @@ test('should return false if .vscode/extension.json contains all recommended ext
   const vsCodeExtension = new VSCodeExtensions(rootPath);
 
   vsCodeExtension.getChoices = jest.fn(() => {
-    return [
+    return Promise.resolve([
       { name: 'extension1', value: 'ext1' },
       { name: 'extension2', value: 'ext2' },
-    ];
+    ]);
   });
 
-  expect(vsCodeExtension.shouldBeApplied()).toBeFalsy();
+  return vsCodeExtension.shouldBeApplied().then(result => {
+    expect(result).toBeFalsy();
+  });
 });

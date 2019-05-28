@@ -1,8 +1,7 @@
 import { RuleRegister } from '../../rule-register';
 import { Elasticsearch } from '../../../stacks/elasticsearch';
 import { StackRegister } from '../../../stacks/stack-register';
-import * as request from 'request-promise';
-import * as PromiseBlu from 'bluebird';
+import axios from 'axios';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
@@ -15,8 +14,8 @@ export class ElasticsearchNodesVersion {
   }
 
   async shouldBeApplied(): Promise<boolean> {
-    return request(`${this.rootPath}_nodes`).then(data => {
-      const versions = Object.values(JSON.parse(data).nodes).map(
+    return axios.get(`${this.rootPath}_nodes`).then(result => {
+      const versions = Object.values(JSON.parse(result.data).nodes).map(
         (node: any) => node.version,
       );
 

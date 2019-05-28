@@ -1,6 +1,5 @@
 import Rule from '../../rules/rule';
 import Stack from '../stack';
-import { Class } from '@babel/types';
 
 export interface Constructor<T> {
   new (...args: any[]): T;

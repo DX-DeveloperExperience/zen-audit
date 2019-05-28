@@ -1,29 +1,33 @@
 import { FileNotReadableError } from '../../errors/FileNotReadableError';
 import FileUtils from '../../file-utils';
 import { RuleRegister } from '../rule-register';
-import * as fs from 'fs';
+import { StackRegister } from '../../stacks/stack-register';
+import { TypeScript } from '../../stacks/typescript/index';
+import { Node } from '../../stacks/node/index';
+import * as fs from 'fs-extra';
 
 @RuleRegister.register
+@StackRegister.registerRuleForStacks([TypeScript, Node])
 export class Linter {
-  readonly requiredFiles: string[] = ['tslint.json'];
   readonly rootPath: string;
   private packageJSONPath: string;
-  private packageFileExists: boolean;
-  private parsedFile: any;
+  private tslintPath: string;
+  private eslintPath: string;
+  private packageJSONExists: boolean;
+  private parsedPackageJSON: any;
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
-
     this.packageJSONPath = `${this.rootPath}package.json`;
+    this.tslintPath = `${this.rootPath}tslint.json`;
+    this.eslintPath = `${this.rootPath}eslint.json`;
 
     try {
-      this.parsedFile = JSON.parse(
-        fs.readFileSync(this.packageJSONPath, { encoding: 'utf8' }),
-      );
-      this.packageFileExists = true;
+      require(this.packageJSONPath);
+      this.packageJSONExists = true;
     } catch (err) {
-      if (err.code === 'ENOENT') {
-        this.packageFileExists = false;
+      if (err.code === 'MODULE_NOT_FOUND') {
+        this.packageJSONExists = false;
       } else {
         throw new FileNotReadableError(this.packageJSONPath);
       }
@@ -32,28 +36,38 @@ export class Linter {
 
   async shouldBeApplied() {
     return (
-      this.packageFileExists &&
-      !(
-        FileUtils.filesExistIn(this.rootPath, this.requiredFiles) &&
-        this.isInDevDep()
-      )
+      this.packageJSONExists &&
+      (!FileUtils.filesExistIn(this.rootPath, ['tslint.json', 'eslint.json']) ||
+        !this.isInDevDep())
     );
   }
 
-  apply() {
-    // TODO
+  async apply() {
+    if (new TypeScript(this.rootPath).isAvailable()) {
+      return fs.writeFile(
+        this.tslintPath,
+        JSON.stringify(tslintJSON, null, '\t'),
+        { encoding: 'utf-8' },
+      );
+    } else {
+      return fs.writeFile(
+        this.eslintPath,
+        JSON.stringify(eslintJSON, null, '\t'),
+        { encoding: 'utf-8' },
+      );
+    }
   }
 
   isInDevDep(): boolean {
     return (
       this.hasDevDep() &&
-      (this.parsedFile.devDependencies.tslint !== undefined ||
-        this.parsedFile.devDependencies.eslint !== undefined)
+      (this.parsedPackageJSON.devDependencies.tslint !== undefined ||
+        this.parsedPackageJSON.devDependencies.eslint !== undefined)
     );
   }
 
   hasDevDep(): boolean {
-    return this.parsedFile.devDependencies !== undefined;
+    return this.parsedPackageJSON.devDependencies !== undefined;
   }
 
   getName() {

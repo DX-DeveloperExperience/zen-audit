@@ -1,7 +1,7 @@
 import { RuleRegister } from '../../rule-register';
 import { Elasticsearch } from '../../../stacks/elasticsearch';
 import { StackRegister } from '../../../stacks/stack-register';
-import * as request from 'request-promise';
+import axios from 'axios';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
@@ -14,8 +14,8 @@ export class ElasticsearchNodesNumber {
   }
 
   async shouldBeApplied(): Promise<boolean> {
-    return request(`${this.rootPath}_nodes`).then(body => {
-      const parsed = JSON.parse(body);
+    return axios.get(`${this.rootPath}_nodes`).then(result => {
+      const parsed = JSON.parse(result.data);
       return Object.keys(parsed.nodes).length < 3;
     });
   }

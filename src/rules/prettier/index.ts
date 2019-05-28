@@ -19,7 +19,7 @@ export class Prettier {
     this.parsedPackage = require(this.packagePath);
   }
 
-  apply() {
+  async apply() {
     // TODO
   }
 

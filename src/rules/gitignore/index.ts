@@ -54,7 +54,6 @@ export class GitIgnore {
           return this.getMissingGitRules();
         })
         .then(missingGitRules => {
-          console.log(missingGitRules);
           this.missingRules = missingGitRules;
           this.initialized = true;
         })
@@ -70,10 +69,9 @@ export class GitIgnore {
   async shouldBeApplied(): Promise<boolean> {
     return this.init().then(async () => {
       return (
-        !this.rootPath.startsWith('http') &&
-        (!this.gitIgnoreExists ||
-          this.gitIgnoreContent === '' ||
-          (await this.missGitRules()))
+        !this.gitIgnoreExists ||
+        this.gitIgnoreContent === '' ||
+        (await this.missGitRules())
       );
     });
   }
@@ -125,7 +123,6 @@ export class GitIgnore {
   async apply(): Promise<void> {
     return this.init().then(() => {
       if (this.missingRules !== undefined) {
-        console.log(this.missingRules);
         return fs.writeFile(
           this.gitIgnorePath,
           (this.gitIgnoreContent + '\n' + this.missingRules.join('\n')).trim(),

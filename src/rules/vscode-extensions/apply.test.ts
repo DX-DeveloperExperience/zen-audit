@@ -1,5 +1,5 @@
 import { VSCodeExtensions } from '.';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 
 const mockFS = require('mock-fs');
 
@@ -30,19 +30,21 @@ test('should create the .vscode/extensions.json file with recommendations even i
   expect(vscodeIsDirectory).toThrow();
   expect(extensionsIsFile).toThrow();
 
-  new VSCodeExtensions(rootPath).apply(['extension1', 'extension2']);
-
-  expect(fs.lstatSync('root/.vscode').isDirectory()).toBeTruthy();
-  expect(fs.lstatSync('root/.vscode/extensions.json').isFile()).toBeTruthy();
-
-  const extensionsJSON = JSON.parse(
-    fs.readFileSync('root/.vscode/extensions.json', {
-      encoding: 'utf-8',
-    }),
-  );
-
-  expect(extensionsJSON.recommendations[0]).toEqual('extension1');
-  expect(extensionsJSON.recommendations[1]).toEqual('extension2');
+  return new VSCodeExtensions(rootPath)
+    .apply(['extension1', 'extension2'])
+    .then(() => {
+      expect(fs.lstatSync('root/.vscode').isDirectory()).toBeTruthy();
+      expect(
+        fs.lstatSync('root/.vscode/extensions.json').isFile(),
+      ).toBeTruthy();
+      return fs
+        .readFile('root/.vscode/extensions.json', { encoding: 'utf-8' })
+        .then(result => {
+          const extensionsJSON = JSON.parse(result);
+          expect(extensionsJSON.recommendations[0]).toEqual('extension1');
+          expect(extensionsJSON.recommendations[1]).toEqual('extension2');
+        });
+    });
 });
 
 test('should not add extensions if they already exist', () => {
@@ -54,15 +56,17 @@ test('should not add extensions if they already exist', () => {
     virtual: true,
   });
 
-  new VSCodeExtensions(rootPath).apply(['extension1', 'extension3']);
-
-  const extensionsJSONFinal = JSON.parse(
-    fs.readFileSync('root/.vscode/extensions.json', {
-      encoding: 'utf-8',
-    }),
-  );
-  expect(extensionsJSONFinal.recommendations.length).toEqual(3);
-  expect(extensionsJSONFinal.recommendations[0]).toEqual('extension1');
-  expect(extensionsJSONFinal.recommendations[1]).toEqual('extension2');
-  expect(extensionsJSONFinal.recommendations[2]).toEqual('extension3');
+  new VSCodeExtensions(rootPath)
+    .apply(['extension1', 'extension3'])
+    .then(() => {
+      return fs
+        .readFile('root/.vscode/extensions.json', { encoding: 'utf-8' })
+        .then(result => {
+          const extensionsJSON = JSON.parse(result);
+          expect(extensionsJSON.recommendations.length).toEqual(3);
+          expect(extensionsJSON.recommendations[0]).toEqual('extension1');
+          expect(extensionsJSON.recommendations[1]).toEqual('extension2');
+          expect(extensionsJSON.recommendations[2]).toEqual('extension3');
+        });
+    });
 });

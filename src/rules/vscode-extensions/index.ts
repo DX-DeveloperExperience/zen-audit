@@ -5,6 +5,7 @@ import Choice from '../../choice';
 import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import { choices } from './constants';
+import * as util from 'util';
 
 @RuleRegister.register
 @StackRegister.registerRuleForAll({ excludes: [] })
@@ -96,24 +97,16 @@ export class VSCodeExtensions {
       }
     });
 
-    // Create .vscode directory if it does not exist
-    if (!fs.existsSync(`${this.rootPath}/.vscode`)) {
-      try {
-        fs.mkdirSync(`${this.rootPath}/.vscode`);
-      } catch (err) {
-        // console.log(err);
-      }
-    }
-
-    try {
-      fs.writeFileSync(
-        `${this.rootPath}/.vscode/extensions.json`,
-        JSON.stringify(this.parsedExtensionsFile, null, '\t'),
-        { encoding: 'utf8' },
-      );
-    } catch (err) {
-      //
-    }
+    return fs
+      .ensureDir(`${this.rootPath}.vscode`)
+      .catch(err => {})
+      .then(() => {
+        return fs.writeJSON(
+          this.extensionsJSONPath,
+          this.parsedExtensionsFile,
+          { spaces: '\t' },
+        );
+      });
   }
 
   getName() {

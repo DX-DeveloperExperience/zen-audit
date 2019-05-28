@@ -42,7 +42,7 @@ export class Husky {
         );
       })
       .catch((err: Error) => {
-        return err;
+        throw err;
       });
   }
 

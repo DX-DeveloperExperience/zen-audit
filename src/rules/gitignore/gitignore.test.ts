@@ -28,7 +28,7 @@ test('shouldBeApplied should return true if .gitignore file exists but is empty'
   });
 });
 
-test('shouldBeApplied should return true if .gitignore file does not contain every possible rule for a stack', () => {
+test('shouldBeApplied should return true if .gitignore file does not contain every possible rule for a stack, apply should write missing rules to file', () => {
   const gitignore: string =
     '# comment\n' +
     '# another comment\n' +
@@ -65,17 +65,18 @@ test('shouldBeApplied should return true if .gitignore file does not contain eve
 
   const gitIgnore = new GitIgnore();
   return gitIgnore.shouldBeApplied().then(result => {
-    gitIgnore.apply();
-    expect(resultGitignore).toEqual(
-      '# comment\n' +
-        '# another comment\n' +
-        'a/directory/to/ignore\n' +
-        'another/directory/to/ignore\n' +
-        'a/directory/to/be/added/to/gitignore\n' +
-        'another/directory/to/be/added/to/gitignore',
-    );
-
     expect(result).toBeTruthy();
+
+    return gitIgnore.apply().then(() => {
+      expect(resultGitignore).toEqual(
+        '# comment\n' +
+          '# another comment\n' +
+          'a/directory/to/ignore\n' +
+          'another/directory/to/ignore\n' +
+          'a/directory/to/be/added/to/gitignore\n' +
+          'another/directory/to/be/added/to/gitignore',
+      );
+    });
   });
 });
 
@@ -85,7 +86,9 @@ test('shouldBeApplied should return false if .gitignore file contains every poss
     '# another comment \n' +
     'a/directory/to/ignore \n' +
     'another/directory/to/ignore';
-  fs.readFileSync.mockReturnValue(gitignore);
+
+  fs.readFile.mockReturnValue(Promise.resolve(gitignore));
+
   ListStacks.getStacksIn = jest.fn(() => {
     return Promise.resolve([
       {
@@ -95,6 +98,7 @@ test('shouldBeApplied should return false if .gitignore file contains every poss
       } as any,
     ]);
   });
+
   axios.get.mockImplementation(() => {
     return Promise.resolve({
       data:
@@ -103,6 +107,7 @@ test('shouldBeApplied should return false if .gitignore file contains every poss
         'another/directory/to/ignore',
     });
   });
+
   return new GitIgnore().shouldBeApplied().then(result => {
     expect(result).toBeFalsy();
   });

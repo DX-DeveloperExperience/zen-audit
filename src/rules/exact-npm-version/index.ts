@@ -1,9 +1,8 @@
 import { RuleRegister } from '../rule-register';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import { StackRegister } from '../../stacks/stack-register';
 import { jsonObjectsToCheck } from './constants';
 import { YesNo } from '../../choice';
-import * as PromiseBlu from 'bluebird';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
@@ -15,8 +14,9 @@ export class ExactNpmVersion {
   readonly requiredFiles: string[] = ['package.json'];
   readonly rootPath: string;
   private packageJSONPath: string;
-  private packageFileExists: boolean;
-  private parsedFile: any;
+  private packageJSONExists: boolean;
+  private parsedPackageJSON: any;
+  private initialized: boolean = false;
   readonly semverRegex = new RegExp(
     '^(\\^|\\~)((([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)$',
     'g',
@@ -28,11 +28,16 @@ export class ExactNpmVersion {
     this.packageJSONPath = `${this.rootPath}package.json`;
 
     try {
-      this.parsedFile = require(this.packageJSONPath);
-      this.packageFileExists = true;
+      this.parsedPackageJSON = require(this.packageJSONPath);
+      this.packageJSONExists = true;
       this.jsonObjToCheckFound = this.findJsonObjectsToCheck();
     } catch (err) {
-      this.packageFileExists = false;
+      this.packageJSONExists = false;
+    }
+  }
+
+  private async init() {
+    if (!this.initialized) {
     }
   }
 
@@ -41,20 +46,19 @@ export class ExactNpmVersion {
    */
   async shouldBeApplied(): Promise<boolean> {
     let result = false;
-    if (!this.packageFileExists) {
+    if (!this.packageJSONExists) {
       return false;
     }
 
-    return PromiseBlu.each(this.jsonObjToCheckFound, jsonObjStr => {
-      const jsonObj = this.parsedFile[jsonObjStr];
+    this.jsonObjToCheckFound.forEach(jsonObjStr => {
+      const jsonObj = this.parsedPackageJSON[jsonObjStr];
 
       const jsonObjValues: string[] = Object.values(jsonObj);
       if (this.valuesMatches(jsonObjValues, this.semverRegex)) {
         result = true;
       }
-    }).then(() => {
-      return result;
     });
+    return result;
   }
 
   /**
@@ -69,7 +73,7 @@ export class ExactNpmVersion {
   /**
    * Removes tilds or circumflex inside package.json's dependencies' Semvers
    */
-  apply() {
+  async apply() {
     fs.writeFileSync(this.packageJSONPath, this.correctSemverNotation(), {
       encoding: 'utf8',
     });
@@ -80,12 +84,12 @@ export class ExactNpmVersion {
    */
   private correctSemverNotation(): string {
     this.jsonObjToCheckFound.forEach(jsonObjName => {
-      this.parsedFile[jsonObjName] = this.replaceMatchingEntriesForObj(
+      this.parsedPackageJSON[jsonObjName] = this.replaceMatchingEntriesForObj(
         jsonObjName,
         this.semverRegex,
       );
     });
-    return JSON.stringify(this.parsedFile, null, '\t');
+    return JSON.stringify(this.parsedPackageJSON, null, '\t');
   }
 
   /**
@@ -94,7 +98,9 @@ export class ExactNpmVersion {
    * @param regex
    */
   private replaceMatchingEntriesForObj(jsonObjName: string, regex: RegExp) {
-    const entries: string[][] = Object.entries(this.parsedFile[jsonObjName]);
+    const entries: string[][] = Object.entries(
+      this.parsedPackageJSON[jsonObjName],
+    );
     const changedEntries = entries.map(([dep, val]) => {
       if (val.match(regex)) {
         return [
@@ -118,7 +124,7 @@ export class ExactNpmVersion {
 
   private findJsonObjectsToCheck() {
     return jsonObjectsToCheck.filter(val => {
-      return Object.keys(this.parsedFile).includes(val);
+      return Object.keys(this.parsedPackageJSON).includes(val);
     });
   }
 

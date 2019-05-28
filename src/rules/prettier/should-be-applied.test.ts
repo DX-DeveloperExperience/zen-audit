@@ -15,7 +15,9 @@ test('Should return true if prettier is not in devDependencies', () => {
 
   jest.mock('./test1/package.json', () => packageJSON, { virtual: true });
 
-  expect(new Prettier(path).shouldBeApplied()).toBeTruthy();
+  return new Prettier(path).shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
 test('Should return false if prettier is in devDependencies', () => {
@@ -29,7 +31,9 @@ test('Should return false if prettier is in devDependencies', () => {
 
   jest.mock(`./test2/package.json`, () => packageJSON, { virtual: true });
 
-  expect(new Prettier(path).shouldBeApplied()).toBeFalsy();
+  return new Prettier(path).shouldBeApplied().then(result => {
+    expect(result).toBeFalsy();
+  });
 });
 
 test('Should return true if prettier is something else than a dependency in devDependencies', () => {
@@ -46,5 +50,7 @@ test('Should return true if prettier is something else than a dependency in devD
 
   jest.mock(`./test3/package.json`, () => packageJSON, { virtual: true });
 
-  expect(new Prettier(path).shouldBeApplied()).toBeTruthy();
+  return new Prettier(path).shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
