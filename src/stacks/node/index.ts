@@ -1,5 +1,6 @@
 import { StackRegister } from '../stack-register';
 import * as fs from 'fs-extra';
+import { existsPaths } from '../../utils/fs';
 
 @StackRegister.register
 export class Node {
@@ -9,24 +10,8 @@ export class Node {
     this.packagePath = `${this.rootPath}package.json`;
   }
 
-  // async isAvailable() {
-  //   try {
-  //     require(this.packagePath);
-  //     return true;
-  //   } catch (e) {
-  //     return false;
-  //   }
-  // }
-
   isAvailable(): Promise<boolean> {
-    return fs
-      .readFile(this.packagePath, 'utf-8')
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        return false;
-      });
+    return existsPaths(`${this.rootPath}package.json`);
   }
 
   parsedPackage(): object {
