@@ -1,6 +1,5 @@
 import { StackRegister } from '../stack-register';
-import * as fs from 'fs-extra';
-import { existsPaths } from '../../utils/fs';
+import { existsPaths } from '../../file-utils/index';
 
 @StackRegister.register
 export class Node {
