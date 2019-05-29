@@ -1,13 +1,11 @@
 import { FileNotReadableError } from './../../errors/FileNotReadableError';
 import { Linter } from '../../rules/linter';
-import FileUtils from '../../file-utils';
 
 const fs = require('fs');
 jest.mock('fs');
 
 const rootPath = 'linter/';
 const packageJSONPath = `${rootPath}package.json`;
-const emptyJSON = {};
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -67,10 +65,6 @@ test('should return false if package.json exists with tslint in devDependencies 
 
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
-  FileUtils.filesExistIn = jest.fn(() => {
-    return true;
-  });
-
   new Linter(rootPath).shouldBeApplied().then(result => {
     expect(result).toBeFalsy();
   });
@@ -84,10 +78,6 @@ test('should return true if package.json exists with tslint in devDependencies a
   };
 
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
-
-  FileUtils.filesExistIn = jest.fn(() => {
-    return false;
-  });
 
   new Linter(rootPath).shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
@@ -103,9 +93,6 @@ test('should return false if package.json exists with eslint in devDependencies 
 
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
-  FileUtils.filesExistIn = jest.fn(() => {
-    return true;
-  });
   new Linter(rootPath).shouldBeApplied().then(result => {
     expect(result).toBeFalsy();
   });
@@ -119,10 +106,6 @@ test('should return true if package.json exists with eslint in devDependencies a
   };
 
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
-
-  FileUtils.filesExistIn = jest.fn(() => {
-    return false;
-  });
 
   new Linter(rootPath).shouldBeApplied().then(result => {
     expect(result).toBeTruthy();

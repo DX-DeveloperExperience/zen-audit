@@ -1,5 +1,4 @@
 import { FileNotReadableError } from '../../errors/FileNotReadableError';
-import FileUtils from '../../file-utils';
 import { RuleRegister } from '../rule-register';
 import { StackRegister } from '../../stacks/stack-register';
 import { TypeScript } from '../../stacks/typescript/index';
