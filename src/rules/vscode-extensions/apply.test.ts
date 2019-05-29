@@ -56,17 +56,17 @@ test('should not add extensions if they already exist', () => {
     virtual: true,
   });
 
-  new VSCodeExtensions(rootPath)
+  return new VSCodeExtensions(rootPath)
     .apply(['extension1', 'extension3'])
     .then(() => {
       return fs
         .readFile('root/.vscode/extensions.json', { encoding: 'utf-8' })
         .then(result => {
-          const extensionsJSON = JSON.parse(result);
-          expect(extensionsJSON.recommendations.length).toEqual(3);
-          expect(extensionsJSON.recommendations[0]).toEqual('extension1');
-          expect(extensionsJSON.recommendations[1]).toEqual('extension2');
-          expect(extensionsJSON.recommendations[2]).toEqual('extension3');
+          const extensionsJSONRead = JSON.parse(result);
+          expect(extensionsJSONRead.recommendations.length).toEqual(3);
+          expect(extensionsJSONRead.recommendations[0]).toEqual('extension1');
+          expect(extensionsJSONRead.recommendations[1]).toEqual('extension2');
+          expect(extensionsJSONRead.recommendations[2]).toEqual('extension3');
         });
     });
 });

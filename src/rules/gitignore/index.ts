@@ -48,16 +48,9 @@ export class GitIgnore {
           }
         })
         .then((result: string) => {
-          this.gitIgnoreContent = result.trim();
+          this.gitIgnoreContent = result;
           this.gitIgnoreExists = true;
-
-          return this.getMissingGitRules();
-        })
-        .then(missingGitRules => {
-          this.missingRules = missingGitRules;
-          this.initialized = true;
-        })
-        .catch(e => {});
+        });
     }
 
     return Promise.resolve();
@@ -68,10 +61,9 @@ export class GitIgnore {
    */
   async shouldBeApplied(): Promise<boolean> {
     return this.init().then(async () => {
+      const missGitRules = await this.missGitRules();
       return (
-        !this.gitIgnoreExists ||
-        this.gitIgnoreContent === '' ||
-        (await this.missGitRules())
+        !this.gitIgnoreExists || this.gitIgnoreContent === '' || missGitRules
       );
     });
   }
@@ -86,7 +78,10 @@ export class GitIgnore {
         const getNewRules: Promise<string[]> = axios
           .get(`https://gitignore.io/api/${stack.name().toLowerCase()}`)
           .then(result => {
-            return result.data.split('\n').map((rule: string) => rule.trim());
+            return result.data
+              .split('\n')
+              .map((rule: string) => rule.trim())
+              .filter((rule: string) => rule !== '');
           })
           .catch(() => {
             return [];
@@ -97,11 +92,11 @@ export class GitIgnore {
             .split('\n')
             .map((rule: string) => rule.trim());
 
-          return newRules.filter((newRule: string) => {
-            return (
-              !currRules.includes(newRule.trim()) && !newRule.startsWith('#')
-            );
+          const filterRules = newRules.filter((newRule: string) => {
+            return !currRules.includes(newRule) && !newRule.startsWith('#');
           });
+
+          return filterRules;
         });
       });
 
@@ -114,9 +109,9 @@ export class GitIgnore {
   }
 
   private missGitRules(): Promise<boolean> {
-    return this.getMissingGitRules().then(gitRules => {
-      this.missingRules = gitRules;
-      return gitRules.length !== 0;
+    return this.getMissingGitRules().then(missingGitRules => {
+      this.missingRules = missingGitRules;
+      return missingGitRules.length !== 0;
     });
   }
 

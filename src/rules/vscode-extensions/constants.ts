@@ -4,7 +4,7 @@ interface ChoiceList {
   [stack: string]: Choice[];
 }
 
-export const choices: ChoiceList = {
+export const possibleChoices: ChoiceList = {
   All: [{ name: 'GitLens', value: 'eamodio.gitlens' }],
   Angular: [
     { name: 'Angular Language Service', value: 'angular.ng-template' },

@@ -3,7 +3,9 @@ import { ListStacks } from './index';
 import Stack from '../stack/index';
 test('should return available stacks', () => {
   class Stack1 {
-    constructor(rootPath: string) {}
+    constructor(rootPath: string) {
+      //
+    }
     isAvailable() {
       return new Promise<boolean>(resolve => {
         resolve(true);
@@ -12,7 +14,9 @@ test('should return available stacks', () => {
   }
 
   class Stack2 {
-    constructor(rootPath: string) {}
+    constructor(rootPath: string) {
+      //
+    }
     isAvailable() {
       return new Promise<boolean>(resolve => {
         resolve(false);

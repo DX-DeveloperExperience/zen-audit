@@ -5,139 +5,126 @@ import FileUtils from '../../file-utils';
 const fs = require('fs');
 jest.mock('fs');
 
-const rootPath = './src/tests/rules/';
+const rootPath = 'linter/';
+const packageJSONPath = `${rootPath}package.json`;
+const emptyJSON = {};
 
-const emptyJSON = JSON.stringify({});
+afterEach(() => {
+  jest.resetAllMocks();
+  jest.resetModules();
+});
 
 test('Constructor should throw FileNotReadableError if package.json file not readable', () => {
+  jest.mock(
+    packageJSONPath,
+    () => {
+      throw { code: 'NOT_MODULE_NOT_FOUND' };
+    },
+    { virtual: true },
+  );
+
   function instantiate() {
     return new Linter(rootPath);
   }
 
-  fs.readFileSync.mockImplementation(() => {
-    throw { code: 'NOT_ENOENT' };
-  });
-
   expect(instantiate).toThrowError(FileNotReadableError);
 });
 
-test('isInDevDep should return false if tslint not in dev dependencies', () => {
-  const packageJSON = JSON.stringify({
-    devDependencies: {
-      dependency1: 'dependency1',
-      dependency2: 'dependency2',
-    },
+test('should return true if package.json does not exist', () => {
+  jest.mock(packageJSONPath, () => {
+    throw { code: 'MODULE_NOT_FOUND' };
   });
-
-  fs.readFileSync.mockReturnValue(packageJSON);
-
-  expect(new Linter(rootPath).isInDevDep()).toBeFalsy();
+  new Linter(rootPath).shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
-test('isInDevDep should return true if tslint in devDependencies', () => {
-  const packageJSON = JSON.stringify({
-    devDependencies: {
-      dependency1: 'dependency1',
-      tslint: 'dependency2',
+test('should return true if package.json exists but tslint or eslint not in devDependencies', () => {
+  const packageJSON = {
+    obj: {
+      other: 'other',
+      tslint: 'not_in_devdependencies',
     },
+    devDependencies: {
+      dependency1: 'dep1',
+      dependency2: 'dep2',
+    },
+  };
+
+  jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
+
+  new Linter(rootPath).shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
   });
-
-  fs.readFileSync.mockReturnValue(packageJSON);
-
-  expect(new Linter(rootPath).isInDevDep()).toBeTruthy();
 });
 
-test('isInDevDep should return true if eslint is in devDependencies', () => {
-  const packageJSON = JSON.stringify({
+test('should return false if package.json exists with tslint in devDependencies and tslint.json exists', () => {
+  const packageJSON = {
     devDependencies: {
-      dependency1: 'dependency1',
-      eslint: 'dependency2',
-    },
-  });
-
-  fs.readFileSync.mockReturnValue(packageJSON);
-
-  expect(new Linter(rootPath).isInDevDep()).toBeTruthy();
-});
-
-test('isInDevDep should return false if tslint or eslint found elsewhere than in devDependencies', () => {
-  const packageJSON = JSON.stringify({
-    devDependencies: {
-      dependency1: 'dependency1',
-      dependency2: 'dependency2',
-    },
-    other: {
       tslint: 'tslint',
     },
-    tslint: {
-      other1: 'other',
-      other2: 'other2',
-    },
-    eslint: {
-      other3: 'eslint',
-      other4: 'other',
-    },
+  };
+
+  jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
+
+  FileUtils.filesExistIn = jest.fn(() => {
+    return true;
   });
 
-  fs.readFileSync.mockReturnValue(packageJSON);
-
-  expect(new Linter(rootPath).isInDevDep()).toBeFalsy();
+  new Linter(rootPath).shouldBeApplied().then(result => {
+    expect(result).toBeFalsy();
+  });
 });
 
-test('shouldBeApplied should return false if package.json does not exist', () => {
-  fs.readFileSync.mockImplementation(() => {
-    throw { code: 'ENOENT' };
+test('should return true if package.json exists with tslint in devDependencies and tslint.json does not exist', () => {
+  const packageJSON = {
+    devDependencies: {
+      tslint: 'tslint',
+    },
+  };
+
+  jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
+
+  FileUtils.filesExistIn = jest.fn(() => {
+    return false;
   });
 
-  expect(new Linter(rootPath).shouldBeApplied()).toBeFalsy();
+  new Linter(rootPath).shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
-test('shouldBeApplied should return true if tslint.json does not exist and tslint not in devDependencies', () => {
-  fs.readFileSync.mockReturnValue(emptyJSON);
-  const linter = new Linter(rootPath);
+test('should return false if package.json exists with eslint in devDependencies and eslint.json exists', () => {
+  const packageJSON = {
+    devDependencies: {
+      eslint: 'eslint',
+    },
+  };
 
-  linter.isInDevDep = jest
-    .fn()
-    .mockName('isInDevDepMock')
-    .mockReturnValue(false);
+  jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
-  FileUtils.filesExistIn = jest.fn().mockReturnValue(false);
-
-  expect(linter.shouldBeApplied()).toBeTruthy();
+  FileUtils.filesExistIn = jest.fn(() => {
+    return true;
+  });
+  new Linter(rootPath).shouldBeApplied().then(result => {
+    expect(result).toBeFalsy();
+  });
 });
 
-test('shouldBeApplied should return true if tslint.json does not exist but tslint is in devDependencies', () => {
-  fs.readFileSync.mockReturnValue(emptyJSON);
-  const linter = new Linter(rootPath);
+test('should return true if package.json exists with eslint in devDependencies and eslint.json does not exist', () => {
+  const packageJSON = {
+    devDependencies: {
+      eslint: 'eslint',
+    },
+  };
 
-  linter.isInDevDep = jest
-    .fn()
-    .mockName('isInDevDepMock')
-    .mockReturnValue(true);
+  jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
-  FileUtils.filesExistIn = jest.fn().mockReturnValue(false);
+  FileUtils.filesExistIn = jest.fn(() => {
+    return false;
+  });
 
-  expect(linter.shouldBeApplied()).toBeTruthy();
-});
-
-test('shouldBeApplied should return true if tslint.json exists but tslint is not in devDependencies', () => {
-  fs.readFileSync.mockReturnValue(emptyJSON);
-  const linter = new Linter(rootPath);
-
-  linter.isInDevDep = jest.fn().mockReturnValue(false);
-
-  FileUtils.filesExistIn = jest.fn().mockReturnValue(true);
-
-  expect(linter.shouldBeApplied()).toBeTruthy();
-});
-
-test('shouldBeApplied should return false if tslint.json exists and tslint is in devDependencies', () => {
-  fs.readFileSync.mockReturnValue(emptyJSON);
-  const linter = new Linter(rootPath);
-
-  linter.isInDevDep = jest.fn().mockReturnValue(true);
-
-  FileUtils.filesExistIn = jest.fn().mockReturnValue(true);
-
-  expect(linter.shouldBeApplied()).toBeFalsy();
+  new Linter(rootPath).shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });

@@ -7,9 +7,6 @@ const rootPath = 'root/';
 require('constants');
 jest.mock('./constants');
 
-const fs = require('fs');
-jest.mock('fs');
-
 afterEach(() => {
   jest.resetAllMocks();
 });
@@ -32,8 +29,7 @@ test('should give us a list of choices corresponding to stacks', () => {
 
   const vsCodeExtensions = new VSCodeExtensions(rootPath);
 
-  const choices = vsCodeExtensions.getChoices();
-  return choices.then(choices => {
+  return vsCodeExtensions.getChoices().then(choices => {
     expect(choices.length).toEqual(2);
   });
 });
@@ -59,9 +55,7 @@ test('should not add already existing extensions in choice list', () => {
 
   const vsCodeExtensions = new VSCodeExtensions(rootPath);
 
-  const choices = vsCodeExtensions.getChoices();
-
-  return choices.then(choices => {
+  return vsCodeExtensions.getChoices().then(choices => {
     expect(choices.length).toEqual(1);
     expect(choices[0].value).toEqual('ext2');
   });

@@ -4,7 +4,7 @@ import { ListStacks } from '../../stacks/list-stacks';
 import Choice from '../../choice';
 import * as fs from 'fs-extra';
 import * as cp from 'child_process';
-import { choices } from './constants';
+import { possibleChoices } from './constants';
 import * as util from 'util';
 
 @RuleRegister.register
@@ -98,8 +98,10 @@ export class VSCodeExtensions {
     });
 
     return fs
-      .ensureDir(`${this.rootPath}.vscode`)
-      .catch(err => {})
+      .ensureFile(this.extensionsJSONPath)
+      .catch(err => {
+        throw err;
+      })
       .then(() => {
         return fs.writeJSON(
           this.extensionsJSONPath,
@@ -145,14 +147,14 @@ export class VSCodeExtensions {
         (keptChoices, stackName) => {
           let choicesByStack: Choice[];
 
-          if (choices[stackName] !== undefined) {
+          if (possibleChoices[stackName] !== undefined) {
             // If some recommendations are existing...
             if (
               existingRecommendations !== undefined &&
               existingRecommendations.length !== 0
             ) {
               // ...do not add choices that are included in these recommendations
-              choicesByStack = choices[stackName].reduce(
+              choicesByStack = possibleChoices[stackName].reduce(
                 (kept, curr) => {
                   if (!existingRecommendations.includes(curr.value as string)) {
                     return [...kept, curr];
@@ -162,7 +164,7 @@ export class VSCodeExtensions {
                 [] as Choice[],
               );
             } else {
-              choicesByStack = choices[stackName];
+              choicesByStack = possibleChoices[stackName];
             }
             if (choicesByStack !== undefined) {
               return [...keptChoices, ...choicesByStack];

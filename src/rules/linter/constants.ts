@@ -1,4 +1,4 @@
-const tslintJSON = {
+export const tslintJSON = {
   defaultSeverity: 'error',
   extends: ['tslint:recommended'],
   jsRules: {
@@ -20,3 +20,5 @@ const tslintJSON = {
   },
   rulesDirectory: [],
 };
+
+export const eslintJSON = {};

@@ -9,7 +9,7 @@ class Rule2 {}
 test('getImplementations() should return an array containing two class constructors', () => {
   StackRegister.register(Stack1 as any);
 
-  expect(StackRegister.getImplementations().length).toBe(1);
+  expect(StackRegister.getConstructors().length).toEqual(1);
 });
 
 test('getRulesByStack(stackName) should return an array containing the Rule constructor', () => {

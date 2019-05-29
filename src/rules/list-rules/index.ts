@@ -33,7 +33,16 @@ export class ListRules {
         ruleConstructor => new ruleConstructor(rootPath),
       );
 
-      return Promise.all(rules.map(rule => rule.shouldBeApplied())).then(
+      const uniqueRules = rules.filter((rule, index, self) => {
+        return (
+          index ===
+          self.findIndex(otherRule => {
+            return JSON.stringify(rule) === JSON.stringify(otherRule);
+          })
+        );
+      });
+
+      return Promise.all(uniqueRules.map(rule => rule.shouldBeApplied())).then(
         values => {
           return rules.reduce((acc: Rule[], rule: Rule, i: number) => {
             if (values[i]) {

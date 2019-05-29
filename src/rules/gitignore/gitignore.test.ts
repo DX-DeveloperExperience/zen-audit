@@ -28,7 +28,9 @@ test('shouldBeApplied should return true if .gitignore file exists but is empty'
   });
 });
 
-test('shouldBeApplied should return true if .gitignore file does not contain every possible rule for a stack, apply should write missing rules to file', () => {
+test('shouldBeApplied should return true if .gitignore\
+ file does not contain every possible rule for a stack,\
+ apply should write missing rules to file', () => {
   const gitignore: string =
     '# comment\n' +
     '# another comment\n' +

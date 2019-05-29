@@ -16,7 +16,6 @@ export class ExactNpmVersion {
   private packageJSONPath: string;
   private packageJSONExists: boolean;
   private parsedPackageJSON: any;
-  private initialized: boolean = false;
   readonly semverRegex = new RegExp(
     '^(\\^|\\~)((([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)$',
     'g',
@@ -33,11 +32,6 @@ export class ExactNpmVersion {
       this.jsonObjToCheckFound = this.findJsonObjectsToCheck();
     } catch (err) {
       this.packageJSONExists = false;
-    }
-  }
-
-  private async init() {
-    if (!this.initialized) {
     }
   }
 
