@@ -1,8 +1,4 @@
-import { FileNotReadableError } from './../../errors/FileNotReadableError';
-import { Linter } from '../../rules/linter';
-
-const fs = require('fs');
-jest.mock('fs');
+import { Linter } from '.';
 
 const rootPath = 'linter/';
 const packageJSONPath = `${rootPath}package.json`;
