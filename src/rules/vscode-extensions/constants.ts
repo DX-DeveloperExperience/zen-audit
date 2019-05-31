@@ -5,7 +5,7 @@ interface ChoiceList {
 }
 
 export const choices: ChoiceList = {
-  default: [{ name: 'GitLens', value: 'eamodio.gitlens' }],
+  All: [{ name: 'GitLens', value: 'eamodio.gitlens' }],
   Angular: [
     { name: 'Angular Language Service', value: 'angular.ng-template' },
     { name: 'TSLint', value: 'ms-vscode.vscode-typescript-tslint-plugin' },
@@ -17,4 +17,6 @@ export const choices: ChoiceList = {
     { name: 'ESLint', value: 'dbaeumer.vscode-eslint' },
     { name: 'Prettier', value: 'esbenp.prettier-vscode' },
   ],
+  TypeScript: [{ name: 'Prettier', value: 'esbenp.prettier-vscode' }],
+  Node: [{ name: 'Prettier', value: 'esbenp.prettier-vscode' }],
 };

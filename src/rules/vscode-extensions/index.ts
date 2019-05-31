@@ -2,7 +2,7 @@ import { RuleRegister } from '../rule-register';
 import { StackRegister } from '../../stacks/stack-register';
 import { ListStacks } from '../../stacks/list-stacks';
 import Choice from '../../choice';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import { choices } from './constants';
 
@@ -11,24 +11,21 @@ import { choices } from './constants';
 export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
   readonly rootPath: string;
-  private extensionsJSON: string;
+  private extensionsJSONPath: string;
   private parsedExtensionsFile: any;
   private extensionsFileExists: boolean;
   private missingRecommendations: string[] = [];
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
-    this.extensionsJSON = `${this.rootPath}.vscode/extensions.json`;
+    this.extensionsJSONPath = `${this.rootPath}.vscode/extensions.json`;
 
     try {
-      this.parsedExtensionsFile = JSON.parse(
-        fs.readFileSync(this.extensionsJSON, {
-          encoding: 'utf8',
-        }),
-      );
+      this.parsedExtensionsFile = require(this.extensionsJSONPath);
       this.extensionsFileExists = true;
-    } catch (err) {
+    } catch (e) {
       this.extensionsFileExists = false;
+      // console.log(e);
     }
   }
 
@@ -92,8 +89,19 @@ export class VSCodeExtensions {
     }
 
     answers.forEach(mr => {
-      this.parsedExtensionsFile.recommendations.push(mr);
+      if (!this.parsedExtensionsFile.recommendations.includes(mr)) {
+        this.parsedExtensionsFile.recommendations.push(mr);
+      }
     });
+
+    // Create .vscode directory if it does not exist
+    if (!fs.existsSync(`${this.rootPath}/.vscode`)) {
+      try {
+        fs.mkdirSync(`${this.rootPath}/.vscode`);
+      } catch (err) {
+        // console.log(err);
+      }
+    }
 
     try {
       fs.writeFileSync(
@@ -123,18 +131,46 @@ export class VSCodeExtensions {
   }
 
   getChoices(): Choice[] {
-    const stacks = ListStacks.getStacksIn(this.rootPath);
+    const stackNames = ListStacks.getStacksIn(this.rootPath).map(stack => {
+      return stack.name();
+    });
 
-    return stacks.reduce(
-      (keptChoices, stack) => {
-        const choicesByStack: Choice[] = choices[stack.name()];
-        if (choicesByStack !== undefined) {
-          return [...keptChoices, ...choicesByStack];
+    let existingRecommendations: string[] = [];
+    if (this.parsedExtensionsFile !== undefined) {
+      existingRecommendations = this.parsedExtensionsFile.recommendations;
+    }
+
+    return stackNames.reduce(
+      (keptChoices, stackName) => {
+        let choicesByStack: Choice[];
+
+        if (choices[stackName] !== undefined) {
+          // If some recommendations are existing...
+          if (
+            existingRecommendations !== undefined &&
+            existingRecommendations.length !== 0
+          ) {
+            // ...do not add choices that are included in these recommendations
+            choicesByStack = choices[stackName].reduce(
+              (kept, curr) => {
+                if (!existingRecommendations.includes(curr.value as string)) {
+                  return [...kept, curr];
+                }
+                return [...kept];
+              },
+              [] as Choice[],
+            );
+          } else {
+            choicesByStack = choices[stackName];
+          }
+          if (choicesByStack !== undefined) {
+            return [...keptChoices, ...choicesByStack];
+          }
         }
 
         return [...keptChoices];
       },
-      [...choices.default],
+      [] as Choice[],
     );
   }
 }

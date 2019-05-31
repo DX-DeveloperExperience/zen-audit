@@ -3,11 +3,11 @@ import request from 'sync-request';
 
 @StackRegister.register
 export class Elasticsearch {
-  constructor(private path: string) {}
+  constructor(private readonly rootPath: string = './') {}
   private isElasticsearchResponse() {
     try {
       const elasticsearchResponse = JSON.parse(
-        request('GET', this.path, {
+        request('GET', this.rootPath, {
           timeout: 3000,
         })
           .getBody()
@@ -19,8 +19,16 @@ export class Elasticsearch {
     }
   }
 
-  isAvailable(path: string) {
-    return path.startsWith(`http`) && this.isElasticsearchResponse();
+  isAvailable() {
+    return this.rootPath.startsWith(`http`) && this.isElasticsearchResponse();
+  }
+
+  isAvailableProm(): Promise<boolean> {
+    return new Promise<boolean>(resolve => {
+      resolve(
+        this.rootPath.startsWith('http') && this.isElasticsearchResponse(),
+      );
+    });
   }
   name() {
     return this.constructor.name;

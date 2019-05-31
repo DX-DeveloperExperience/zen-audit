@@ -32,4 +32,17 @@ export default class FileUtils {
     }
     return found;
   }
+
+  static deleteRecursively(path: string): void {
+    const fileStat = fs.lstatSync(path);
+    if (fileStat.isFile() || fileStat.isSymbolicLink()) {
+      fs.unlinkSync(path);
+    } else if (fileStat.isDirectory()) {
+      fs.readdirSync(path).forEach(subPath => {
+        FileUtils.deleteRecursively(`${path}/${subPath}`);
+      });
+
+      fs.rmdirSync(path);
+    }
+  }
 }

@@ -1,5 +1,4 @@
 export const choices: any = {
-  default: [{ name: 'Default Extension', value: 'default' }],
   stack1: [
     { name: 'Extension 1', value: 'ext1' },
     { name: 'Extension 2', value: 'ext2' },
