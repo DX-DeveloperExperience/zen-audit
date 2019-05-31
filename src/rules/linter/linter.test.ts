@@ -12,32 +12,7 @@ afterEach(() => {
   jest.resetModules();
 });
 
-test('Constructor should throw FileNotReadableError if package.json file not readable', () => {
-  jest.mock(
-    packageJSONPath,
-    () => {
-      throw { code: 'NOT_MODULE_NOT_FOUND' };
-    },
-    { virtual: true },
-  );
-
-  function instantiate() {
-    return new Linter(rootPath);
-  }
-
-  expect(instantiate).toThrowError(FileNotReadableError);
-});
-
-test('should return true if package.json does not exist', () => {
-  jest.mock(packageJSONPath, () => {
-    throw { code: 'MODULE_NOT_FOUND' };
-  });
-  new Linter(rootPath).shouldBeApplied().then(result => {
-    expect(result).toBeTruthy();
-  });
-});
-
-test('should return true if package.json exists but tslint or eslint not in devDependencies', () => {
+test('should return true if tslint or eslint not in devDependencies', () => {
   const packageJSON = {
     obj: {
       other: 'other',
@@ -56,7 +31,7 @@ test('should return true if package.json exists but tslint or eslint not in devD
   });
 });
 
-test('should return false if package.json exists with tslint in devDependencies and tslint.json exists', () => {
+test('should return false if tslint in devDependencies and tslint.json exists', () => {
   const packageJSON = {
     devDependencies: {
       tslint: 'tslint',
@@ -70,7 +45,7 @@ test('should return false if package.json exists with tslint in devDependencies 
   });
 });
 
-test('should return true if package.json exists with tslint in devDependencies and tslint.json does not exist', () => {
+test('should return true if tslint in devDependencies and tslint.json does not exist', () => {
   const packageJSON = {
     devDependencies: {
       tslint: 'tslint',
@@ -84,7 +59,7 @@ test('should return true if package.json exists with tslint in devDependencies a
   });
 });
 
-test('should return false if package.json exists with eslint in devDependencies and eslint.json exists', () => {
+test('should return false if eslint in devDependencies and eslint.json exists', () => {
   const packageJSON = {
     devDependencies: {
       eslint: 'eslint',
@@ -98,7 +73,7 @@ test('should return false if package.json exists with eslint in devDependencies 
   });
 });
 
-test('should return true if package.json exists with eslint in devDependencies and eslint.json does not exist', () => {
+test('should return true if eslint in devDependencies and eslint.json does not exist', () => {
   const packageJSON = {
     devDependencies: {
       eslint: 'eslint',
