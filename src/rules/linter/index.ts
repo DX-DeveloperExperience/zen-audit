@@ -24,17 +24,8 @@ export class Linter {
     this.tslintPath = `${this.rootPath}tslint.json`;
     this.eslintPath = `${this.rootPath}eslint.json`;
 
-    try {
-      require(this.packageJSONPath);
-      this.packageJSONExists = true;
-    } catch (err) {
-      if (err.code === 'MODULE_NOT_FOUND') {
-        this.packageJSONExists = false;
-      } else {
-        throw new FileNotReadableError(this.packageJSONPath);
+    this.parsedPackageJSON = require(this.packageJSONPath);
       }
-    }
-  }
 
   private async init() {
     if (!this.initialized) {
