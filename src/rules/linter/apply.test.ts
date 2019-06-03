@@ -35,8 +35,8 @@ test('should install tslint as devDependencies and create tslint.json', () => {
 
   const linterRule = new Linter(rootPath);
 
-  util.promisify.mockImplementation((exec: Function) => {
-    return function(cmd: string) {
+  util.promisify.mockImplementation((exec: (cmd: string) => void) => {
+    return (cmd: string) => {
       exec(cmd);
       return Promise.resolve();
     };

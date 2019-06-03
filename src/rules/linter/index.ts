@@ -30,21 +30,28 @@ export class Linter {
     this.parsedPackageJSON = require(this.packageJSONPath);
   }
 
-  private async init() {
+  private async init(): Promise<void> {
+    // return new Promise(resolve => {
     if (!this.initialized) {
-      return new TypeScript(this.rootPath).isAvailable().then(result => {
-        this.linterChoice = result ? 'tslint' : 'eslint';
-        return Promise.resolve();
-      });
+      return new TypeScript(this.rootPath)
+        .isAvailable()
+        .then(result => {
+          this.linterChoice = result ? 'tslint' : 'eslint';
+          return;
+        })
+        .catch(e => {
+          return;
+        });
     }
-
-    return Promise.resolve();
+    return;
+    // });
   }
 
   async shouldBeApplied() {
     return this.init().then(async () => {
       this.linterhasConfigFile = await this.hasConfigFile(this.linterChoice);
       this.linterInDevDep = this.isInDevDep(this.linterChoice);
+
       return this.linterInDevDep && this.linterhasConfigFile;
     });
   }
@@ -102,14 +109,7 @@ export class Linter {
   }
 
   hasConfigFile(linter: string): Promise<boolean> {
-    return fs
-      .pathExists(this.linterPaths[linter])
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        return false;
-      });
+    return fs.pathExists(this.linterPaths[linter]);
   }
 
   isInDevDep(linter: string): boolean {
