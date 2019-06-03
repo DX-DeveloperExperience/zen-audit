@@ -2,6 +2,7 @@ import { RuleRegister } from '../../rule-register';
 import { Elasticsearch } from '../../../stacks/elasticsearch';
 import { StackRegister } from '../../../stacks/stack-register';
 import axios from 'axios';
+import { YesNo } from '../../../choice';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
@@ -15,7 +16,7 @@ export class ElasticsearchNodesVersion {
 
   async shouldBeApplied(): Promise<boolean> {
     return axios.get(`${this.rootPath}_nodes`).then(result => {
-      const versions = Object.values(JSON.parse(result.data).nodes).map(
+      const versions = Object.values(result.data.nodes).map(
         (node: any) => node.version,
       );
 
@@ -33,10 +34,10 @@ export class ElasticsearchNodesVersion {
   }
 
   getPromptType() {
-    return '';
+    return 'list';
   }
 
   getChoices() {
-    return [];
+    return YesNo;
   }
 }

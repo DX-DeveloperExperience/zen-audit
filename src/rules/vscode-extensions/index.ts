@@ -6,9 +6,10 @@ import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import { possibleChoices } from './constants';
 import * as util from 'util';
+import { Elasticsearch } from '../../stacks/elasticsearch';
 
 @RuleRegister.register
-@StackRegister.registerRuleForAll({ excludes: [] })
+@StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
 export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
   readonly rootPath: string;

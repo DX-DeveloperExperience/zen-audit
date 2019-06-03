@@ -58,7 +58,7 @@ export class Linter {
 
   async apply() {
     const exec = util.promisify(cp.exec);
-    return this.init()
+    this.init()
       .then(() => {
         if (!this.linterInDevDep) {
           const installCmd =

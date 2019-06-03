@@ -10,7 +10,7 @@ export class Elasticsearch {
         timeout: 3000,
       })
       .then(result => {
-        const elasticSearchResponse = JSON.parse(result.data);
+        const elasticSearchResponse = result.data;
         return elasticSearchResponse.tagline === 'You Know, for Search';
       })
       .catch(err => {
@@ -19,9 +19,12 @@ export class Elasticsearch {
   }
 
   async isAvailable(): Promise<boolean> {
-    return (
-      this.rootPath.startsWith(`http`) && (await this.isElasticsearchResponse())
-    );
+    if (this.rootPath.startsWith(`http`)) {
+      const isElasticsearchResponse = await this.isElasticsearchResponse();
+
+      return Promise.resolve(isElasticsearchResponse);
+    }
+    return Promise.resolve(false);
   }
 
   name() {

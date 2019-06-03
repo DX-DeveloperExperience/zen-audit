@@ -29,20 +29,12 @@ export class ListRules {
     });
 
     return rulesByStackPromise.then(rulesConstructors => {
-      const rules = rulesConstructors.map(
+      const uniqueRulesConstructors = new Set(rulesConstructors);
+      const rules = Array.from(uniqueRulesConstructors).map(
         ruleConstructor => new ruleConstructor(rootPath),
       );
 
-      const uniqueRules = rules.filter((rule, index, self) => {
-        return (
-          index ===
-          self.findIndex(otherRule => {
-            return JSON.stringify(rule) === JSON.stringify(otherRule);
-          })
-        );
-      });
-
-      return Promise.all(uniqueRules.map(rule => rule.shouldBeApplied())).then(
+      return Promise.all(rules.map(rule => rule.shouldBeApplied())).then(
         values => {
           return rules.reduce((acc: Rule[], rule: Rule, i: number) => {
             if (values[i]) {
