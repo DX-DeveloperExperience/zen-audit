@@ -24,7 +24,7 @@ fs.writeJson.mockImplementation((path: string, content: any) => {
   return Promise.resolve();
 });
 
-test('should install tslint as devDependencies and create tslint.json', () => {
+test('should install tslint as devDependencies and create tslint.json', done => {
   const packageJSON = {
     devDependencies: {
       typescript: 'test',
@@ -37,16 +37,11 @@ test('should install tslint as devDependencies and create tslint.json', () => {
 
   util.promisify.mockImplementation((exec: (cmd: string) => void) => {
     return (cmd: string) => {
-      exec(cmd);
+      expect(cmd).toBe('npm i tslint typescript -DE');
+      done();
       return Promise.resolve();
     };
   });
 
-  new TypeScript(rootPath).isAvailable = jest.fn(() => {
-    return Promise.resolve(true);
-  });
-
-  return linterRule.apply().then(() => {
-    expect(cp.exec).toBeCalledWith('npm i tslint typescript -DE');
-  });
+  return linterRule.apply();
 });
