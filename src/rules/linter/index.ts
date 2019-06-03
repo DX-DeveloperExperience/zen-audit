@@ -53,13 +53,12 @@ export class Linter {
     const exec = util.promisify(cp.exec);
     return this.init()
       .then(() => {
-        console.log('test');
         if (!this.linterInDevDep) {
           const installCmd =
             this.linterChoice === 'tslint'
               ? 'npm i tslint typescript -DE'
               : 'npm i eslint -DE';
-          exec(installCmd)
+          return exec(installCmd)
             .then(() => {
               return `Installed ${this.linterChoice} succesfully`;
             })
@@ -78,22 +77,24 @@ export class Linter {
         };
 
         if (!this.linterhasConfigFile) {
-          return fs
-            .writeJson(
-              this.linterPaths[this.linterChoice],
-              linterJSON[this.linterChoice],
-              { spaces: '\t' },
-            )
-            .then(() => {
-              return (
-                feedBack +
-                ` ${
-                  this.linterChoice
-                }.json succesfully written to root folder. You may add more rules if you like, find documentation at : ${
-                  documentation[this.linterChoice]
-                }`
-              );
-            });
+          return fs.ensureFile(this.linterPaths[this.linterChoice]).then(() => {
+            return fs
+              .writeJson(
+                this.linterPaths[this.linterChoice],
+                linterJSON[this.linterChoice],
+                { spaces: '\t' },
+              )
+              .then(() => {
+                return (
+                  feedBack +
+                  ` ${
+                    this.linterChoice
+                  }.json succesfully written to root folder. You may add more rules if you like, find documentation at : ${
+                    documentation[this.linterChoice]
+                  }`
+                );
+              });
+          });
         } else {
           return feedBack + `${this.linterChoice}.json file already existing.`;
         }
@@ -101,7 +102,14 @@ export class Linter {
   }
 
   hasConfigFile(linter: string): Promise<boolean> {
-    return fs.pathExists(this.linterPaths[linter]);
+    return fs
+      .pathExists(this.linterPaths[linter])
+      .then(() => {
+        return true;
+      })
+      .catch(() => {
+        return false;
+      });
   }
 
   isInDevDep(linter: string): boolean {
