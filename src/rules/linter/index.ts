@@ -51,9 +51,8 @@ export class Linter {
 
   async apply() {
     const exec = util.promisify(cp.exec);
-    return this.init()
+    this.init()
       .then(() => {
-        console.log('test');
         if (!this.linterInDevDep) {
           const installCmd =
             this.linterChoice === 'tslint'

@@ -1,5 +1,5 @@
 import { StackRegister } from '../stack-register';
-import { existsPaths } from '../../utils/fs';
+import { existsPaths } from '../../file-utils';
 
 @StackRegister.register
 export class Java {

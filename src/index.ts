@@ -61,7 +61,7 @@ class ProjectFillerCli extends Command {
       path = args.path.endsWith('/') ? args.path : args.path + '/';
     }
 
-    if (!Path.isAbsolute(path)) {
+    if (!path.startsWith('http') && !Path.isAbsolute(path)) {
       path = Path.resolve(path) + '/';
     }
 
