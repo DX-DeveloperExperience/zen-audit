@@ -6,6 +6,7 @@ import * as Path from 'path';
 import Rule from './rules/rule';
 import { init } from './init/index';
 import { StackRegister } from './stacks/stack-register';
+import * as PromiseBlu from 'bluebird';
 
 init();
 
@@ -64,38 +65,28 @@ class ProjectFillerCli extends Command {
       path = Path.resolve(path) + '/';
     }
 
-    const rulesWithPromptProm = await ListRules.getRulesToApplyIn(path).then(
-      rules => {
-        return rules.map(async (rule: Rule) => {
-          const question: inquirer.Question = {
+    const rules = await ListRules.getRulesToApplyIn(path);
+    await PromiseBlu.each(rules, async (rule: Rule) => {
+      this.log(`Rule found: ${rule.getName()}`);
+      await inquirer
+        .prompt([
+          {
             name: rule.constructor.name,
             message: rule.getDescription(),
             type: rule.getPromptType(),
             choices: await rule.getChoices(),
-          };
-          return {
-            rule,
-            promptObject: question,
-          };
-        });
-      },
-    );
-
-    Promise.all(rulesWithPromptProm).then(rulesWithPrompt => {
-      rulesWithPrompt.forEach(async ruleWithPrompt => {
-        await inquirer
-          .prompt([ruleWithPrompt.promptObject])
-          .then(async answers => {
-            if (ruleWithPrompt.rule.apply !== undefined) {
-              const answer = Object.values(answers)[0];
-              if (Array.isArray(answer) && answer.length !== 0) {
-                await ruleWithPrompt.rule.apply(answer);
-              } else if (answer === true) {
-                await ruleWithPrompt.rule.apply();
-              }
+          },
+        ])
+        .then(answers => {
+          if (rule.apply !== undefined) {
+            const answer = Object.values(answers)[0];
+            if (Array.isArray(answer) && answer.length !== 0) {
+              rule.apply(answer);
+            } else if (answer === true) {
+              rule.apply();
             }
-          });
-      });
+          }
+        });
     });
   }
 }
