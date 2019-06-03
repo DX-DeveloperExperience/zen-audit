@@ -64,7 +64,7 @@ class ProjectFillerCli extends Command {
       path = Path.resolve(path) + '/';
     }
 
-    const rulesWithPrompt = await ListRules.getRulesToApplyIn(path).then(
+    const rulesWithPromptProm = await ListRules.getRulesToApplyIn(path).then(
       rules => {
         return rules.map(async (rule: Rule) => {
           const question: inquirer.Question = {
@@ -81,8 +81,7 @@ class ProjectFillerCli extends Command {
       },
     );
 
-    Promise.all(rulesWithPrompt).then(rulesWithPrompt => {
-      console.log(rulesWithPrompt);
+    Promise.all(rulesWithPromptProm).then(rulesWithPrompt => {
       rulesWithPrompt.forEach(async ruleWithPrompt => {
         await inquirer
           .prompt([ruleWithPrompt.promptObject])
