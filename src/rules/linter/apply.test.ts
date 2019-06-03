@@ -2,15 +2,27 @@ import { Linter } from './index';
 import { TypeScript } from '../../stacks/typescript';
 const rootPath = 'linter/';
 
+const cp = require('child_process');
+jest.mock('child_process');
+
+const util = require('util');
+jest.mock('util');
+
+const fs = require('fs-extra');
+jest.mock('fs-extra');
+
 afterEach(() => {
   jest.resetAllMocks();
   jest.resetModules();
 });
 
-const cp = require('child_process');
-jest.mock('child_process');
+fs.ensureFile.mockImplementation(() => {
+  return Promise.resolve();
+});
 
-jest.mock('fs-extra');
+fs.writeJson.mockImplementation((path: string, content: any) => {
+  return Promise.resolve();
+});
 
 test('should install tslint as devDependencies and create tslint.json', () => {
   const packageJSON = {
@@ -18,11 +30,16 @@ test('should install tslint as devDependencies and create tslint.json', () => {
       typescript: 'test',
     },
   };
+
   jest.mock('linter/package.json', () => packageJSON, { virtual: true });
+
   const linterRule = new Linter(rootPath);
 
-  linterRule.shouldBeApplied = jest.fn(() => {
-    return Promise.resolve(true);
+  util.promisify.mockImplementation((exec: Function) => {
+    return function(cmd: string) {
+      exec(cmd);
+      return Promise.resolve();
+    };
   });
 
   new TypeScript(rootPath).isAvailable = jest.fn(() => {
@@ -30,6 +47,6 @@ test('should install tslint as devDependencies and create tslint.json', () => {
   });
 
   return linterRule.apply().then(() => {
-    expect(cp.exec).toBeCalled();
+    expect(cp.exec).toBeCalledWith('npm i tslint typescript -DE');
   });
 });
