@@ -1,5 +1,4 @@
 export default interface Stack {
-  isAvailable(): boolean;
-  isAvailableProm(): Promise<boolean>;
+  isAvailable(): Promise<boolean>;
   name(): string;
 }

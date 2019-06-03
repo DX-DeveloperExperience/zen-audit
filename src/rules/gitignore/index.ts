@@ -1,10 +1,11 @@
 import { RuleRegister } from '../rule-register';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import { StackRegister } from '../../stacks/stack-register';
 import { YesNo } from '../../choice';
 import { ListStacks } from '../../stacks/list-stacks';
-import request from 'sync-request';
+import axios from 'axios';
 import { Elasticsearch } from '../../stacks/elasticsearch';
+import * as util from 'util';
 
 /**
  * This Rule will look for a .gitignore file. If it doesn't exist, applying this rule will
@@ -18,86 +19,112 @@ export class GitIgnore {
   readonly rootPath: string;
   private gitIgnoreContent: string = '';
   private gitIgnorePath: string;
-  private gitIgnoreExists: boolean;
+  private gitIgnoreExists: boolean = false;
   private description: string = '';
-  private missingRules: string = '';
+  private missingRules: string[] | undefined = undefined;
+  private initialized: boolean = false;
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
     this.gitIgnorePath = `${this.rootPath}.gitignore`;
-    try {
-      this.gitIgnoreContent = fs
-        .readFileSync(this.gitIgnorePath, {
-          encoding: 'utf8',
+  }
+
+  private async init() {
+    if (!this.initialized) {
+      return fs
+        .readFile(this.gitIgnorePath, {
+          encoding: 'utf-8',
         })
-        .trim();
-      this.gitIgnoreExists = true;
-    } catch (err) {
-      this.gitIgnoreExists = false;
-      this.description = 'The .gitignore file was not found. ';
+        .catch(e => {
+          if (
+            e.code === 'EACCESS' ||
+            e.code === 'EISDIR' ||
+            e.code === 'ENOENT'
+          ) {
+            this.gitIgnoreExists = false;
+            return '';
+          } else {
+            throw e;
+          }
+        })
+        .then((result: string) => {
+          this.gitIgnoreContent = result;
+          this.gitIgnoreExists = true;
+        });
     }
+
+    return Promise.resolve();
   }
 
   /**
    * Returns true if .gitignore
    */
-  shouldBeApplied() {
-    return (
-      !this.rootPath.startsWith('http') &&
-      (!this.gitIgnoreExists ||
-        this.gitIgnoreContent === '' ||
-        this.missGitRules())
-    );
+  async shouldBeApplied(): Promise<boolean> {
+    return this.init().then(async () => {
+      const missGitRules = await this.missGitRules();
+      return (
+        !this.gitIgnoreExists || this.gitIgnoreContent === '' || missGitRules
+      );
+    });
   }
 
-  private missGitRules() {
-    this.missingRules = ListStacks.getStacksIn(this.rootPath).reduce(
-      (keptRules, currStack) => {
-        const stackName = currStack.name().toLowerCase();
+  private getMissingGitRules(): Promise<string[]> {
+    if (this.missingRules !== undefined) {
+      Promise.resolve(this.missingRules);
+    }
 
-        let newRules = '';
-
-        // Get new rules from gitignore.io API
-        try {
-          newRules = request('GET', `https://gitignore.io/api/${stackName}`, {
-            timeout: 5000,
+    return ListStacks.getStacksIn(this.rootPath).then(availableStacks => {
+      const getKeptRules = availableStacks.map(stack => {
+        const getNewRules: Promise<string[]> = axios
+          .get(`https://gitignore.io/api/${stack.name().toLowerCase()}`)
+          .then(result => {
+            return result.data
+              .split('\n')
+              .map((rule: string) => rule.trim())
+              .filter((rule: string) => rule !== '');
           })
-            .getBody()
-            .toString();
-        } catch (err) {
-          // TODO
-        }
-
-        // Keep only rules that are not already in the .gitignore file
-        let addedRules: string = '';
-        newRules.split('\n').forEach((newRule: string) => {
-          let addRule: boolean = true;
-
-          // if a line from the gitignore api starts with a #, ignore it and go to next line
-          if (newRule.trim().startsWith('#')) {
-            return;
-          }
-
-          this.gitIgnoreContent.split('\n').forEach(currRule => {
-            if (newRule.trim() === currRule.trim()) {
-              addRule = false;
-            }
+          .catch(() => {
+            return [];
           });
-          addedRules += addRule ? newRule + '\n' : '';
+
+        return getNewRules.then(newRules => {
+          const currRules = this.gitIgnoreContent
+            .split('\n')
+            .map((rule: string) => rule.trim());
+
+          const filterRules = newRules.filter((newRule: string) => {
+            return !currRules.includes(newRule) && !newRule.startsWith('#');
+          });
+
+          return filterRules;
         });
-        return keptRules + addedRules;
-      },
-      '',
-    );
-    return this.missingRules !== '';
+      });
+
+      return Promise.all(getKeptRules).then(keptRules => {
+        return keptRules.reduce((acc: string[], curr: string[]) => {
+          return [...acc, ...curr];
+        }, []);
+      });
+    });
   }
 
-  apply() {
-    fs.writeFileSync(
-      this.gitIgnorePath,
-      this.gitIgnoreContent + '\n' + this.missingRules.trim(),
-      { encoding: 'utf8' },
-    );
+  private missGitRules(): Promise<boolean> {
+    return this.getMissingGitRules().then(missingGitRules => {
+      this.missingRules = missingGitRules;
+      return missingGitRules.length !== 0;
+    });
+  }
+
+  async apply(): Promise<void> {
+    return this.init().then(() => {
+      if (this.missingRules !== undefined) {
+        return fs.writeFile(
+          this.gitIgnorePath,
+          (this.gitIgnoreContent + '\n' + this.missingRules.join('\n')).trim(),
+          { encoding: 'utf-8' },
+        );
+      }
+    });
   }
 
   getName() {

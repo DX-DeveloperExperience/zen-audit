@@ -4,29 +4,16 @@ import { StackRegister } from '../stack-register';
 export class TypeScript {
   constructor(private readonly rootPath: string = './') {}
 
-  isAvailable() {
+  async isAvailable() {
     try {
-      const packageJson = require(`${this.rootPath}/package.json`);
-      return Object.keys(packageJson.devDependencies).includes('typescript');
+      const packageJSON = require(`${this.rootPath}package.json`);
+      return Object.keys(packageJSON.devDependencies).includes('typescript');
     } catch (e) {
-      return false;
-    }
-  }
-
-  isAvailableProm(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      try {
-        const packageJSON = require(`${this.rootPath}package.json`);
-        resolve(
-          Object.keys(packageJSON.devDependencies).includes('typescript'),
-        );
-      } catch (e) {
-        if (e.code === 'MODULE_NOT_FOUND') {
-          resolve(false);
-        }
-        reject(e);
+      if (e.code === 'MODULE_NOT_FOUND') {
+        return false;
       }
-    });
+      throw e;
+    }
   }
 
   name() {

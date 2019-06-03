@@ -2,10 +2,10 @@ import { Node } from '../../stacks/node';
 import { RuleRegister } from '../rule-register';
 import { StackRegister } from '../../stacks/stack-register';
 import { TypeScript } from '../../stacks/typescript';
-import request from 'sync-request';
 import * as cp from 'child_process';
-import * as fs from 'fs';
 import { YesNo } from '../../choice';
+import axios from 'axios';
+import { nodeSchedule, setNodeSchedule } from './constants';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
@@ -15,35 +15,37 @@ export class NodeVersion {
   private nodeVersionSchedule: any;
   private nodeVersion: string = '';
   private shortNodeVersion: string = '';
+  private initialized: boolean = false;
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
     this.nodeVersion = cp.execSync('node --version').toString();
     this.shortNodeVersion = this.nodeVersion.split('.')[0];
+  }
 
-    try {
-      this.nodeVersionSchedule = JSON.parse(
-        request(
-          'GET',
+  private async init() {
+    if (!this.initialized) {
+      return axios
+        .get(
           'https://raw.githubusercontent.com/nodejs/Release/master/schedule.json',
-          {
-            timeout: 3000,
-          },
+          { timeout: 3000 },
         )
-          .getBody()
-          .toString(),
-      );
-    } catch (err) {
-      this.nodeVersionSchedule = JSON.parse(
-        fs.readFileSync('./etc/node-schedule.json', {
-          encoding: 'utf-8',
-        }),
-      );
+        .catch(err => {
+          this.nodeVersionSchedule = nodeSchedule;
+          throw err;
+        })
+        .then(result => {
+          const fetchedSchedule = result.data;
+          this.nodeVersionSchedule = fetchedSchedule;
+          setNodeSchedule(fetchedSchedule);
+        });
     }
   }
 
-  shouldBeApplied() {
-    return this.isCritical() || this.isOutdated();
+  async shouldBeApplied() {
+    return this.init().then(() => {
+      return this.isCritical() || this.isOutdated();
+    });
   }
 
   private isCritical() {

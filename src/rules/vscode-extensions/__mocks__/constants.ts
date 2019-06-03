@@ -1,4 +1,4 @@
-export const choices: any = {
+export const possibleChoices: any = {
   stack1: [
     { name: 'Extension 1', value: 'ext1' },
     { name: 'Extension 2', value: 'ext2' },

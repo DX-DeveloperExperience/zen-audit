@@ -28,10 +28,10 @@ test('Method apply() should add husky to devDependencies', () => {
   expect(node.isAvailable()).toBeTruthy();
 
   return husky.apply().then(() => {
-    const packageJSON = fs.readFileSync(`${rootPath}package.json`, {
+    const packageJSONRead = fs.readFileSync(`${rootPath}package.json`, {
       encoding: 'utf-8',
     });
-    const parsedPackage = JSON.parse(packageJSON);
+    const parsedPackage = JSON.parse(packageJSONRead);
 
     expect(parsedPackage.devDependencies.husky).toBeDefined();
     expect(parsedPackage.husky.hooks['pre-push']).toEqual('exit 1');

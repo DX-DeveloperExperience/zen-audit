@@ -5,11 +5,7 @@ import * as inquirer from 'inquirer';
 import * as Path from 'path';
 import Rule from './rules/rule';
 import { init } from './init/index';
-import { flagUsages } from '@oclif/parser';
-import { boolean } from '@oclif/parser/lib/flags';
-import { ListStacks } from './stacks/list-stacks';
 import { StackRegister } from './stacks/stack-register';
-import { RuleRegister } from './rules/rule-register';
 
 init();
 
@@ -45,7 +41,7 @@ class ProjectFillerCli extends Command {
 
     if (runFlags.list) {
       this.log('Stacks available:');
-      const stacks = StackRegister.getImplementations();
+      const stacks = StackRegister.getConstructors();
       cli.table(stacks, {
         name: {},
         rules: {
@@ -64,49 +60,43 @@ class ProjectFillerCli extends Command {
       path = args.path.endsWith('/') ? args.path : args.path + '/';
     }
 
-    if (!Path.isAbsolute(path)) {
+    if (!path.startsWith('http') && !Path.isAbsolute(path)) {
       path = Path.resolve(path) + '/';
     }
 
-    const rules = ListRules.getRulesToApplyIn(path);
-    await this.asyncForEach(rules, async (rule: Rule) => {
-      this.log(`Rule found: ${rule.getName()}`);
-      // responses.push(
-      await inquirer
-        .prompt([
-          {
+    const rulesWithPromptProm = await ListRules.getRulesToApplyIn(path).then(
+      rules => {
+        return rules.map(async (rule: Rule) => {
+          const question: inquirer.Question = {
             name: rule.constructor.name,
             message: rule.getDescription(),
             type: rule.getPromptType(),
-            choices: rule.getChoices(),
-          },
-        ])
-        .then(answers => {
-          if (rule.apply !== undefined) {
-            const answer = Object.values(answers)[0];
-            if (Array.isArray(answer) && answer.length !== 0) {
-              rule.apply(answer);
-            } else if (answer === true) {
-              rule.apply();
-            }
-          }
+            choices: await rule.getChoices(),
+          };
+          return {
+            rule,
+            promptObject: question,
+          };
         });
-      // );
+      },
+    );
+
+    Promise.all(rulesWithPromptProm).then(rulesWithPrompt => {
+      rulesWithPrompt.forEach(async ruleWithPrompt => {
+        await inquirer
+          .prompt([ruleWithPrompt.promptObject])
+          .then(async answers => {
+            if (ruleWithPrompt.rule.apply !== undefined) {
+              const answer = Object.values(answers)[0];
+              if (Array.isArray(answer) && answer.length !== 0) {
+                await ruleWithPrompt.rule.apply(answer);
+              } else if (answer === true) {
+                await ruleWithPrompt.rule.apply();
+              }
+            }
+          });
+      });
     });
-
-    // await this.asyncForEach(responses, async (resp: {Rule: any}) => {
-    //   console.log(resp);
-
-    //   const rule = Object.
-
-    //   if(Object.keys(resp)[0].getPromptType())
-    // });
-  }
-
-  async asyncForEach(array: any[], callback: any) {
-    for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array);
-    }
   }
 }
 

@@ -19,11 +19,11 @@ export class Prettier {
     this.parsedPackage = require(this.packagePath);
   }
 
-  apply() {
+  async apply() {
     // TODO
   }
 
-  shouldBeApplied() {
+  async shouldBeApplied() {
     return !this.isInDevDep();
   }
 

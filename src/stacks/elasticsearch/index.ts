@@ -1,35 +1,32 @@
 import { StackRegister } from '../stack-register';
-import request from 'sync-request';
+import axios from 'axios';
 
 @StackRegister.register
 export class Elasticsearch {
   constructor(private readonly rootPath: string = './') {}
   private isElasticsearchResponse() {
-    try {
-      const elasticsearchResponse = JSON.parse(
-        request('GET', this.rootPath, {
-          timeout: 3000,
-        })
-          .getBody()
-          .toString(),
-      );
-      return elasticsearchResponse.tagline === 'You Know, for Search';
-    } catch (e) {
-      return false;
+    return axios
+      .get(this.rootPath, {
+        timeout: 3000,
+      })
+      .then(result => {
+        const elasticSearchResponse = result.data;
+        return elasticSearchResponse.tagline === 'You Know, for Search';
+      })
+      .catch(err => {
+        return false;
+      });
+  }
+
+  async isAvailable(): Promise<boolean> {
+    if (this.rootPath.startsWith(`http`)) {
+      const isElasticsearchResponse = await this.isElasticsearchResponse();
+
+      return Promise.resolve(isElasticsearchResponse);
     }
+    return Promise.resolve(false);
   }
 
-  isAvailable() {
-    return this.rootPath.startsWith(`http`) && this.isElasticsearchResponse();
-  }
-
-  isAvailableProm(): Promise<boolean> {
-    return new Promise<boolean>(resolve => {
-      resolve(
-        this.rootPath.startsWith('http') && this.isElasticsearchResponse(),
-      );
-    });
-  }
   name() {
     return this.constructor.name;
   }

@@ -1,7 +1,8 @@
 import { RuleRegister } from '../../rule-register';
 import { Elasticsearch } from '../../../stacks/elasticsearch';
 import { StackRegister } from '../../../stacks/stack-register';
-import request from 'sync-request';
+import axios from 'axios';
+import { YesNo } from '../../../choice';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
@@ -13,15 +14,10 @@ export class ElasticsearchNodesNumber {
     this.rootPath = rootPath;
   }
 
-  shouldBeApplied() {
-    const elasticsearchResponse = JSON.parse(
-      request('GET', this.rootPath + '_nodes', {
-        timeout: 3000,
-      })
-        .getBody()
-        .toString(),
-    );
-    return Object.keys(elasticsearchResponse.nodes).length < 3;
+  async shouldBeApplied(): Promise<boolean> {
+    return axios.get(`${this.rootPath}_nodes`).then(result => {
+      return Object.keys(result.data.nodes).length < 3;
+    });
   }
 
   getName() {
@@ -33,10 +29,10 @@ export class ElasticsearchNodesNumber {
   }
 
   getPromptType() {
-    return '';
+    return 'list';
   }
 
   getChoices() {
-    return [];
+    return YesNo;
   }
 }

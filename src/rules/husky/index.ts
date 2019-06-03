@@ -22,7 +22,7 @@ export class Husky {
     const exec = util.promisify(cp.exec);
 
     return exec('npm i -DE husky', { cwd: this.rootPath })
-      .then(out => {
+      .then(() => {
         return fs.readFile(this.packagePath, { encoding: 'utf-8' });
       })
       .then(data => {
@@ -42,11 +42,11 @@ export class Husky {
         );
       })
       .catch((err: Error) => {
-        return err;
+        throw err;
       });
   }
 
-  shouldBeApplied() {
+  async shouldBeApplied() {
     return !this.isInDevDep();
   }
 
