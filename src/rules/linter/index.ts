@@ -65,6 +65,7 @@ export class Linter {
             this.linterChoice === 'tslint'
               ? 'npm i tslint typescript -DE'
               : 'npm i eslint -DE';
+
           return exec(installCmd)
             .then(() => {
               return `Installed ${this.linterChoice} succesfully`;
