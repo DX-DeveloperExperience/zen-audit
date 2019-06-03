@@ -1,59 +1,126 @@
-import { FileNotReadableError } from '../../errors/FileNotReadableError';
-import FileUtils from '../../file-utils';
 import { RuleRegister } from '../rule-register';
-import * as fs from 'fs';
+import { StackRegister } from '../../stacks/stack-register';
+import { TypeScript } from '../../stacks/typescript/index';
+import { Node } from '../../stacks/node/index';
+import * as fs from 'fs-extra';
+import { linterJSON } from './constants';
+import * as cp from 'child_process';
+import * as util from 'util';
 
 @RuleRegister.register
+@StackRegister.registerRuleForStacks([TypeScript, Node])
 export class Linter {
-  readonly requiredFiles: string[] = ['tslint.json'];
   readonly rootPath: string;
   private packageJSONPath: string;
-  private packageFileExists: boolean;
-  private parsedFile: any;
+  private linterPaths: { [path: string]: string };
+  private parsedPackageJSON: any;
+  private initialized: boolean | undefined = undefined;
+  private linterChoice: string = '';
+  private linterhasConfigFile: boolean = false;
+  private linterInDevDep: boolean = false;
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
-
     this.packageJSONPath = `${this.rootPath}package.json`;
+    this.linterPaths = {
+      tslint: `${this.rootPath}tslint.json`,
+      eslint: `${this.rootPath}eslint.json`,
+    };
 
-    try {
-      this.parsedFile = JSON.parse(
-        fs.readFileSync(this.packageJSONPath, { encoding: 'utf8' }),
-      );
-      this.packageFileExists = true;
-    } catch (err) {
-      if (err.code === 'ENOENT') {
-        this.packageFileExists = false;
-      } else {
-        throw new FileNotReadableError(this.packageJSONPath);
-      }
+    this.parsedPackageJSON = require(this.packageJSONPath);
+  }
+
+  private async init(): Promise<void> {
+    // return new Promise(resolve => {
+    if (!this.initialized) {
+      return new TypeScript(this.rootPath)
+        .isAvailable()
+        .then(result => {
+          this.linterChoice = result ? 'tslint' : 'eslint';
+          return;
+        })
+        .catch(e => {
+          return;
+        });
     }
+    return;
+    // });
   }
 
-  shouldBeApplied() {
-    return (
-      this.packageFileExists &&
-      !(
-        FileUtils.filesExistIn(this.rootPath, this.requiredFiles) &&
-        this.isInDevDep()
-      )
-    );
+  async shouldBeApplied() {
+    return this.init().then(async () => {
+      this.linterhasConfigFile = await this.hasConfigFile(this.linterChoice);
+      this.linterInDevDep = this.isInDevDep(this.linterChoice);
+
+      return this.linterInDevDep && this.linterhasConfigFile;
+    });
   }
 
-  apply() {
-    // TODO
+  async apply() {
+    const exec = util.promisify(cp.exec);
+    this.init()
+      .then(() => {
+        if (!this.linterInDevDep) {
+          const installCmd =
+            this.linterChoice === 'tslint'
+              ? 'npm i tslint typescript -DE'
+              : 'npm i eslint -DE';
+          return exec(installCmd)
+            .then(() => {
+              return `Installed ${this.linterChoice} succesfully`;
+            })
+            .catch(() => {
+              return `Could notCould not install ${
+                this.linterChoice
+              }, try installing it using "${installCmd}" command.`;
+            });
+        }
+        return `${this.linterChoice} already installed.`;
+      })
+      .then(feedBack => {
+        const documentation: { [linter: string]: string } = {
+          tslint: 'https://palantir.github.io/tslint/usage/configuration/',
+          eslint: 'https://eslint.org/docs/user-guide/configuring',
+        };
+
+        if (!this.linterhasConfigFile) {
+          return fs.ensureFile(this.linterPaths[this.linterChoice]).then(() => {
+            return fs
+              .writeJson(
+                this.linterPaths[this.linterChoice],
+                linterJSON[this.linterChoice],
+                { spaces: '\t' },
+              )
+              .then(() => {
+                return (
+                  feedBack +
+                  ` ${
+                    this.linterChoice
+                  }.json succesfully written to root folder. You may add more rules if you like, find documentation at : ${
+                    documentation[this.linterChoice]
+                  }`
+                );
+              });
+          });
+        } else {
+          return feedBack + `${this.linterChoice}.json file already existing.`;
+        }
+      });
   }
 
-  isInDevDep(): boolean {
+  hasConfigFile(linter: string): Promise<boolean> {
+    return fs.pathExists(this.linterPaths[linter]);
+  }
+
+  isInDevDep(linter: string): boolean {
     return (
       this.hasDevDep() &&
-      (this.parsedFile.devDependencies.tslint !== undefined ||
-        this.parsedFile.devDependencies.eslint !== undefined)
+      this.parsedPackageJSON.devDependencies[linter] !== undefined
     );
   }
 
   hasDevDep(): boolean {
-    return this.parsedFile.devDependencies !== undefined;
+    return this.parsedPackageJSON.devDependencies !== undefined;
   }
 
   getName() {

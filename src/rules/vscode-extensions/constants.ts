@@ -4,7 +4,7 @@ interface ChoiceList {
   [stack: string]: Choice[];
 }
 
-export const choices: ChoiceList = {
+export const possibleChoices: ChoiceList = {
   All: [{ name: 'GitLens', value: 'eamodio.gitlens' }],
   Angular: [
     { name: 'Angular Language Service', value: 'angular.ng-template' },
@@ -17,4 +17,6 @@ export const choices: ChoiceList = {
     { name: 'ESLint', value: 'dbaeumer.vscode-eslint' },
     { name: 'Prettier', value: 'esbenp.prettier-vscode' },
   ],
+  TypeScript: [{ name: 'Prettier', value: 'esbenp.prettier-vscode' }],
+  Node: [{ name: 'Prettier', value: 'esbenp.prettier-vscode' }],
 };

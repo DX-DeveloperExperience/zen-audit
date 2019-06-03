@@ -2,12 +2,17 @@ import { StackRegister } from '../stack-register';
 
 @StackRegister.register
 export class TypeScript {
-  isAvailable(path: string) {
+  constructor(private readonly rootPath: string = './') {}
+
+  async isAvailable() {
     try {
-      const packageJson = require(`${path}/package.json`);
-      return Object.keys(packageJson.devDependencies).includes('typescript');
+      const packageJSON = require(`${this.rootPath}package.json`);
+      return Object.keys(packageJSON.devDependencies).includes('typescript');
     } catch (e) {
-      return false;
+      if (e.code === 'MODULE_NOT_FOUND') {
+        return false;
+      }
+      throw e;
     }
   }
 

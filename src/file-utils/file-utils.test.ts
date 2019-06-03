@@ -1,5 +1,4 @@
-import FileUtils from '.';
-
+import { findFileRecursively } from '.';
 const mockFS = require('mock-fs');
 
 mockFS({
@@ -26,12 +25,10 @@ afterAll(() => {
 });
 
 test('findFilesRecursively to return false if file is not in file tree', () => {
-  expect(
-    FileUtils.findFileRecursively('root', 'UnexistingFile.ts'),
-  ).toBeFalsy();
+  expect(findFileRecursively('root', 'UnexistingFile.ts')).toBeFalsy();
 });
 
 test('findFilesRecursively should return true if file is in file tree', () => {
-  expect(FileUtils.findFileRecursively('root', 'file2-1-1-1.ts')).toBeTruthy();
-  expect(FileUtils.findFileRecursively('root', 'file1-1.ts')).toBeTruthy();
+  expect(findFileRecursively('root', 'file2-1-1-1.ts')).toBeTruthy();
+  expect(findFileRecursively('root', 'file1-1.ts')).toBeTruthy();
 });

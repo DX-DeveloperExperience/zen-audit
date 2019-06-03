@@ -1,84 +1,85 @@
 import { GitIgnore } from '../../rules/gitignore';
 import { ListStacks } from '../../stacks/list-stacks/index';
 
-const fs = require('fs');
-const request = require('sync-request');
+const fs = require('fs-extra');
+const axios = require('axios');
 
-jest.mock('fs');
-jest.mock('sync-request');
+jest.mock('fs-extra');
+jest.mock('axios');
 
 afterEach(() => {
   jest.resetAllMocks();
 });
 
 test('shouldBeApplied should return true if .gitignore file does not exist', () => {
-  fs.readFileSync.mockImplementation(() => {
-    throw { code: 'ENOENT' };
+  fs.readFile.mockImplementation(() => {
+    return Promise.reject({ code: 'ENOENT' });
   });
 
-  expect(new GitIgnore().shouldBeApplied()).toBeTruthy();
+  return new GitIgnore().shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
 test('shouldBeApplied should return true if .gitignore file exists but is empty', () => {
-  fs.readFileSync.mockReturnValue('');
-
-  expect(new GitIgnore().shouldBeApplied()).toBeTruthy();
+  fs.readFile.mockReturnValue(Promise.resolve(''));
+  return new GitIgnore().shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
-test('shouldBeApplied should return true if .gitignore file does not contain every possible rule for a stack', () => {
+test('shouldBeApplied should return true if .gitignore\
+ file does not contain every possible rule for a stack,\
+ apply should write missing rules to file', () => {
   const gitignore: string =
     '# comment\n' +
     '# another comment\n' +
     'a/directory/to/ignore\n' +
     'another/directory/to/ignore';
 
-  fs.readFileSync.mockReturnValue(gitignore);
+  fs.readFile.mockReturnValue(Promise.resolve(gitignore));
 
   ListStacks.getStacksIn = jest.fn(() => {
-    return [
+    return Promise.resolve([
       {
         name(): string {
-          return '';
+          return 'stack1';
         },
       } as any,
-    ];
+    ]);
   });
 
-  request.mockImplementation(() => {
-    return {
-      getBody() {
-        return {
-          toString() {
-            return (
-              '# comment\n' +
-              'a/directory/to/ignore\n' +
-              'a/directory/to/be/added/to/gitignore\n' +
-              'another/directory/to/ignore\n' +
-              'another/directory/to/be/added/to/gitignore'
-            );
-          },
-        };
-      },
-    };
+  axios.get.mockImplementation(() => {
+    return Promise.resolve({
+      data:
+        '# comment\n' +
+        'a/directory/to/ignore\n' +
+        'a/directory/to/be/added/to/gitignore\n' +
+        'another/directory/to/ignore\n' +
+        'another/directory/to/be/added/to/gitignore',
+    });
   });
 
-  let resultGitignore;
-  fs.writeFileSync.mockImplementation((_P: string, result: string) => {
+  let resultGitignore: string;
+  fs.writeFile.mockImplementation((_P: string, result: string) => {
     resultGitignore = result;
   });
 
   const gitIgnore = new GitIgnore();
+  return gitIgnore.shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
 
-  expect(gitIgnore.shouldBeApplied()).toBeTruthy();
-  gitIgnore.apply();
-  expect(resultGitignore).toEqual(
-    '# comment\n' +
-      '# another comment\n' +
-      'a/directory/to/ignore\n' +
-      'another/directory/to/ignore\n' +
-      'a/directory/to/be/added/to/gitignore\n' +
-      'another/directory/to/be/added/to/gitignore',
-  );
+    return gitIgnore.apply().then(() => {
+      expect(resultGitignore).toEqual(
+        '# comment\n' +
+          '# another comment\n' +
+          'a/directory/to/ignore\n' +
+          'another/directory/to/ignore\n' +
+          'a/directory/to/be/added/to/gitignore\n' +
+          'another/directory/to/be/added/to/gitignore',
+      );
+    });
+  });
 });
 
 test('shouldBeApplied should return false if .gitignore file contains every possible rules', () => {
@@ -88,33 +89,28 @@ test('shouldBeApplied should return false if .gitignore file contains every poss
     'a/directory/to/ignore \n' +
     'another/directory/to/ignore';
 
-  fs.readFileSync.mockReturnValue(gitignore);
+  fs.readFile.mockReturnValue(Promise.resolve(gitignore));
 
   ListStacks.getStacksIn = jest.fn(() => {
-    return [
+    return Promise.resolve([
       {
         name(): string {
           return '';
         },
       } as any,
-    ];
+    ]);
   });
 
-  request.mockImplementation(() => {
-    return {
-      getBody() {
-        return {
-          toString() {
-            return (
-              '# comment\n' +
-              'a/directory/to/ignore\n' +
-              'another/directory/to/ignore'
-            );
-          },
-        };
-      },
-    };
+  axios.get.mockImplementation(() => {
+    return Promise.resolve({
+      data:
+        '# comment\n' +
+        'a/directory/to/ignore\n' +
+        'another/directory/to/ignore',
+    });
   });
 
-  expect(new GitIgnore().shouldBeApplied()).toBeFalsy();
+  return new GitIgnore().shouldBeApplied().then(result => {
+    expect(result).toBeFalsy();
+  });
 });

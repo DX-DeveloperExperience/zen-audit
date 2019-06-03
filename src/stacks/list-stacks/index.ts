@@ -1,21 +1,33 @@
-import { StackRegister } from '../stack-register';
+import { StackRegister, Constructor } from '../stack-register';
 import Stack from '../stack';
 
 export class ListStacks {
-  private static stacks: Stack[] = [];
-  private static path = '';
-
-  static getStacksIn(rootPath: string): Stack[] {
-    if (this.path === '' || this.path !== rootPath) {
-      this.path = rootPath;
+  static stacks: Stack[];
+  static getStacksIn(rootPath: string) {
+    if (ListStacks.stacks) {
+      return Promise.resolve(ListStacks.stacks);
     }
+    const stackConstructors: Array<
+      Constructor<Stack>
+    > = StackRegister.getConstructors();
 
-    if (this.stacks.length === 0 || this.path !== rootPath) {
-      this.stacks = StackRegister.getImplementations()
-        .map(stack => new stack(rootPath))
-        .filter(stack => stack.isAvailable(rootPath));
-    }
+    const stacks = stackConstructors.map(
+      stackConstructor => new stackConstructor(rootPath),
+    );
 
-    return this.stacks;
+    const isAvailablePromise = stacks.map(stack => stack.isAvailable());
+
+    return Promise.all(isAvailablePromise).then(availableValues => {
+      ListStacks.stacks = stacks.reduce(
+        (acc: Stack[], stack: Stack, i: number) => {
+          if (availableValues[i]) {
+            return [...acc, stack];
+          }
+          return acc;
+        },
+        [],
+      );
+      return ListStacks.stacks;
+    });
   }
 }

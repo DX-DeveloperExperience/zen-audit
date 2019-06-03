@@ -2,42 +2,41 @@ import { RuleRegister } from '../rule-register';
 import { StackRegister } from '../../stacks/stack-register';
 import { ListStacks } from '../../stacks/list-stacks';
 import Choice from '../../choice';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as cp from 'child_process';
-import { choices } from './constants';
+import { possibleChoices } from './constants';
+import * as util from 'util';
+import { Elasticsearch } from '../../stacks/elasticsearch';
 
 @RuleRegister.register
-@StackRegister.registerRuleForAll({ excludes: [] })
+@StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
 export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
   readonly rootPath: string;
-  private extensionsJSON: string;
+  private extensionsJSONPath: string;
   private parsedExtensionsFile: any;
   private extensionsFileExists: boolean;
   private missingRecommendations: string[] = [];
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
-    this.extensionsJSON = `${this.rootPath}.vscode/extensions.json`;
+    this.extensionsJSONPath = `${this.rootPath}.vscode/extensions.json`;
 
     try {
-      this.parsedExtensionsFile = JSON.parse(
-        fs.readFileSync(this.extensionsJSON, {
-          encoding: 'utf8',
-        }),
-      );
+      this.parsedExtensionsFile = require(this.extensionsJSONPath);
       this.extensionsFileExists = true;
-    } catch (err) {
+    } catch (e) {
       this.extensionsFileExists = false;
+      // console.log(e);
     }
   }
 
-  shouldBeApplied() {
+  async shouldBeApplied() {
     return (
       (this.dotVSCodeExists() && !this.extensionsFileExists) ||
       (this.extensionsFileExists && !this.hasRecommendations()) ||
       (!this.extensionsFileExists && this.codeIsInPath()) ||
-      this.getMissingRecommendations().length !== 0
+      (await this.getMissingRecommendations().length) !== 0
     );
   }
 
@@ -74,10 +73,12 @@ export class VSCodeExtensions {
 
   private getMissingRecommendations(): string[] {
     if (this.missingRecommendations.length === 0) {
-      this.getExtensionsList().forEach(choice => {
-        if (!this.parsedExtensionsFile.recommendations.includes(choice)) {
-          this.missingRecommendations.push(choice);
-        }
+      this.getExtensionsList().then(extensionsList => {
+        extensionsList.forEach(choice => {
+          if (!this.parsedExtensionsFile.recommendations.includes(choice)) {
+            this.missingRecommendations.push(choice);
+          }
+        });
       });
     }
 
@@ -97,24 +98,18 @@ export class VSCodeExtensions {
       }
     });
 
-    // Create .vscode directory if it does not exist
-    if (!fs.existsSync(`${this.rootPath}/.vscode`)) {
-      try {
-        fs.mkdirSync(`${this.rootPath}/.vscode`);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    try {
-      fs.writeFileSync(
-        `${this.rootPath}/.vscode/extensions.json`,
-        JSON.stringify(this.parsedExtensionsFile, null, '\t'),
-        { encoding: 'utf8' },
-      );
-    } catch (err) {
-      //
-    }
+    return fs
+      .ensureFile(this.extensionsJSONPath)
+      .catch(err => {
+        throw err;
+      })
+      .then(() => {
+        return fs.writeJSON(
+          this.extensionsJSONPath,
+          this.parsedExtensionsFile,
+          { spaces: '\t' },
+        );
+      });
   }
 
   getName() {
@@ -129,51 +124,58 @@ export class VSCodeExtensions {
     return 'checkbox';
   }
 
-  getExtensionsList(): string[] {
-    return this.getChoices().map(choice => choice.value as string);
+  getExtensionsList(): Promise<string[]> {
+    return this.getChoices().then((choices: Choice[]) => {
+      return choices.map(choice => choice.value as string);
+    });
   }
 
-  getChoices(): Choice[] {
-    const stackNames = ListStacks.getStacksIn(this.rootPath).map(stack => {
-      return stack.name();
-    });
-
-    let existingRecommendations: string[] = [];
-    if (this.parsedExtensionsFile !== undefined) {
-      existingRecommendations = this.parsedExtensionsFile.recommendations;
-    }
-
-    return stackNames.reduce(
-      (keptChoices, stackName) => {
-        let choicesByStack: Choice[];
-
-        if (choices[stackName] !== undefined) {
-          // If some recommendations are existing...
-          if (
-            existingRecommendations !== undefined &&
-            existingRecommendations.length !== 0
-          ) {
-            // ...do not add choices that are included in these recommendations
-            choicesByStack = choices[stackName].reduce(
-              (kept, curr) => {
-                if (!existingRecommendations.includes(curr.value as string)) {
-                  return [...kept, curr];
-                }
-                return [...kept];
-              },
-              [] as Choice[],
-            );
-          } else {
-            choicesByStack = choices[stackName];
-          }
-          if (choicesByStack !== undefined) {
-            return [...keptChoices, ...choicesByStack];
-          }
-        }
-
-        return [...keptChoices];
-      },
-      [] as Choice[],
+  getChoices(): Promise<Choice[]> {
+    const stackNamesPromise = ListStacks.getStacksIn(this.rootPath).then(
+      stacks =>
+        stacks.map(stack => {
+          return stack.name();
+        }),
     );
+
+    return stackNamesPromise.then(stackNames => {
+      let existingRecommendations: string[] = [];
+      if (this.parsedExtensionsFile !== undefined) {
+        existingRecommendations = this.parsedExtensionsFile.recommendations;
+      }
+
+      return stackNames.reduce(
+        (keptChoices, stackName) => {
+          let choicesByStack: Choice[];
+
+          if (possibleChoices[stackName] !== undefined) {
+            // If some recommendations are existing...
+            if (
+              existingRecommendations !== undefined &&
+              existingRecommendations.length !== 0
+            ) {
+              // ...do not add choices that are included in these recommendations
+              choicesByStack = possibleChoices[stackName].reduce(
+                (kept, curr) => {
+                  if (!existingRecommendations.includes(curr.value as string)) {
+                    return [...kept, curr];
+                  }
+                  return [...kept];
+                },
+                [] as Choice[],
+              );
+            } else {
+              choicesByStack = possibleChoices[stackName];
+            }
+            if (choicesByStack !== undefined) {
+              return [...keptChoices, ...choicesByStack];
+            }
+          }
+
+          return [...keptChoices];
+        },
+        [] as Choice[],
+      );
+    });
   }
 }
