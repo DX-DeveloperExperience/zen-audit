@@ -55,29 +55,29 @@ class ProjectFillerCli extends Command {
       path = Path.resolve(path) + '/';
     }
 
-    const rules = await ListRules.getRulesToApplyIn(path);
-    await PromiseBlu.each(rules, async (rule: Rule) => {
-      this.log(`Rule found: ${rule.getName()}`);
-      await inquirer
-        .prompt([
-          {
-            name: rule.constructor.name,
-            message: rule.getDescription(),
-            type: rule.getPromptType(),
-            choices: await rule.getChoices(),
-          },
-        ])
-        .then(answers => {
-          if (rule.apply !== undefined) {
-            const answer = Object.values(answers)[0];
-            if (Array.isArray(answer) && answer.length !== 0) {
-              rule.apply(answer);
-            } else if (answer === true) {
-              rule.apply();
-            }
-          }
-        });
-    });
+    // const rules = await ListRules.getRulesToApplyIn(path);
+    // await PromiseBlu.each(rules, async (rule: Rule) => {
+    //   this.log(`Rule found: ${rule.getName()}`);
+    //   await inquirer
+    //     .prompt([
+    //       {
+    //         name: rule.constructor.name,
+    //         message: rule.getDescription(),
+    //         type: rule.getPromptType(),
+    //         choices: await rule.getChoices(),
+    //       },
+    //     ])
+    //     .then(answers => {
+    //       if (rule.apply !== undefined) {
+    //         const answer = Object.values(answers)[0];
+    //         if (Array.isArray(answer) && answer.length !== 0) {
+    //           rule.apply(answer);
+    //         } else if (answer === true) {
+    //           rule.apply();
+    //         }
+    //       }
+    //     });
+    // });
 
     const tasks = new Listr([
       {
