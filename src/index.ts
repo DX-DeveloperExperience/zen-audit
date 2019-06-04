@@ -118,6 +118,27 @@ class ProjectFillerCli extends Command {
           });
         },
       },
+      {
+        title: 'Searching for rules..',
+        enabled: () => Object.keys(runFlags).length === 0,
+        task: (result, task) => {
+          return new Promise((resolve, reject) => {
+            ListRules.getRulesToApplyIn(path).then(foundRules => {
+              task.title = 'Rules found';
+              result.prompts = [];
+              foundRules.map(async rule => {
+                result.prompts.push({
+                  name: rule.constructor.name,
+                  message: rule.getDescription(),
+                  type: rule.getPromptType(),
+                  choices: await rule.getChoices(),
+                });
+              });
+              resolve();
+            });
+          });
+        },
+      },
     ]);
 
     tasks
@@ -128,10 +149,14 @@ class ProjectFillerCli extends Command {
             name: {},
             rules: {},
           });
-        } else if (result.foundStacks) {
+        }
+        if (result.foundStacks) {
           cli.table(result.foundStacks, {
             name: {},
           });
+        }
+        if (result.prompts) {
+          inquirer.prompt(result.prompts);
         }
       })
       .catch(() => ({}));
