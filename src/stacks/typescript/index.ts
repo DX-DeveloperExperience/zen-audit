@@ -7,7 +7,10 @@ export class TypeScript {
   async isAvailable() {
     try {
       const packageJSON = require(`${this.rootPath}package.json`);
-      return Object.keys(packageJSON.devDependencies).includes('typescript');
+      if (packageJSON.devDependencies !== undefined) {
+        return Object.keys(packageJSON.devDependencies).includes('typescript');
+      }
+      return false;
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND') {
         return false;

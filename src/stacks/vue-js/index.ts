@@ -7,7 +7,10 @@ export class VueJS {
   async isAvailable(): Promise<boolean> {
     try {
       const packageJson = require(`${this.rootPath}/package.json`);
-      return Object.keys(packageJson.dependencies).includes('vue');
+      if (packageJson.dependencies !== undefined) {
+        return Object.keys(packageJson.dependencies).includes('vue');
+      }
+      return false;
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND') {
         return false;

@@ -4,19 +4,13 @@ import { StackRegister } from '../stack-register';
 export class Angular {
   constructor(private readonly rootPath: string = './') {}
 
-  // isAvailable() {
-  //   try {
-  //     const packageJson = require(`${this.rootPath}/package.json`);
-  //     return Object.keys(packageJson.dependencies).includes('@angular/core');
-  //   } catch (e) {
-  //     return false;
-  //   }
-  // }
-
   async isAvailable(): Promise<boolean> {
     try {
       const packageJSON = require(`${this.rootPath}package.json`);
-      return Object.keys(packageJSON.dependencies).includes('@angular/core');
+      if (packageJSON.dependencies !== undefined) {
+        return Object.keys(packageJSON.dependencies).includes('@angular/core');
+      }
+      return false;
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND') {
         return false;
