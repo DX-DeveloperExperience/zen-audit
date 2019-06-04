@@ -7,6 +7,8 @@ import Rule from './rules/rule';
 import { init } from './init/index';
 import { StackRegister } from './stacks/stack-register';
 import * as PromiseBlu from 'bluebird';
+import { ListStacks } from './stacks/list-stacks/index';
+import * as Listr from 'listr';
 
 init();
 
@@ -29,6 +31,10 @@ class ProjectFillerCli extends Command {
       char: 'r',
       description: 'Search for rules that may apply to your project',
     }),
+    stacks: flags.boolean({
+      char: 's',
+      description: 'Search for stacks found in your project',
+    }),
     list: flags.boolean({
       char: 'l',
       description: 'List all rules and stacks available',
@@ -39,22 +45,6 @@ class ProjectFillerCli extends Command {
 
   async run() {
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
-
-    if (runFlags.list) {
-      this.log('Stacks available:');
-      const stacks = StackRegister.getConstructors();
-      cli.table(stacks, {
-        name: {},
-        rules: {
-          get: stack =>
-            StackRegister.getRulesByStack(stack.name)
-              .map(rule => rule.name)
-              .join(', '),
-        },
-      });
-      return;
-    }
-
     let path = './';
 
     if (args.path !== undefined) {
@@ -88,6 +78,63 @@ class ProjectFillerCli extends Command {
           }
         });
     });
+
+    const tasks = new Listr([
+      {
+        title: 'Retrieving rules and stacks',
+        enabled: () => runFlags.list,
+        task: (result, task) => {
+          return new Promise((resolve, reject) => {
+            task.title = 'Possible stacks:';
+            const stacks = StackRegister.getConstructors();
+            result.rulesAndStacks = stacks.map(stack => {
+              return {
+                name: stack.name,
+                rules: StackRegister.getRulesByStack(stack.name)
+                  .map(rule => rule.name)
+                  .join(', '),
+              };
+            });
+            resolve();
+          });
+        },
+      },
+      {
+        title: 'Searching for available Stacks',
+        enabled: () => runFlags.stacks,
+        task: (result, task) => {
+          return new Promise((resolve, reject) => {
+            const stacksFoundProm = ListStacks.getStacksIn(path);
+            stacksFoundProm.then(stacksFound => {
+              if (stacksFound.length === 0) {
+                reject(new Error('No stack found.'));
+              }
+              task.title = 'Stacks found';
+              result.foundStacks = stacksFound.map(stackFound => {
+                return { name: stackFound.name() };
+              });
+              resolve();
+            });
+          });
+        },
+      },
+    ]);
+
+    tasks
+      .run({})
+      .then(result => {
+        if (result.rulesAndStacks) {
+          cli.table(result.rulesAndStacks, {
+            name: {},
+            rules: {},
+          });
+        } else if (result.foundStacks) {
+          cli.table(result.foundStacks, {
+            name: {},
+          });
+        }
+      })
+      .catch(() => ({}));
   }
 }
 
