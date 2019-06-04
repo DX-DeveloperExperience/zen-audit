@@ -9,7 +9,7 @@ const cp = require('child_process');
 jest.mock('child_process');
 
 test('Should run npm i prettier -DE command', () => {
-  jest.mock(rootPath + 'package.json', () => {}, { virtual: true });
+  jest.mock(rootPath + 'package.json', () => ({}), { virtual: true });
 
   const prettier = new Prettier(rootPath);
 
