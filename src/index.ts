@@ -55,30 +55,6 @@ class ProjectFillerCli extends Command {
       path = Path.resolve(path) + '/';
     }
 
-    // const rules = await ListRules.getRulesToApplyIn(path);
-    // await PromiseBlu.each(rules, async (rule: Rule) => {
-    //   this.log(`Rule found: ${rule.getName()}`);
-    //   await inquirer
-    //     .prompt([
-    //       {
-    //         name: rule.constructor.name,
-    //         message: rule.getDescription(),
-    //         type: rule.getPromptType(),
-    //         choices: await rule.getChoices(),
-    //       },
-    //     ])
-    //     .then(answers => {
-    //       if (rule.apply !== undefined) {
-    //         const answer = Object.values(answers)[0];
-    //         if (Array.isArray(answer) && answer.length !== 0) {
-    //           rule.apply(answer);
-    //         } else if (answer === true) {
-    //           rule.apply();
-    //         }
-    //       }
-    //     });
-    // });
-
     if (runFlags.list) {
       cli.action.start('Retrieving rules and stacks');
       const stacks = StackRegister.getConstructors();
@@ -120,11 +96,12 @@ class ProjectFillerCli extends Command {
           };
         });
 
+        if (prompts.length === 0) {
+          cli.action.stop('No rule to apply, you\'re good to go ! :)');
+          return;
+        }
+
         Promise.all(prompts).then(prompts => {
-          if (prompts.length === 0) {
-            cli.action.stop('No rule to apply, you\'re good to go ! :)');
-            return;
-          }
           cli.action.stop(`${prompts.length} rules found ! Let's go !`);
           inquirer.prompt(prompts).then(answers => {
             Object.entries(answers).forEach(([ruleName, answer], i) => {
