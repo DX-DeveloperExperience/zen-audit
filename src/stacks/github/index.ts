@@ -1,6 +1,7 @@
 import { StackRegister } from '../stack-register';
 import * as util from 'util';
 import * as cp from 'child_process';
+import { logger } from '../../logger/index';
 
 @StackRegister.register
 export class GitHub {
@@ -9,12 +10,13 @@ export class GitHub {
   async isAvailable(): Promise<boolean> {
     const exec = util.promisify(cp.exec);
 
-    return exec(`git -C ${this.rootPath} remote -v`)
+    return exec(`git remote -v`, { cwd: this.rootPath })
       .then((value: { stdout: string; stderr: string }) => {
         return value.stdout.includes('github.com');
       })
       .catch(() => {
-        throw new Error('Could not execute "git" command, is git installed ?');
+        logger.error('Could not execute "git" command, is git installed ?');
+        return false;
       });
   }
 
