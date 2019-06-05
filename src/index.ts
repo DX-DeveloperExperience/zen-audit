@@ -79,87 +79,64 @@ class ProjectFillerCli extends Command {
     //     });
     // });
 
-    const tasks = new Listr([
-      {
-        title: 'Retrieving rules and stacks',
-        enabled: () => runFlags.list,
-        task: (result, task) => {
-          return new Promise((resolve, reject) => {
-            task.title = 'Possible stacks:';
-            const stacks = StackRegister.getConstructors();
-            result.rulesAndStacks = stacks.map(stack => {
-              return {
-                name: stack.name,
-                rules: StackRegister.getRulesByStack(stack.name)
-                  .map(rule => rule.name)
-                  .join(', '),
-              };
-            });
-            resolve();
-          });
+    if (runFlags.list) {
+      cli.action.start('Retrieving rules and stacks');
+      const stacks = StackRegister.getConstructors();
+      cli.action.stop();
+      cli.table(stacks, {
+        name: {},
+        rules: {
+          get: stack =>
+            StackRegister.getRulesByStack(stack.name)
+              .map(rule => rule.name)
+              .join(', '),
         },
-      },
-      {
-        title: 'Searching for available Stacks',
-        enabled: () => runFlags.stacks,
-        task: (result, task) => {
-          return new Promise((resolve, reject) => {
-            const stacksFoundProm = ListStacks.getStacksIn(path);
-            stacksFoundProm.then(stacksFound => {
-              if (stacksFound.length === 0) {
-                reject(new Error('No stack found.'));
-              }
-              task.title = 'Stacks found';
-              result.foundStacks = stacksFound.map(stackFound => {
-                return { name: stackFound.name() };
-              });
-              resolve();
-            });
-          });
-        },
-      },
-      {
-        title: 'Searching for rules..',
-        enabled: () => Object.keys(runFlags).length === 0,
-        task: (result, task) => {
-          return new Promise((resolve, reject) => {
-            ListRules.getRulesToApplyIn(path).then(foundRules => {
-              task.title = 'Rules found';
-              result.prompts = [];
-              foundRules.map(async rule => {
-                result.prompts.push({
-                  name: rule.constructor.name,
-                  message: rule.getDescription(),
-                  type: rule.getPromptType(),
-                  choices: await rule.getChoices(),
-                });
-              });
-              resolve();
-            });
-          });
-        },
-      },
-    ]);
+      });
+    }
 
-    tasks
-      .run({})
-      .then(result => {
-        if (result.rulesAndStacks) {
-          cli.table(result.rulesAndStacks, {
-            name: {},
-            rules: {},
+    if (runFlags.stacks) {
+      cli.action.start('Searching for available stacks');
+      const stacksFoundProm = ListStacks.getStacksIn(path);
+      stacksFoundProm.then(stacksFound => {
+        if (stacksFound.length === 0) {
+          cli.action.stop('No stack found.');
+        }
+        cli.action.stop('Stacks found: ');
+        stacksFound.map(stackFound => {
+          this.log(stackFound.name());
+        });
+      });
+    }
+
+    if (Object.keys(runFlags).length === 0) {
+      cli.action.start('Searching for rules');
+      ListRules.getRulesToApplyIn(path).then(foundRules => {
+        const prompts = foundRules.map(async rule => {
+          return {
+            name: rule.constructor.name,
+            message: rule.getDescription(),
+            type: rule.getPromptType(),
+            choices: await rule.getChoices(),
+          };
+        });
+
+        Promise.all(prompts).then(prompts => {
+          if (prompts.length === 0) {
+            cli.action.stop('No rule to apply, you\'re good to go ! :)');
+            return;
+          }
+          cli.action.stop(`${prompts.length} rules found ! Let's go !`);
+          inquirer.prompt(prompts).then(answers => {
+            Object.entries(answers).forEach(([ruleName, answer], i) => {
+              const apply = foundRules[i].apply;
+              if (apply) {
+                const applyResult = apply.call(foundRules[i], answer);
+              }
+            });
           });
-        }
-        if (result.foundStacks) {
-          cli.table(result.foundStacks, {
-            name: {},
-          });
-        }
-        if (result.prompts) {
-          inquirer.prompt(result.prompts);
-        }
-      })
-      .catch(() => ({}));
+        });
+      });
+    }
   }
 }
 
