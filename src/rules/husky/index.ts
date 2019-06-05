@@ -18,32 +18,34 @@ export class Husky {
     this.parsedPackage = require(this.packagePath);
   }
 
-  apply() {
-    const exec = util.promisify(cp.exec);
+  async apply(apply: boolean): Promise<void> {
+    if (apply) {
+      const exec = util.promisify(cp.exec);
 
-    return exec('npm i -DE husky', { cwd: this.rootPath })
-      .then(() => {
-        return fs.readFile(this.packagePath, { encoding: 'utf-8' });
-      })
-      .then(data => {
-        const parsed = JSON.parse(data);
-        parsed.husky = {
-          hooks: {
-            'pre-push': 'exit 1',
-          },
-        };
+      return exec('npm i -DE husky', { cwd: this.rootPath })
+        .then(() => {
+          return fs.readFile(this.packagePath, { encoding: 'utf-8' });
+        })
+        .then(data => {
+          const parsed = JSON.parse(data);
+          parsed.husky = {
+            hooks: {
+              'pre-push': 'exit 1',
+            },
+          };
 
-        return fs.writeFile(
-          this.packagePath,
-          JSON.stringify(parsed, null, '\t'),
-          {
-            encoding: 'utf-8',
-          },
-        );
-      })
-      .catch((err: Error) => {
-        throw err;
-      });
+          return fs.writeFile(
+            this.packagePath,
+            JSON.stringify(parsed, null, '\t'),
+            {
+              encoding: 'utf-8',
+            },
+          );
+        })
+        .catch((err: Error) => {
+          throw err;
+        });
+    }
   }
 
   async shouldBeApplied() {

@@ -52,8 +52,6 @@ export class GitIgnore {
           this.gitIgnoreExists = true;
         });
     }
-
-    return Promise.resolve();
   }
 
   /**
@@ -115,16 +113,28 @@ export class GitIgnore {
     });
   }
 
-  async apply(): Promise<void> {
-    return this.init().then(() => {
-      if (this.missingRules !== undefined) {
-        return fs.writeFile(
-          this.gitIgnorePath,
-          (this.gitIgnoreContent + '\n' + this.missingRules.join('\n')).trim(),
-          { encoding: 'utf-8' },
-        );
-      }
-    });
+  async apply(apply: boolean): Promise<void> {
+    if (apply) {
+      return this.init()
+        .then(() => {
+          if (this.missingRules !== undefined) {
+            return fs
+              .writeFile(
+                this.gitIgnorePath,
+                (
+                  this.gitIgnoreContent +
+                  '\n' +
+                  this.missingRules.join('\n')
+                ).trim(),
+                { encoding: 'utf-8' },
+              )
+              .then(() => {
+                // return 'Succesfully added rules to .gitignore file.';
+              });
+          }
+        })
+        .catch(() => {});
+    }
   }
 
   getName() {

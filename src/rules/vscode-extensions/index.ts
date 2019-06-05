@@ -5,7 +5,6 @@ import Choice from '../../choice';
 import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import { possibleChoices } from './constants';
-import * as util from 'util';
 import { Elasticsearch } from '../../stacks/elasticsearch';
 
 @RuleRegister.register
@@ -27,7 +26,6 @@ export class VSCodeExtensions {
       this.extensionsFileExists = true;
     } catch (e) {
       this.extensionsFileExists = false;
-      // console.log(e);
     }
   }
 
@@ -92,9 +90,9 @@ export class VSCodeExtensions {
       };
     }
 
-    answers.forEach(mr => {
-      if (!this.parsedExtensionsFile.recommendations.includes(mr)) {
-        this.parsedExtensionsFile.recommendations.push(mr);
+    answers.forEach(recommendation => {
+      if (!this.parsedExtensionsFile.recommendations.includes(recommendation)) {
+        this.parsedExtensionsFile.recommendations.push(recommendation);
       }
     });
 

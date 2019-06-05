@@ -58,10 +58,12 @@ export class ExactNpmVersion {
   /**
    * Removes tilds or circumflex inside package.json's dependencies' Semvers
    */
-  async apply() {
-    fs.writeFileSync(this.packageJSONPath, this.correctSemverNotation(), {
-      encoding: 'utf8',
-    });
+  async apply(apply: boolean) {
+    if (apply) {
+      fs.writeFileSync(this.packageJSONPath, this.correctSemverNotation(), {
+        encoding: 'utf8',
+      });
+    }
   }
 
   /**
