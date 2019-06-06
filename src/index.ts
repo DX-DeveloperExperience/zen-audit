@@ -137,11 +137,7 @@ class ProjectFillerCli extends Command {
           cli.action.stop(`${prompts.length} rules found ! Let's go !`);
 
           inquirer.prompt(prompts).then(answers => {
-<<<<<<< HEAD
-            Object.entries(answers).forEach(([_R, answer], i) => {
-=======
             Object.entries(answers).forEach(([_, answer], i) => {
->>>>>>> 2521c966014223a99f2e262cf493ab792cbb5ba4
               const apply = foundRules[i].apply;
               if (apply) {
                 const applyResult = apply.call(foundRules[i], answer);
