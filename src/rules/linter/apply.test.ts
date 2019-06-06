@@ -1,5 +1,4 @@
 import { Linter } from './index';
-import { TypeScript } from '../../stacks/typescript';
 const rootPath = 'linter/';
 
 const cp = require('child_process');
@@ -43,5 +42,5 @@ test('should install tslint as devDependencies and create tslint.json', done => 
     };
   });
 
-  return linterRule.apply();
+  return linterRule.apply(true);
 });

@@ -27,7 +27,7 @@ test('Method apply() should add husky to devDependencies', () => {
 
   expect(node.isAvailable()).toBeTruthy();
 
-  return husky.apply().then(() => {
+  return husky.apply(true).then(() => {
     const packageJSONRead = fs.readFileSync(`${rootPath}package.json`, {
       encoding: 'utf-8',
     });

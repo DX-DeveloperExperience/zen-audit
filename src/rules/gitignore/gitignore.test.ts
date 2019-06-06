@@ -63,13 +63,14 @@ test('shouldBeApplied should return true if .gitignore\
   let resultGitignore: string;
   fs.writeFile.mockImplementation((_P: string, result: string) => {
     resultGitignore = result;
+    return Promise.resolve();
   });
 
   const gitIgnore = new GitIgnore();
   return gitIgnore.shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
 
-    return gitIgnore.apply().then(() => {
+    return gitIgnore.apply(true).then(() => {
       expect(resultGitignore).toEqual(
         '# comment\n' +
           '# another comment\n' +
