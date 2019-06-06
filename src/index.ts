@@ -9,7 +9,6 @@ import { ListStacks } from './stacks/list-stacks/index';
 import { logger } from './logger/index';
 import * as fs from 'fs-extra';
 
-process.env.VERBOSE = 'false';
 init();
 
 class ProjectFillerCli extends Command {
@@ -59,9 +58,9 @@ class ProjectFillerCli extends Command {
     path = args.path;
 
     try {
-    if (!path.startsWith('http') && !Path.isAbsolute(path)) {
-      path = Path.resolve(path) + '/';
-    }
+      if (!path.startsWith('http') && !Path.isAbsolute(path)) {
+        path = Path.resolve(path) + '/';
+      }
       const fileStat = fs.statSync(path);
       if (!fileStat.isDirectory()) {
         logger.error(`The provided path: ${path} is not a directory.`);
@@ -77,6 +76,15 @@ class ProjectFillerCli extends Command {
 
     if (runFlags.debug) {
       logger.level = 'debug';
+    }
+
+    if (runFlags.rules) {
+      cli.action.start('Searching for rules to apply');
+      ListRules.getRulesToApplyIn(path).then(rules => {
+        rules.forEach(rule => {
+          this.log(`${rule.getName}: ${rule.getDescription}`);
+        });
+      });
     }
 
     if (runFlags.list) {
@@ -129,7 +137,7 @@ class ProjectFillerCli extends Command {
           cli.action.stop(`${prompts.length} rules found ! Let's go !`);
 
           inquirer.prompt(prompts).then(answers => {
-            Object.entries(answers).forEach(([_ruleName, answer], i) => {
+            Object.entries(answers).forEach(([_R, answer], i) => {
               const apply = foundRules[i].apply;
               if (apply) {
                 const applyResult = apply.call(foundRules[i], answer);
