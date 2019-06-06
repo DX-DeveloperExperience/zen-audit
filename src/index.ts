@@ -59,9 +59,9 @@ class ProjectFillerCli extends Command {
     path = args.path;
 
     try {
-    if (!path.startsWith('http') && !Path.isAbsolute(path)) {
-      path = Path.resolve(path) + '/';
-    }
+      if (!path.startsWith('http') && !Path.isAbsolute(path)) {
+        path = Path.resolve(path) + '/';
+      }
       const fileStat = fs.statSync(path);
       if (!fileStat.isDirectory()) {
         logger.error(`The provided path: ${path} is not a directory.`);
@@ -69,7 +69,7 @@ class ProjectFillerCli extends Command {
       }
     } catch (err) {
       logger.error(
-        `An error occured while trying to parse arguments. Did you provide a path to your project's directory ?`,
+        "An error occured while trying to parse arguments. Did you provide a path to your project's directory ?",
       );
       logger.debug(err);
       return;
@@ -129,7 +129,7 @@ class ProjectFillerCli extends Command {
           cli.action.stop(`${prompts.length} rules found ! Let's go !`);
 
           inquirer.prompt(prompts).then(answers => {
-            Object.entries(answers).forEach(([_ruleName, answer], i) => {
+            Object.entries(answers).forEach(([_, answer], i) => {
               const apply = foundRules[i].apply;
               if (apply) {
                 const applyResult = apply.call(foundRules[i], answer);
