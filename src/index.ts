@@ -6,7 +6,9 @@ import * as Path from 'path';
 import { init } from './init/index';
 import { StackRegister } from './stacks/stack-register';
 import { ListStacks } from './stacks/list-stacks/index';
+import { logger } from './logger/index';
 
+process.env.VERBOSE = 'false';
 init();
 
 class ProjectFillerCli extends Command {
@@ -36,6 +38,10 @@ class ProjectFillerCli extends Command {
       char: 'l',
       description: 'List all rules and stacks available',
     }),
+    debug: flags.boolean({
+      char: 'd',
+      description: 'Debug mode',
+    }),
   };
 
   static args = [{ name: 'path' }];
@@ -50,6 +56,10 @@ class ProjectFillerCli extends Command {
 
     if (!path.startsWith('http') && !Path.isAbsolute(path)) {
       path = Path.resolve(path) + '/';
+    }
+
+    if (runFlags.debug) {
+      logger.level = 'debug';
     }
 
     if (runFlags.list) {
