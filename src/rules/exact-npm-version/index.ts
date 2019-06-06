@@ -5,6 +5,7 @@ import { jsonObjectsToCheck } from './constants';
 import { YesNo } from '../../choice';
 import { Node } from '../../stacks/node/index';
 import { TypeScript } from '../../stacks/typescript/index';
+import { logger } from '../../logger';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
@@ -60,10 +61,21 @@ export class ExactNpmVersion {
    */
   async apply(apply: boolean) {
     if (apply) {
-      fs.writeFileSync(this.packageJSONPath, this.correctSemverNotation(), {
-        encoding: 'utf8',
-      });
+      return fs
+        .writeFile(this.packageJSONPath, this.correctSemverNotation(), {
+          encoding: 'utf8',
+        })
+        .then(() => {
+          logger.info(
+            'Succesfully updated package.json with exact semver notation',
+          );
+        })
+        .catch(err => {
+          logger.error('Could not write to package.json');
+          logger.debug(err);
+        });
     }
+    return;
   }
 
   /**
