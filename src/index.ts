@@ -3,12 +3,9 @@ import { Command, flags, run } from '@oclif/command';
 import { cli } from 'cli-ux';
 import * as inquirer from 'inquirer';
 import * as Path from 'path';
-import Rule from './rules/rule';
 import { init } from './init/index';
 import { StackRegister } from './stacks/stack-register';
-import * as PromiseBlu from 'bluebird';
 import { ListStacks } from './stacks/list-stacks/index';
-import * as Listr from 'listr';
 
 init();
 
