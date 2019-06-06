@@ -26,7 +26,7 @@ export class Prettier {
       exec('npm i prettier -DE', { cwd: this.rootPath })
         .then((result: { stdout: string; stderr: string }) => {
           logger.debug(result.stderr);
-          return 'Succesfully installed prettier.';
+          logger.info('Succesfully installed prettier.');
         })
         .catch(err => {
           logger.error(

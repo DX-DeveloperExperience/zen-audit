@@ -1,6 +1,6 @@
 import { Prettier } from '.';
 
-const rootPath = './prettier';
+const rootPath = './prettier/';
 
 const util = require('util');
 
@@ -9,13 +9,16 @@ jest.mock('child_process');
 
 test('Should run npm i prettier -DE command', () => {
   jest.mock(rootPath + 'package.json', () => ({}), { virtual: true });
+
   const prettier = new Prettier(rootPath);
+
   util.promisify = jest.fn((exec: (cmd: string) => {}) => {
     return (cmd: string) => {
       exec(cmd);
       return Promise.resolve();
     };
   });
+
   return prettier.apply(true).then(() => {
     expect(cp.exec).toBeCalled();
   });
