@@ -48,14 +48,30 @@ class ProjectFillerCli extends Command {
 
   async run() {
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
-    let path = './';
+    let path;
 
-    if (args.path !== undefined) {
-      path = args.path.endsWith('/') ? args.path : args.path + '/';
+    if (args.path === undefined) {
+      logger.error('Please provide the path to the project to be audited.');
+      return;
     }
 
+    path = args.path;
+
+    try {
     if (!path.startsWith('http') && !Path.isAbsolute(path)) {
       path = Path.resolve(path) + '/';
+    }
+      const fileStat = fs.statSync(path);
+      if (!fileStat.isDirectory()) {
+        logger.error(`The provided path: ${path} is not a directory.`);
+        return;
+      }
+    } catch (err) {
+      logger.error(
+        `An error occured while trying to parse arguments. Did you provide a path to your project's directory ?`,
+      );
+      logger.debug(err);
+      return;
     }
 
     if (runFlags.debug) {
