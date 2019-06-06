@@ -8,12 +8,6 @@ afterEach(() => {
 
 const rootPath = './exact-npm-version/';
 
-test('shouldBeApplied() should return false if package.json not found', () => {
-  return new ExactNpmVersion(rootPath).shouldBeApplied().then(result => {
-    expect(result).toBeFalsy();
-  });
-});
-
 test('Should return false if no incorrect semver is found', () => {
   const packageJSON = {
     mockDep1: {
