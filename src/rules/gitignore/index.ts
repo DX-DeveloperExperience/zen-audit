@@ -5,7 +5,7 @@ import { YesNo } from '../../choice';
 import { ListStacks } from '../../stacks/list-stacks';
 import axios from 'axios';
 import { Elasticsearch } from '../../stacks/elasticsearch';
-import * as util from 'util';
+import { logger } from '../../logger/index';
 
 /**
  * This Rule will look for a .gitignore file. If it doesn't exist, applying this rule will
@@ -35,6 +35,10 @@ export class GitIgnore {
         .readFile(this.gitIgnorePath, {
           encoding: 'utf-8',
         })
+        .then((result: string) => {
+          this.gitIgnoreContent = result;
+          this.gitIgnoreExists = true;
+        })
         .catch(e => {
           if (
             e.code === 'EACCESS' ||
@@ -42,14 +46,9 @@ export class GitIgnore {
             e.code === 'ENOENT'
           ) {
             this.gitIgnoreExists = false;
-            return '';
           } else {
             throw e;
           }
-        })
-        .then((result: string) => {
-          this.gitIgnoreContent = result;
-          this.gitIgnoreExists = true;
         });
     }
   }
@@ -115,25 +114,29 @@ export class GitIgnore {
 
   async apply(apply: boolean): Promise<void> {
     if (apply) {
-      return this.init()
-        .then(() => {
-          if (this.missingRules !== undefined) {
-            return fs
-              .writeFile(
-                this.gitIgnorePath,
-                (
-                  this.gitIgnoreContent +
-                  '\n' +
-                  this.missingRules.join('\n')
-                ).trim(),
-                { encoding: 'utf-8' },
-              )
-              .then(() => {
-                // return 'Succesfully added rules to .gitignore file.';
-              });
-          }
-        })
-        .catch(() => {});
+      return this.init().then(() => {
+        if (this.missingRules !== undefined) {
+          return fs
+            .writeFile(
+              this.gitIgnorePath,
+              (
+                this.gitIgnoreContent +
+                '\n' +
+                this.missingRules.join('\n')
+              ).trim(),
+              { encoding: 'utf-8' },
+            )
+            .then(() => {
+              logger.info('Succesfully added rules to .gitignore file.');
+            })
+            .catch(err => {
+              logger.error(
+                `An error occured while trying to write to your project's .gitignore file.`,
+              );
+              logger.debug(err);
+            });
+        }
+      });
     }
   }
 
