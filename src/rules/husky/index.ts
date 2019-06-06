@@ -6,6 +6,7 @@ import { YesNo } from '../../choice/index';
 import * as fs from 'fs-extra';
 import * as util from 'util';
 import * as cp from 'child_process';
+import { logger } from '../../logger';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
@@ -23,7 +24,10 @@ export class Husky {
       const exec = util.promisify(cp.exec);
 
       return exec('npm i -DE husky', { cwd: this.rootPath })
-        .then(() => {
+        .then((out: { stdout: string; stderr: string }) => {
+          if (out !== undefined && out.stderr !== undefined) {
+            throw new Error(out.stderr);
+          }
           return fs.readFile(this.packagePath, { encoding: 'utf-8' });
         })
         .then(data => {
@@ -43,7 +47,7 @@ export class Husky {
           );
         })
         .catch((err: Error) => {
-          throw err;
+          logger.error(err);
         });
     }
   }
