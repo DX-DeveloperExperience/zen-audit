@@ -14,8 +14,9 @@ export class GitHub {
       .then((value: { stdout: string; stderr: string }) => {
         return value.stdout.includes('github.com');
       })
-      .catch(() => {
+      .catch(err => {
         logger.error('Could not execute "git" command, is git installed ?');
+        logger.debug(err);
         return false;
       });
   }

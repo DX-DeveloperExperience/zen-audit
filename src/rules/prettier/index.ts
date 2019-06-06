@@ -4,6 +4,7 @@ import { StackRegister } from '../../stacks/stack-register';
 import { RuleRegister } from '../rule-register';
 import * as util from 'util';
 import * as cp from 'child_process';
+import { logger } from '../../logger/index';
 /**
  * Looks for Prettier dependency in package.json, and add it if necessary.
  */
@@ -24,13 +25,14 @@ export class Prettier {
 
       exec('npm i prettier -DE', { cwd: this.rootPath })
         .then((result: { stdout: string; stderr: string }) => {
-          console.log(result.stderr);
+          logger.debug(result.stderr);
           return 'Succesfully installed prettier.';
         })
-        .catch(() => {
-          throw new Error(
+        .catch(err => {
+          logger.error(
             'Could not install prettier, try installing it using "npm i prettier -DE" command in your terminal.',
           );
+          logger.debug(err);
         });
     }
   }
