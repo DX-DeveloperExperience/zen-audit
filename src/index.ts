@@ -7,6 +7,7 @@ import { init } from './init/index';
 import { StackRegister } from './stacks/stack-register';
 import { ListStacks } from './stacks/list-stacks/index';
 import { logger } from './logger/index';
+import * as fs from 'fs-extra';
 
 process.env.VERBOSE = 'false';
 init();
@@ -110,7 +111,7 @@ class ProjectFillerCli extends Command {
     if (Object.keys(runFlags).length === 0) {
       cli.action.start('Searching for rules');
       ListRules.getRulesToApplyIn(path).then(foundRules => {
-        const prompts = foundRules.map(async rule => {
+        const promptsProm = foundRules.map(async rule => {
           return {
             name: rule.constructor.name,
             message: rule.getDescription(),
@@ -119,15 +120,16 @@ class ProjectFillerCli extends Command {
           };
         });
 
-        if (prompts.length === 0) {
-          cli.action.stop('No rule to apply, you\'re good to go ! :)');
+        if (promptsProm.length === 0) {
+          cli.action.stop(`No rule to apply, you're good to go ! :)`);
           return;
         }
 
-        Promise.all(prompts).then(prompts => {
+        Promise.all(promptsProm).then(prompts => {
           cli.action.stop(`${prompts.length} rules found ! Let's go !`);
+
           inquirer.prompt(prompts).then(answers => {
-            Object.entries(answers).forEach(([ruleName, answer], i) => {
+            Object.entries(answers).forEach(([_ruleName, answer], i) => {
               const apply = foundRules[i].apply;
               if (apply) {
                 const applyResult = apply.call(foundRules[i], answer);
