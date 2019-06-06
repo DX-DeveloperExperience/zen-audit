@@ -129,7 +129,7 @@ class ProjectFillerCli extends Command {
         });
 
         if (promptsProm.length === 0) {
-          cli.action.stop(`No rule to apply, you're good to go ! :)`);
+          cli.action.stop("No rule to apply, you're good to go ! :)");
           return;
         }
 
