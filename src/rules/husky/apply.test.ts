@@ -1,4 +1,4 @@
-import { Node } from '../../stacks/node/index';
+import Node from '../../stacks/node/index';
 import { Husky } from './index';
 
 const rootPath = './husky/';
@@ -10,6 +10,9 @@ jest.mock('child_process');
 
 const fs = require('fs-extra');
 jest.mock('fs-extra');
+
+require('../../logger');
+jest.mock('../../logger');
 
 afterEach(() => {
   jest.resetModules();

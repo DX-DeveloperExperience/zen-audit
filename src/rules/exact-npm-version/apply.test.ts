@@ -5,6 +5,9 @@ const fs = require('fs-extra');
 jest.mock('fs-extra');
 jest.mock('./constants');
 
+require('../../logger');
+jest.mock('../../logger');
+
 afterEach(() => {
   jest.resetAllMocks();
   jest.resetModules();

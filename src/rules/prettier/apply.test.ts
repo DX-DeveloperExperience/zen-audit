@@ -7,6 +7,9 @@ const util = require('util');
 const cp = require('child_process');
 jest.mock('child_process');
 
+require('../../logger');
+jest.mock('../../logger');
+
 test('Should run npm i prettier -DE command', () => {
   jest.mock(rootPath + 'package.json', () => ({}), { virtual: true });
 

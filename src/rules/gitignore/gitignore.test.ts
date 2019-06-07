@@ -7,6 +7,9 @@ const axios = require('axios');
 jest.mock('fs-extra');
 jest.mock('axios');
 
+require('../../logger');
+jest.mock('../../logger');
+
 afterEach(() => {
   jest.resetAllMocks();
 });
