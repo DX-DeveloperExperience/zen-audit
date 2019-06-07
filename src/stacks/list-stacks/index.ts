@@ -33,12 +33,12 @@ export class ListStacks {
 
   static getStackByName(name: string): Promise<Stack> {
     if (ListStacks.stacks) {
-      const stack = ListStacks.stacks.find(stack => {
+      const foundStack = ListStacks.stacks.find(stack => {
         return stack.name() === name;
       });
 
-      if (stack) {
-        return Promise.resolve(stack);
+      if (foundStack) {
+        return Promise.resolve(foundStack);
       }
     }
     return Promise.reject();
