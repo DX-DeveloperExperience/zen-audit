@@ -49,7 +49,7 @@ export class Linter {
       this.linterhasConfigFile = await this.hasConfigFile(this.linterChoice);
       this.linterInDevDep = this.isInDevDep(this.linterChoice);
 
-      return this.linterInDevDep && this.linterhasConfigFile;
+      return !this.linterInDevDep || !this.linterhasConfigFile;
     });
   }
 
