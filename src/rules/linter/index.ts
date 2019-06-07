@@ -71,35 +71,33 @@ export class Linter {
               .catch(() => {
                 logger.error(
                   `Could notCould not install ${
-                  this.linterChoice
+                    this.linterChoice
                   }, try installing it using "${installCmd}" command.`,
                 );
               });
           } else {
             logger.info(`${this.linterChoice} already installed.`);
           }
-          return `${this.linterChoice} already installed.`;
         })
-        .then(feedBack => {
-          const documentation: { [linter: string]: string } = {
-            tslint: 'https://palantir.github.io/tslint/usage/configuration/',
-            eslint: 'https://eslint.org/docs/user-guide/configuring',
-          };
-
+        .then(() => {
           if (!this.linterhasConfigFile) {
-            return fs
-              .ensureFile(this.linterPaths[this.linterChoice])
+            const documentation: { [linter: string]: string } = {
+              tslint: 'https://palantir.github.io/tslint/usage/configuration/',
+              eslint: 'https://eslint.org/docs/user-guide/configuring',
+            };
+            this.writeLinterFile()
               .then(() => {
                 logger.info(
-                      ` ${
-                        this.linterChoice
-                      }.json succesfully written to root folder. You may add more rules if you like, find documentation at : ${
-                        documentation[this.linterChoice]
-                      }`
-                    );
+                  ` ${
+                    this.linterChoice
+                  }.json succesfully written to root folder. You may add more rules if you like, find documentation at : ${
+                    documentation[this.linterChoice]
+                  }`,
+                );
+              })
+              .catch(err => {
                 logger.error(`Error writing to ${this.linterChoice} file.`);
                 logger.debug(err);
-                  });
               });
           } else {
             logger.info(`${this.linterChoice}.json file already existing.`);
@@ -108,8 +106,23 @@ export class Linter {
     }
   }
 
+  private writeLinterFile() {
+    return fs
+      .ensureFile(this.linterPaths[this.linterChoice])
+      .catch(err => {
         logger.error(`Error creating ${this.linterChoice}.json`);
         logger.debug(err);
+        return;
+      })
+      .then(() => {
+        return fs.writeJson(
+          this.linterPaths[this.linterChoice],
+          linterJSON[this.linterChoice],
+          { spaces: '\t' },
+        );
+      });
+  }
+
   hasConfigFile(linter: string): Promise<boolean> {
     return fs.pathExists(this.linterPaths[linter]);
   }
