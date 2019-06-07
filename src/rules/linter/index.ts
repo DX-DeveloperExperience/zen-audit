@@ -66,13 +66,17 @@ export class Linter {
 
             return exec(installCmd, { cwd: this.rootPath })
               .then(() => {
-                return `Installed ${this.linterChoice} succesfully`;
+                logger.info(`Installed ${this.linterChoice} succesfully`);
               })
               .catch(() => {
-                return `Could notCould not install ${
+                logger.error(
+                  `Could notCould not install ${
                   this.linterChoice
-                }, try installing it using "${installCmd}" command.`;
+                  }, try installing it using "${installCmd}" command.`,
+                );
               });
+          } else {
+            logger.info(`${this.linterChoice} already installed.`);
           }
           return `${this.linterChoice} already installed.`;
         })
@@ -86,32 +90,26 @@ export class Linter {
             return fs
               .ensureFile(this.linterPaths[this.linterChoice])
               .then(() => {
-                return fs
-                  .writeJson(
-                    this.linterPaths[this.linterChoice],
-                    linterJSON[this.linterChoice],
-                    { spaces: '\t' },
-                  )
-                  .then(() => {
-                    return (
-                      feedBack +
+                logger.info(
                       ` ${
                         this.linterChoice
                       }.json succesfully written to root folder. You may add more rules if you like, find documentation at : ${
                         documentation[this.linterChoice]
                       }`
                     );
+                logger.error(`Error writing to ${this.linterChoice} file.`);
+                logger.debug(err);
                   });
               });
           } else {
-            return (
-              feedBack + `${this.linterChoice}.json file already existing.`
-            );
+            logger.info(`${this.linterChoice}.json file already existing.`);
           }
         });
     }
   }
 
+        logger.error(`Error creating ${this.linterChoice}.json`);
+        logger.debug(err);
   hasConfigFile(linter: string): Promise<boolean> {
     return fs.pathExists(this.linterPaths[linter]);
   }
