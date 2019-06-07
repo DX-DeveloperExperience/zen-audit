@@ -1,5 +1,5 @@
 import { RuleRegister } from '../../rule-register';
-import { Elasticsearch } from '../../../stacks/elasticsearch';
+import Elasticsearch from '../../../stacks/elasticsearch';
 import { StackRegister } from '../../../stacks/stack-register';
 import axios from 'axios';
 import { YesNo } from '../../../choice';
