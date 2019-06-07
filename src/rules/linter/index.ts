@@ -32,16 +32,14 @@ export class Linter {
 
   private async init(): Promise<void> {
     if (!this.initialized) {
-      return new TypeScript(this.rootPath)
-        .isAvailable()
-        .then(result => {
+      return ListStacks.getStackByName('TypeScript').then(stack => {
+        return stack.isAvailable().then(result => {
           this.linterChoice = result ? 'tslint' : 'eslint';
           return;
-        })
-        .catch(e => {
-          return;
         });
+      });
     }
+    return;
   }
 
   async shouldBeApplied() {
