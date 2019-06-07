@@ -30,4 +30,17 @@ export class ListStacks {
       return ListStacks.stacks;
     });
   }
+
+  static getStackByName(name: string): Promise<Stack> {
+    if (ListStacks.stacks) {
+      const stack = ListStacks.stacks.find(stack => {
+        return stack.name() === name;
+      });
+
+      if (stack) {
+        return Promise.resolve(stack);
+      }
+    }
+    return Promise.reject();
+  }
 }
