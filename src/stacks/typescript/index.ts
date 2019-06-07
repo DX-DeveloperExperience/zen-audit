@@ -1,4 +1,5 @@
 import { StackRegister } from '../stack-register';
+import { logger } from '../../logger/index';
 
 @StackRegister.register
 export default class TypeScript {
@@ -15,7 +16,13 @@ export default class TypeScript {
       if (e.code === 'MODULE_NOT_FOUND') {
         return false;
       }
-      throw e;
+      logger.error(
+        `Error trying to read ${
+          this.rootPath
+        }package.json, run in debug mode to find why.`,
+      );
+      logger.debug(e);
+      return false;
     }
   }
 
