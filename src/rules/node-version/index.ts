@@ -1,4 +1,3 @@
-import { Node } from '../../stacks/node';
 import { RuleRegister } from '../rule-register';
 import { StackRegister } from '../../stacks/stack-register';
 import { nodeSchedule, setNodeSchedule } from './constants';
@@ -7,7 +6,6 @@ import * as cp from 'child_process';
 import TypeScript from '../../stacks/typescript';
 import Node from '../../stacks/node';
 import axios from 'axios';
-import { nodeSchedule, setNodeSchedule } from './constants';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
