@@ -1,10 +1,10 @@
-import { TypeScript } from '../../stacks/typescript';
-import { Node } from '../../stacks/node';
 import { StackRegister } from '../../stacks/stack-register';
+import { logger } from '../../logger/index';
 import { RuleRegister } from '../rule-register';
 import * as util from 'util';
 import * as cp from 'child_process';
-import { logger } from '../../logger/index';
+import TypeScript from '../../stacks/typescript';
+import Node from '../../stacks/node';
 /**
  * Looks for Prettier dependency in package.json, and add it if necessary.
  */

@@ -1,11 +1,11 @@
 import { RuleRegister } from '../rule-register';
 import { StackRegister } from '../../stacks/stack-register';
 import { ListStacks } from '../../stacks/list-stacks';
-import Choice from '../../choice';
+import { possibleChoices } from './constants';
 import * as fs from 'fs-extra';
 import * as cp from 'child_process';
-import { possibleChoices } from './constants';
-import { Elasticsearch } from '../../stacks/elasticsearch';
+import Elasticsearch from '../../stacks/elasticsearch';
+import Choice from '../../choice';
 
 @RuleRegister.register
 @StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })

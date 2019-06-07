@@ -3,8 +3,8 @@ import * as fs from 'fs-extra';
 import { StackRegister } from '../../stacks/stack-register';
 import { jsonObjectsToCheck } from './constants';
 import { YesNo } from '../../choice';
-import { Node } from '../../stacks/node/index';
-import { TypeScript } from '../../stacks/typescript/index';
+import Node from '../../stacks/node/index';
+import TypeScript from '../../stacks/typescript/index';
 import { logger } from '../../logger';
 
 /**

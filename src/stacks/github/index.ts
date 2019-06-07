@@ -4,7 +4,7 @@ import * as cp from 'child_process';
 import { logger } from '../../logger/index';
 
 @StackRegister.register
-export class GitHub {
+export default class GitHub {
   constructor(readonly rootPath: string = './') {}
 
   async isAvailable(): Promise<boolean> {

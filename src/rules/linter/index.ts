@@ -1,9 +1,11 @@
 import { RuleRegister } from '../rule-register';
 import { StackRegister } from '../../stacks/stack-register';
-import { TypeScript } from '../../stacks/typescript/index';
-import { Node } from '../../stacks/node/index';
-import * as fs from 'fs-extra';
+import { ListStacks } from '../../stacks/list-stacks/index';
 import { linterJSON } from './constants';
+import { logger } from '../../logger/index';
+import TypeScript from '../../stacks/typescript/index';
+import Node from '../../stacks/node/index';
+import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import * as util from 'util';
 

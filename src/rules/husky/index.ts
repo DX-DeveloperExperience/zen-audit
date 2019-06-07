@@ -1,12 +1,12 @@
 import { RuleRegister } from '../rule-register';
-import { Node } from '../../stacks/node';
-import { TypeScript } from '../../stacks/typescript';
 import { StackRegister } from '../../stacks/stack-register';
 import { YesNo } from '../../choice/index';
+import { logger } from '../../logger';
+import Node from '../../stacks/node';
+import TypeScript from '../../stacks/typescript';
 import * as fs from 'fs-extra';
 import * as util from 'util';
 import * as cp from 'child_process';
-import { logger } from '../../logger';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])

@@ -2,7 +2,7 @@ import { StackRegister } from '../stack-register';
 import { existsPaths } from '../../file-utils/index';
 
 @StackRegister.register
-export class Node {
+export default class Node {
   private packagePath: string;
 
   constructor(readonly rootPath: string = './') {

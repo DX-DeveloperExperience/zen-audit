@@ -1,7 +1,7 @@
 import { StackRegister } from '../stack-register';
 
 @StackRegister.register
-export class Angular {
+export default class Angular {
   constructor(private readonly rootPath: string = './') {}
 
   async isAvailable(): Promise<boolean> {

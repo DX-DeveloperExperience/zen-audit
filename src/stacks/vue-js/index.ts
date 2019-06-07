@@ -1,7 +1,7 @@
 import { StackRegister } from '../stack-register';
 
 @StackRegister.register
-export class VueJS {
+export default class VueJS {
   constructor(private readonly rootPath: string = './') {}
 
   async isAvailable(): Promise<boolean> {

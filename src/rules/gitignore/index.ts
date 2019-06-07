@@ -1,11 +1,11 @@
 import { RuleRegister } from '../rule-register';
-import * as fs from 'fs-extra';
 import { StackRegister } from '../../stacks/stack-register';
 import { YesNo } from '../../choice';
-import { ListStacks } from '../../stacks/list-stacks';
-import axios from 'axios';
-import { Elasticsearch } from '../../stacks/elasticsearch';
 import { logger } from '../../logger/index';
+import { ListStacks } from '../../stacks/list-stacks';
+import * as fs from 'fs-extra';
+import Elasticsearch from '../../stacks/elasticsearch';
+import axios from 'axios';
 
 /**
  * This Rule will look for a .gitignore file. If it doesn't exist, applying this rule will

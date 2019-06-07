@@ -1,9 +1,11 @@
 import { Node } from '../../stacks/node';
 import { RuleRegister } from '../rule-register';
 import { StackRegister } from '../../stacks/stack-register';
-import { TypeScript } from '../../stacks/typescript';
-import * as cp from 'child_process';
+import { nodeSchedule, setNodeSchedule } from './constants';
 import { YesNo } from '../../choice';
+import * as cp from 'child_process';
+import TypeScript from '../../stacks/typescript';
+import Node from '../../stacks/node';
 import axios from 'axios';
 import { nodeSchedule, setNodeSchedule } from './constants';
 
