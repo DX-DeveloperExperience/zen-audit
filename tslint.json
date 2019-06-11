@@ -16,7 +16,8 @@
     "object-literal-key-quotes": [true, "as-needed"],
     "no-var-requires": false,
     "import-blacklist": [true, [".*\\.ts$", ".*\\.js$"]],
-    "max-classes-per-file": false
+    "max-classes-per-file": false,
+    "no-floating-promise": true
   },
   "rulesDirectory": []
 }
