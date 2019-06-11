@@ -2,6 +2,7 @@ import Rule from '../rule';
 import { StackRegister, Constructor } from '../../stacks/stack-register/index';
 import { ListStacks } from '../../stacks/list-stacks/index';
 import Stack from '../../stacks/stack/index';
+import { logger } from '../../logger/index';
 
 /**
  * Returns an array of every stack instanciated object
@@ -30,22 +31,29 @@ export class ListRules {
       }, []);
     });
 
-    return rulesByStackPromise.then(rulesConstructors => {
-      const uniqueRulesConstructors = new Set(rulesConstructors);
-      const rules = Array.from(uniqueRulesConstructors).map(
-        ruleConstructor => new ruleConstructor(rootPath),
-      );
+    return rulesByStackPromise
+      .then(rulesConstructors => {
+        const uniqueRulesConstructors = new Set(rulesConstructors);
+        const rules = Array.from(uniqueRulesConstructors).map(
+          ruleConstructor => new ruleConstructor(rootPath),
+        );
 
-      return Promise.all(rules.map(rule => rule.shouldBeApplied())).then(
-        values => {
-          return rules.reduce((acc: Rule[], rule: Rule, i: number) => {
-            if (values[i]) {
-              return [...acc, rule];
-            }
-            return acc;
-          }, []);
-        },
-      );
-    });
+        return Promise.all(rules.map(rule => rule.shouldBeApplied())).then(
+          values => {
+            return rules.reduce((acc: Rule[], rule: Rule, i: number) => {
+              if (values[i]) {
+                return [...acc, rule];
+              }
+              return acc;
+            }, []);
+          },
+        );
+      })
+      .catch(err => {
+        logger.debug(err);
+        throw new Error(
+          'Error trying to get rules to apply in. Run in debug mode to show error.',
+        );
+      });
   }
 }

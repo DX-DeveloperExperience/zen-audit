@@ -84,11 +84,15 @@ class ProjectFillerCli extends Command {
 
     if (runFlags.rules) {
       cli.action.start('Searching for rules to apply');
-      ListRules.getRulesToApplyIn(path).then(rules => {
-        rules.forEach(rule => {
-          this.log(`${rule.getName()}: ${rule.getDescription()}`);
+      ListRules.getRulesToApplyIn(path)
+        .then(rules => {
+          rules.forEach(rule => {
+            this.log(`${rule.getName()}: ${rule.getDescription()}`);
+          });
+        })
+        .catch(err => {
+          logger.error(err);
         });
-      });
     }
 
     if (runFlags.list) {
