@@ -6,6 +6,7 @@ import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import Elasticsearch from '../../stacks/elasticsearch';
 import Choice from '../../choice';
+import { JSONhasObj } from '../rules-utils/index';
 
 @RuleRegister.register
 @StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
@@ -16,6 +17,7 @@ export class VSCodeExtensions {
   private parsedExtensionsFile: any;
   private extensionsFileExists: boolean;
   private missingRecommendations: string[] = [];
+  private initialized: boolean = false;
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
@@ -29,13 +31,23 @@ export class VSCodeExtensions {
     }
   }
 
+  async init() {
+    if (!this.initialized) {
+      return this.getMissingRecommendations().then(() => {
+        this.initialized = true;
+      });
+    }
+  }
+
   async shouldBeApplied() {
-    return (
-      (this.dotVSCodeExists() && !this.extensionsFileExists) ||
-      (this.extensionsFileExists && !this.hasRecommendations()) ||
-      (!this.extensionsFileExists && this.codeIsInPath()) ||
-      (await this.getMissingRecommendations().length) !== 0
-    );
+    return this.init().then(() => {
+      return (
+        (this.dotVSCodeExists() && !this.extensionsFileExists) ||
+        (this.extensionsFileExists && !this.hasRecommendations()) ||
+        (!this.extensionsFileExists && this.codeIsInPath()) ||
+        this.missingRecommendations.length !== 0
+      );
+    });
   }
 
   private dotVSCodeExists(): boolean {
@@ -63,53 +75,54 @@ export class VSCodeExtensions {
 
   private hasRecommendations(): boolean {
     return (
-      this.parsedExtensionsFile.recommendations !== undefined &&
+      JSONhasObj(this.extensionsJSONPath, 'recommendations') &&
       Array.isArray(this.parsedExtensionsFile.recommendations) &&
       this.parsedExtensionsFile.recommendations.length !== 0
     );
   }
 
-  private getMissingRecommendations(): string[] {
-    if (this.missingRecommendations.length === 0) {
-      this.getExtensionsList().then(extensionsList => {
-        extensionsList.forEach(choice => {
-          if (!this.parsedExtensionsFile.recommendations.includes(choice)) {
-            this.missingRecommendations.push(choice);
-          }
-        });
+  private getMissingRecommendations(): Promise<string[]> {
+    return this.getExtensionsList().then(extensionsList => {
+      extensionsList.forEach(choice => {
+        if (!this.parsedExtensionsFile.recommendations.includes(choice)) {
+          this.missingRecommendations.push(choice);
+        }
       });
-    }
-
-    return this.missingRecommendations;
+      return this.missingRecommendations;
+    });
   }
 
   apply(answers: string[]) {
-    if (this.parsedExtensionsFile === undefined) {
-      this.parsedExtensionsFile = {
-        recommendations: [],
-      };
-    }
+    return this.init().then(() => {
+      if (this.parsedExtensionsFile === undefined) {
+        this.parsedExtensionsFile = {
+          recommendations: [],
+        };
+      }
 
-    this.parsedExtensionsFile.recommendations = answers.filter(
-      recommendation => {
+      const filteredAnswers = answers.filter(recommendation => {
         return !this.parsedExtensionsFile.recommendations.includes(
           recommendation,
         );
-      },
-    );
-
-    return fs
-      .ensureFile(this.extensionsJSONPath)
-      .catch(err => {
-        throw err;
-      })
-      .then(() => {
-        return fs.writeJSON(
-          this.extensionsJSONPath,
-          this.parsedExtensionsFile,
-          { spaces: '\t' },
-        );
       });
+
+      this.parsedExtensionsFile.recommendations = this.parsedExtensionsFile.recommendations.concat(
+        filteredAnswers,
+      );
+
+      return fs
+        .ensureFile(this.extensionsJSONPath)
+        .catch(err => {
+          throw err;
+        })
+        .then(() => {
+          return fs.writeJSON(
+            this.extensionsJSONPath,
+            this.parsedExtensionsFile,
+            { spaces: '\t' },
+          );
+        });
+    });
   }
 
   getName() {
