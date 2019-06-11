@@ -59,7 +59,11 @@ class ProjectFillerCli extends Command {
 
     try {
       if (!path.startsWith('http') && !Path.isAbsolute(path)) {
-        path = Path.resolve(path) + '/';
+        path = Path.resolve(path);
+      }
+
+      if (!path.endsWith('/')) {
+        path = path + '/';
       }
       const fileStat = fs.statSync(path);
       if (!fileStat.isDirectory()) {
@@ -82,7 +86,7 @@ class ProjectFillerCli extends Command {
       cli.action.start('Searching for rules to apply');
       ListRules.getRulesToApplyIn(path).then(rules => {
         rules.forEach(rule => {
-          this.log(`${rule.getName}: ${rule.getDescription}`);
+          this.log(`${rule.getName()}: ${rule.getDescription()}`);
         });
       });
     }
@@ -104,7 +108,7 @@ class ProjectFillerCli extends Command {
 
     if (runFlags.stacks) {
       cli.action.start('Searching for available stacks');
-      const stacksFoundProm = ListStacks.getStacksIn(path);
+      const stacksFoundProm = ListStacks.getAvailableStacksIn(path);
       stacksFoundProm.then(stacksFound => {
         if (stacksFound.length === 0) {
           cli.action.stop('No stack found.');
