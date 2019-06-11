@@ -15,7 +15,7 @@ test('Should run npm i prettier -DE command', () => {
 
   const prettier = new Prettier(rootPath);
 
-  util.promisify.mockImplementation((exec: (cmd: string) => {}) => {
+  util.promisify = jest.fn((exec: (cmd: string) => {}) => {
     return (cmd: string) => {
       expect(cmd).toBe('npm i prettier -DE');
       return Promise.resolve();

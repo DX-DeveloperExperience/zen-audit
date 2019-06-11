@@ -41,7 +41,7 @@ test('should install tslint as devDependencies and create tslint.json', () => {
 
   const linterRule = new Linter(rootPath);
 
-  util.promisify.mockImplementation((exec: (cmd: string) => void) => {
+  util.promisify = jest.fn((exec: (cmd: string) => void) => {
     return (cmd: string) => {
       expect(cmd).toBe('npm i tslint typescript -DE');
       return Promise.resolve();
