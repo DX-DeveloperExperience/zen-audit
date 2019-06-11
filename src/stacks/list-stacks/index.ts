@@ -31,10 +31,10 @@ export class ListStacks {
     });
   }
 
-  static getStackByName(name: string): Promise<Stack> {
+  static getStack(ctor: Constructor<Stack>): Promise<Stack> {
     if (ListStacks.stacks) {
       const foundStack = ListStacks.stacks.find(stack => {
-        return stack.name() === name;
+        return stack.constructor.name === ctor.constructor.name;
       });
 
       if (foundStack) {
