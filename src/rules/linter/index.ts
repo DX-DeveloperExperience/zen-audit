@@ -35,12 +35,11 @@ export class Linter {
 
   private async init(): Promise<void> {
     if (!this.initialized) {
-      return ListStacks.getStack(TypeScript).then(stack => {
-        return stack.isAvailable().then(result => {
-          this.linterChoice = result ? 'tslint' : 'eslint';
-          return;
-        });
-      });
+      return ListStacks.findAvailableStackIn(TypeScript, this.rootPath).then(
+        stack => {
+          this.linterChoice = stack !== undefined ? 'tslint' : 'eslint';
+        },
+      );
     }
     return;
   }

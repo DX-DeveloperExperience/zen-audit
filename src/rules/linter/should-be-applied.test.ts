@@ -1,6 +1,7 @@
 import { Linter } from '.';
 import { ListStacks } from '../../stacks/list-stacks/index';
 import Stack from '../../stacks/stack/index';
+import TypeScript from '../../stacks/typescript/index';
 
 const rootPath = 'linter/';
 const packageJSONPath = `${rootPath}package.json`;
@@ -26,12 +27,8 @@ test('should return true if tslint or eslint not in devDependencies and tslint.j
     },
   };
 
-  ListStacks.getStackByName = jest.fn(() => {
-    return Promise.resolve({
-      isAvailable() {
-        return Promise.resolve(true);
-      },
-    } as Stack);
+  ListStacks.findAvailableStackIn = jest.fn(() => {
+    return Promise.resolve({} as Stack);
   });
 
   fs.pathExists = jest.fn(() => {
@@ -54,12 +51,8 @@ test('should return false if tslint in devDependencies and tslint.json exists', 
     },
   };
 
-  ListStacks.getStackByName = jest.fn(() => {
-    return Promise.resolve({
-      isAvailable() {
-        return Promise.resolve(true);
-      },
-    } as Stack);
+  ListStacks.findAvailableStackIn = jest.fn(() => {
+    return Promise.resolve({} as Stack);
   });
 
   fs.pathExists = jest.fn(() => {
@@ -81,12 +74,8 @@ test('should return true if tslint in devDependencies and tslint.json does not e
     },
   };
 
-  ListStacks.getStackByName = jest.fn(() => {
-    return Promise.resolve({
-      isAvailable() {
-        return Promise.resolve(true);
-      },
-    } as Stack);
+  ListStacks.findAvailableStackIn = jest.fn(() => {
+    return Promise.resolve({} as Stack);
   });
 
   fs.pathExists = jest.fn(() => {
@@ -108,12 +97,8 @@ test('should return false if eslint in devDependencies and eslint.json exists', 
     },
   };
 
-  ListStacks.getStackByName = jest.fn(() => {
-    return Promise.resolve({
-      isAvailable() {
-        return Promise.resolve(false);
-      },
-    } as Stack);
+  ListStacks.findAvailableStackIn = jest.fn(() => {
+    return Promise.resolve(undefined);
   });
 
   fs.pathExists = jest.fn(() => {
@@ -135,12 +120,8 @@ test('should return true if eslint in devDependencies and eslint.json does not e
     },
   };
 
-  ListStacks.getStackByName = jest.fn(() => {
-    return Promise.resolve({
-      isAvailable() {
-        return Promise.resolve(false);
-      },
-    } as Stack);
+  ListStacks.findAvailableStackIn = jest.fn(() => {
+    return Promise.resolve(undefined);
   });
 
   fs.pathExists = jest.fn(() => {

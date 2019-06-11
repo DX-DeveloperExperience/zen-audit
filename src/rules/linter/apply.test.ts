@@ -33,12 +33,8 @@ test('should install tslint as devDependencies and create tslint.json', () => {
     },
   };
 
-  ListStacks.getStackByName = jest.fn(() => {
-    return Promise.resolve({
-      isAvailable() {
-        return Promise.resolve(true);
-      },
-    } as Stack);
+  ListStacks.findAvailableStackIn = jest.fn(() => {
+    return Promise.resolve({} as Stack);
   });
 
   jest.mock('linter/package.json', () => packageJSON, { virtual: true });

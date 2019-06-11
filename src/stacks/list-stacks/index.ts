@@ -31,16 +31,14 @@ export class ListStacks {
     });
   }
 
-  static getStack(ctor: Constructor<Stack>): Promise<Stack> {
-    if (ListStacks.stacks) {
-      const foundStack = ListStacks.stacks.find(stack => {
+  static findAvailableStackIn(
+    ctor: Constructor<Stack>,
+    path: string,
+  ): Promise<Stack | undefined> {
+    return ListStacks.getAvailableStacksIn(path).then(stacks => {
+      return stacks.find(stack => {
         return stack.constructor.name === ctor.constructor.name;
       });
-
-      if (foundStack) {
-        return Promise.resolve(foundStack);
-      }
-    }
-    return Promise.reject();
+    });
   }
 }
