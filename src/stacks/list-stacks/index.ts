@@ -32,12 +32,12 @@ export class ListStacks {
   }
 
   static findAvailableStackIn(
-    ctor: Constructor<Stack>,
+    ctor: Function,
     path: string,
   ): Promise<Stack | undefined> {
     return ListStacks.getAvailableStacksIn(path).then(stacks => {
       return stacks.find(stack => {
-        return stack.constructor.name === ctor.constructor.name;
+        return stack.constructor.name === ctor.name;
       });
     });
   }
