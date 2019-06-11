@@ -41,14 +41,12 @@ test('should install tslint as devDependencies and create tslint.json', () => {
 
   const linterRule = new Linter(rootPath);
 
-  util.promisify = jest.fn((exec: (cmd: string, {}) => {}) => {
+  util.promisify.mockImplementation((exec: (cmd: string) => void) => {
     return (cmd: string) => {
-      exec(cmd, {});
+      expect(cmd).toBe('npm i tslint typescript -DE');
       return Promise.resolve();
     };
   });
 
-  return linterRule.apply(true).then(() => {
-    expect(cp.exec).toBeCalled();
-  });
+  return linterRule.apply(true);
 });

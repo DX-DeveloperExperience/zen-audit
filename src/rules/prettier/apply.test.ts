@@ -15,14 +15,12 @@ test('Should run npm i prettier -DE command', () => {
 
   const prettier = new Prettier(rootPath);
 
-  util.promisify = jest.fn((exec: (cmd: string) => {}) => {
+  util.promisify.mockImplementation((exec: (cmd: string) => {}) => {
     return (cmd: string) => {
-      exec(cmd);
+      expect(cmd).toBe('npm i prettier -DE');
       return Promise.resolve();
     };
   });
 
-  return prettier.apply(true).then(() => {
-    expect(cp.exec).toBeCalled();
-  });
+  return prettier.apply(true);
 });
