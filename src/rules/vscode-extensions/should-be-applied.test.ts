@@ -10,7 +10,8 @@ afterEach(() => {
   jest.resetAllMocks();
 });
 
-const rootPath = './test/';
+const rootPath = 'test/';
+const extensionsJSONPath = rootPath + '.vscode/extensions.json';
 
 test('should return true if .vscode/extensions.json and .vscode folder do not exist but vscode is installed', () => {
   cp.execSync.mockImplementation(() => {
@@ -37,7 +38,7 @@ test('Method shouldBeApplied() should return true if .vscode/extension.json does
 });
 
 test('should return true if .vscode/extensions.json is empty', () => {
-  jest.mock('./test/.vscode/extensions.json', () => ({}), { virtual: true });
+  jest.mock(extensionsJSONPath, () => ({}), { virtual: true });
 
   expect(new VSCodeExtensions().shouldBeApplied()).toBeTruthy();
 });
@@ -54,7 +55,7 @@ test('should return true if .vscode/extensions.json has no recommendations array
     },
   };
 
-  jest.mock('./test/.vscode/extensions.json', () => extensionsJSON, {
+  jest.mock(extensionsJSONPath, () => extensionsJSON, {
     virtual: true,
   });
 
@@ -72,7 +73,7 @@ test('should return true if .vscode/extensions.json contains an empty "recommend
     recommendations: [],
   };
 
-  jest.mock('./test/.vscode/extensions.json', () => extensionsJSON, {
+  jest.mock(extensionsJSONPath, () => extensionsJSON, {
     virtual: true,
   });
 
@@ -84,7 +85,7 @@ test('should return true if .vscode/extension.json does not contains all recomme
     recommendations: ['ext1', 'ext2'],
   };
 
-  jest.mock('./test/.vscode/extensions.json', () => extensionsJSON, {
+  jest.mock(extensionsJSONPath, () => extensionsJSON, {
     virtual: true,
   });
 
@@ -111,7 +112,7 @@ test('should return false if .vscode/extension.json contains all recommended ext
     recommendations: ['ext1', 'ext2'],
   };
 
-  jest.mock('./test/.vscode/extensions.json', () => extensionsJSON, {
+  jest.mock(extensionsJSONPath, () => extensionsJSON, {
     virtual: true,
   });
 
