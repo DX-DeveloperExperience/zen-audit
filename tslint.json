@@ -17,7 +17,7 @@
     "no-var-requires": false,
     "import-blacklist": [true, [".*\\.ts$", ".*\\.js$"]],
     "max-classes-per-file": false,
-    "no-floating-promise": true
+    "no-floating-promises": true
   },
   "rulesDirectory": []
 }
