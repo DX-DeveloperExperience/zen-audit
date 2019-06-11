@@ -5,6 +5,7 @@ import * as util from 'util';
 import * as cp from 'child_process';
 import TypeScript from '../../stacks/typescript';
 import Node from '../../stacks/node';
+import { hasDevDependencies } from '../rules-utils/index';
 /**
  * Looks for Prettier dependency in package.json, and add it if necessary.
  */
@@ -43,13 +44,9 @@ export class Prettier {
 
   isInDevDep() {
     return (
-      this.hasDevDep() &&
+      hasDevDependencies(this.parsedPackage) &&
       this.parsedPackage.devDependencies.prettier !== undefined
     );
-  }
-
-  hasDevDep() {
-    return this.parsedPackage.devDependencies !== undefined;
   }
 
   getName() {

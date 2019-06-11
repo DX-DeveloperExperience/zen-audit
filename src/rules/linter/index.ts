@@ -8,6 +8,7 @@ import Node from '../../stacks/node/index';
 import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import * as util from 'util';
+import { hasDevDependencies } from '../rules-utils';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([TypeScript, Node])
@@ -129,13 +130,9 @@ export class Linter {
 
   isInDevDep(linter: string): boolean {
     return (
-      this.hasDevDep() &&
+      hasDevDependencies(this.parsedPackageJSON) &&
       this.parsedPackageJSON.devDependencies[linter] !== undefined
     );
-  }
-
-  hasDevDep(): boolean {
-    return this.parsedPackageJSON.devDependencies !== undefined;
   }
 
   getName() {

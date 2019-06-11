@@ -7,6 +7,7 @@ import TypeScript from '../../stacks/typescript';
 import * as fs from 'fs-extra';
 import * as util from 'util';
 import * as cp from 'child_process';
+import { hasDevDependencies } from '../rules-utils';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
@@ -58,8 +59,8 @@ export class Husky {
 
   isInDevDep(): boolean {
     return (
-      this.parsedPackage.devDependencies !== undefined &&
-      this.parsedPackage.husky !== undefined
+      hasDevDependencies(this.parsedPackage) &&
+      this.parsedPackage.devDependencies.husky !== undefined
     );
   }
 
