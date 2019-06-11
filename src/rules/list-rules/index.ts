@@ -15,7 +15,9 @@ export class ListRules {
       this.path = rootPath;
     }
 
-    const stackPromise: Promise<Stack[]> = ListStacks.getStacksIn(rootPath);
+    const stackPromise: Promise<Stack[]> = ListStacks.getAvailableStacksIn(
+      rootPath,
+    );
 
     const rulesByStackPromise: Promise<
       Array<Constructor<Rule>>

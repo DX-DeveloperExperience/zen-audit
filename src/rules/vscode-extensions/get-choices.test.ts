@@ -12,7 +12,7 @@ afterEach(() => {
 });
 
 test('should give us a list of choices corresponding to stacks', () => {
-  ListStacks.getStacksIn = jest.fn(() => {
+  ListStacks.getAvailableStacksIn = jest.fn(() => {
     return Promise.resolve([
       {
         name() {
@@ -43,7 +43,7 @@ test('should not add already existing extensions in choice list', () => {
     virtual: true,
   });
 
-  ListStacks.getStacksIn = jest.fn(() => {
+  ListStacks.getAvailableStacksIn = jest.fn(() => {
     return Promise.resolve([
       {
         name() {

@@ -3,7 +3,7 @@ import Stack from '../stack';
 
 export class ListStacks {
   static stacks: Stack[];
-  static getStacksIn(rootPath: string) {
+  static getAvailableStacksIn(rootPath: string) {
     if (ListStacks.stacks) {
       return Promise.resolve(ListStacks.stacks);
     }

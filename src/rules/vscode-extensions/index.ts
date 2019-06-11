@@ -129,11 +129,12 @@ export class VSCodeExtensions {
   }
 
   getChoices(): Promise<Choice[]> {
-    const stackNamesPromise = ListStacks.getStacksIn(this.rootPath).then(
-      stacks =>
-        stacks.map(stack => {
-          return stack.name();
-        }),
+    const stackNamesPromise = ListStacks.getAvailableStacksIn(
+      this.rootPath,
+    ).then(stacks =>
+      stacks.map(stack => {
+        return stack.name();
+      }),
     );
 
     return stackNamesPromise.then(stackNames => {

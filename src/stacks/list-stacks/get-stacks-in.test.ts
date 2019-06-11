@@ -27,7 +27,7 @@ test('should return available stacks', () => {
   StackRegister.register(Stack1 as any);
   StackRegister.register(Stack2 as any);
 
-  return ListStacks.getStacksIn('./test').then((stacks: Stack[]) => {
+  return ListStacks.getAvailableStacksIn('./test').then((stacks: Stack[]) => {
     expect(stacks.length).toEqual(1);
     expect(stacks[0]).toBeInstanceOf(Stack1);
   });

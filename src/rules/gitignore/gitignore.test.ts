@@ -42,7 +42,7 @@ test('shouldBeApplied should return true if .gitignore\
 
   fs.readFile.mockReturnValue(Promise.resolve(gitignore));
 
-  ListStacks.getStacksIn = jest.fn(() => {
+  ListStacks.getAvailableStacksIn = jest.fn(() => {
     return Promise.resolve([
       {
         name(): string {
@@ -95,7 +95,7 @@ test('shouldBeApplied should return false if .gitignore file contains every poss
 
   fs.readFile.mockReturnValue(Promise.resolve(gitignore));
 
-  ListStacks.getStacksIn = jest.fn(() => {
+  ListStacks.getAvailableStacksIn = jest.fn(() => {
     return Promise.resolve([
       {
         name(): string {
