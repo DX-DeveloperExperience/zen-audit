@@ -90,11 +90,13 @@ export class VSCodeExtensions {
       };
     }
 
-    answers.forEach(recommendation => {
-      if (!this.parsedExtensionsFile.recommendations.includes(recommendation)) {
-        this.parsedExtensionsFile.recommendations.push(recommendation);
-      }
-    });
+    this.parsedExtensionsFile.recommendations = answers.filter(
+      recommendation => {
+        return !this.parsedExtensionsFile.recommendations.includes(
+          recommendation,
+        );
+      },
+    );
 
     return fs
       .ensureFile(this.extensionsJSONPath)
