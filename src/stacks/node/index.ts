@@ -10,12 +10,7 @@ export default class Node {
   }
 
   isAvailable(): Promise<boolean> {
-    return new Promise((resolve, reject) =>
-      setTimeout(
-        () => resolve(existsPaths(`${this.rootPath}package.json`)),
-        5000,
-      ),
-    );
+    return existsPaths(`${this.rootPath}package.json`);
   }
 
   parsedPackage(): object {
