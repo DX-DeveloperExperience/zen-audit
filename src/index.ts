@@ -113,47 +113,64 @@ class ProjectFillerCli extends Command {
     if (runFlags.stacks) {
       cli.action.start('Searching for available stacks');
       const stacksFoundProm = ListStacks.getAvailableStacksIn(path);
-      stacksFoundProm.then(stacksFound => {
-        if (stacksFound.length === 0) {
-          cli.action.stop('No stack found.');
-        }
-        cli.action.stop('Stacks found: ');
-        stacksFound.map(stackFound => {
-          this.log(stackFound.name());
+      stacksFoundProm
+        .then(stacksFound => {
+          if (stacksFound.length === 0) {
+            cli.action.stop('No stack found.');
+          }
+          cli.action.stop('Stacks found: ');
+          stacksFound.map(stackFound => {
+            this.log(stackFound.name());
+          });
+        })
+        .catch(err => {
+          logger.error(err);
         });
-      });
     }
 
     if (Object.keys(runFlags).length === 0) {
       cli.action.start('Searching for rules');
-      ListRules.getRulesToApplyIn(path).then(foundRules => {
-        const promptsProm = foundRules.map(async rule => {
-          return {
-            name: rule.constructor.name,
-            message: rule.getDescription(),
-            type: rule.getPromptType(),
-            choices: await rule.getChoices(),
-          };
-        });
-
-        if (promptsProm.length === 0) {
-          cli.action.stop("No rule to apply, you're good to go ! :)");
-          return;
-        }
-
-        Promise.all(promptsProm).then(prompts => {
-          cli.action.stop(`${prompts.length} rules found ! Let's go !`);
-
-          inquirer.prompt(prompts).then(answers => {
-            Object.entries(answers).forEach(([_, answer], i) => {
-              const apply = foundRules[i].apply;
-              if (apply) {
-                const applyResult = apply.call(foundRules[i], answer);
-              }
-            });
+      ListRules.getRulesToApplyIn(path)
+        .then(foundRules => {
+          const promptsProm = foundRules.map(async rule => {
+            return {
+              name: rule.constructor.name,
+              message: rule.getDescription(),
+              type: rule.getPromptType(),
+              choices: await rule.getChoices(),
+            };
           });
+
+          if (promptsProm.length === 0) {
+            cli.action.stop("No rule to apply, you're good to go ! :)");
+            return;
+          }
+
+          Promise.all(promptsProm)
+            .then(prompts => {
+              cli.action.stop(`${prompts.length} rules found ! Let's go !`);
+
+              inquirer
+                .prompt(prompts)
+                .then((answers: {}) => {
+                  Object.entries(answers).forEach(([_, answer], i) => {
+                    const apply = foundRules[i].apply;
+                    if (apply) {
+                      const applyResult = apply.call(foundRules[i], answer);
+                    }
+                  });
+                })
+                .catch(err => {
+                  logger.error(err);
+                });
+            })
+            .catch(err => {
+              logger.error(err);
+            });
+        })
+        .catch(err => {
+          logger.error(err);
         });
-      });
     }
   }
 }
