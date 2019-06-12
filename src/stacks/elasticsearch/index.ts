@@ -2,7 +2,7 @@ import { StackRegister } from '../stack-register';
 import axios from 'axios';
 
 @StackRegister.register
-export class Elasticsearch {
+export default class Elasticsearch {
   constructor(private readonly rootPath: string = './') {}
   private isElasticsearchResponse() {
     return axios

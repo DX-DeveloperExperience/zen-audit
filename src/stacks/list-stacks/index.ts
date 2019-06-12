@@ -3,7 +3,7 @@ import Stack from '../stack';
 
 export class ListStacks {
   static stacks: Stack[];
-  static getStacksIn(rootPath: string) {
+  static getAvailableStacksIn(rootPath: string) {
     if (ListStacks.stacks) {
       return Promise.resolve(ListStacks.stacks);
     }
@@ -28,6 +28,17 @@ export class ListStacks {
         [],
       );
       return ListStacks.stacks;
+    });
+  }
+
+  static findAvailableStackIn(
+    ctor: Constructor<Stack>,
+    path: string,
+  ): Promise<Stack | undefined> {
+    return ListStacks.getAvailableStacksIn(path).then(stacks => {
+      return stacks.find(stack => {
+        return stack.constructor.name === ctor.name;
+      });
     });
   }
 }

@@ -3,6 +3,10 @@ import { Husky } from '.';
 const rootPath = 'husky/';
 const packageJSONPath = `${rootPath}package.json`;
 
+afterEach(() => {
+  jest.resetModules();
+});
+
 test('shouldBeApplied() should return true if package.json does not contain devDependencies', () => {
   const packageJSON = {
     dependencies: {
@@ -17,7 +21,9 @@ test('shouldBeApplied() should return true if package.json does not contain devD
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
   const husky = new Husky(rootPath);
-  expect(husky.shouldBeApplied()).toBeTruthy();
+  return husky.shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
 test('shouldBeApplied() should return true if husky is not in devDependencies', () => {
@@ -31,7 +37,9 @@ test('shouldBeApplied() should return true if husky is not in devDependencies', 
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
   const husky = new Husky(rootPath);
-  expect(husky.shouldBeApplied()).toBeTruthy();
+  return husky.shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
 test('shouldBeApplied should return false if husky is in devDependencies', () => {
@@ -45,7 +53,9 @@ test('shouldBeApplied should return false if husky is in devDependencies', () =>
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
   const husky = new Husky(rootPath);
-  expect(husky.shouldBeApplied()).toBeTruthy();
+  return husky.shouldBeApplied().then(result => {
+    expect(result).toBeFalsy();
+  });
 });
 
 test('shouldBeApplied should return true if husky is something else than a dependency in devDependencies', () => {
@@ -62,5 +72,7 @@ test('shouldBeApplied should return true if husky is something else than a depen
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
   const husky = new Husky(rootPath);
-  expect(husky.shouldBeApplied()).toBeTruthy();
+  return husky.shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });

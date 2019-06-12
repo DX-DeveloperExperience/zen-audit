@@ -21,7 +21,7 @@ export class StackRegister {
   } = {};
 
   /**
-   * This method returns every classes that implements the Stack interface.
+   * Returns constructor of every class that implements the Stack interface.
    */
   static getConstructors(): Array<Constructor<Stack>> {
     return StackRegister.implementations;
@@ -32,7 +32,7 @@ export class StackRegister {
   }
 
   /**
-   * This method is a class decorator that makes a class implement the Stack interface,
+   * A class decorator that makes a class implement the Stack interface,
    * and registers this class in an array.
    * @param ctor The constructor of the class that implements the Stack interface
    */

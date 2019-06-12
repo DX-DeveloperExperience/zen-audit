@@ -3,18 +3,19 @@ import * as fs from 'fs-extra';
 import { StackRegister } from '../../stacks/stack-register';
 import { jsonObjectsToCheck } from './constants';
 import { YesNo } from '../../choice';
+import Node from '../../stacks/node/index';
+import TypeScript from '../../stacks/typescript/index';
+import { logger } from '../../logger';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
  * accent in Semver of every dependency.
  */
 @RuleRegister.register
-@StackRegister.registerRuleForAll()
+@StackRegister.registerRuleForStacks([Node, TypeScript])
 export class ExactNpmVersion {
-  readonly requiredFiles: string[] = ['package.json'];
   readonly rootPath: string;
   private packageJSONPath: string;
-  private packageJSONExists: boolean;
   private parsedPackageJSON: any;
   readonly semverRegex = new RegExp(
     '^(\\^|\\~)((([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)$',
@@ -25,14 +26,8 @@ export class ExactNpmVersion {
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
     this.packageJSONPath = `${this.rootPath}package.json`;
-
-    try {
-      this.parsedPackageJSON = require(this.packageJSONPath);
-      this.packageJSONExists = true;
-      this.jsonObjToCheckFound = this.findJsonObjectsToCheck();
-    } catch (err) {
-      this.packageJSONExists = false;
-    }
+    this.parsedPackageJSON = require(this.packageJSONPath);
+    this.jsonObjToCheckFound = this.findJsonObjectsToCheck();
   }
 
   /**
@@ -40,9 +35,6 @@ export class ExactNpmVersion {
    */
   async shouldBeApplied(): Promise<boolean> {
     let result = false;
-    if (!this.packageJSONExists) {
-      return false;
-    }
 
     this.jsonObjToCheckFound.forEach(jsonObjStr => {
       const jsonObj = this.parsedPackageJSON[jsonObjStr];
@@ -67,10 +59,23 @@ export class ExactNpmVersion {
   /**
    * Removes tilds or circumflex inside package.json's dependencies' Semvers
    */
-  async apply() {
-    fs.writeFileSync(this.packageJSONPath, this.correctSemverNotation(), {
-      encoding: 'utf8',
-    });
+  async apply(apply: boolean) {
+    if (apply) {
+      return fs
+        .writeFile(this.packageJSONPath, this.correctSemverNotation(), {
+          encoding: 'utf8',
+        })
+        .then(() => {
+          logger.info(
+            'Succesfully updated package.json with exact semver notation',
+          );
+        })
+        .catch(err => {
+          logger.error('Could not write to package.json');
+          logger.debug(err);
+        });
+    }
+    return;
   }
 
   /**

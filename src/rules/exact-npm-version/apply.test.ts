@@ -1,9 +1,12 @@
 import { ExactNpmVersion } from '.';
 
-const fs = require('fs');
+const fs = require('fs-extra');
 
-jest.mock('fs');
+jest.mock('fs-extra');
 jest.mock('./constants');
+
+require('../../logger');
+jest.mock('../../logger');
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -42,13 +45,15 @@ test('Should replace ^ or ~ in package.json', () => {
     virtual: true,
   });
 
-  let correctSemverNotation;
-  fs.writeFileSync.mockImplementation((_P: string, correct: string) => {
+  let correctSemverNotation: string;
+  fs.writeFile.mockImplementation((_P: string, correct: string) => {
     correctSemverNotation = correct;
+    return Promise.resolve();
   });
 
-  new ExactNpmVersion(rootPath).apply();
-  expect(correctSemverNotation).toEqual(correctedJSON);
+  return new ExactNpmVersion(rootPath).apply(true).then(() => {
+    expect(correctSemverNotation).toEqual(correctedJSON);
+  });
 });
 
 test('Should not replace ^ or ~ in package.json for object that does not need to be corrected', () => {
@@ -90,11 +95,13 @@ test('Should not replace ^ or ~ in package.json for object that does not need to
     virtual: true,
   });
 
-  let correctSemverNotation;
-  fs.writeFileSync.mockImplementation((_P: string, correct: string) => {
+  let correctSemverNotation: string;
+  fs.writeFile.mockImplementation((_P: string, correct: string) => {
     correctSemverNotation = correct;
+    return Promise.resolve();
   });
 
-  new ExactNpmVersion(rootPath).apply();
-  expect(correctSemverNotation).toEqual(correctedJSON);
+  return new ExactNpmVersion(rootPath).apply(true).then(() => {
+    expect(correctSemverNotation).toEqual(correctedJSON);
+  });
 });

@@ -6,6 +6,7 @@
     "outDir": "lib",
     "rootDir": "src",
     "strict": true,
+    "strictFunctionTypes": false,
     "target": "es2017",
     "composite": true,
     "experimentalDecorators": true,

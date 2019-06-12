@@ -7,6 +7,9 @@ const axios = require('axios');
 jest.mock('fs-extra');
 jest.mock('axios');
 
+require('../../logger');
+jest.mock('../../logger');
+
 afterEach(() => {
   jest.resetAllMocks();
 });
@@ -39,7 +42,7 @@ test('shouldBeApplied should return true if .gitignore\
 
   fs.readFile.mockReturnValue(Promise.resolve(gitignore));
 
-  ListStacks.getStacksIn = jest.fn(() => {
+  ListStacks.getAvailableStacksIn = jest.fn(() => {
     return Promise.resolve([
       {
         name(): string {
@@ -63,13 +66,14 @@ test('shouldBeApplied should return true if .gitignore\
   let resultGitignore: string;
   fs.writeFile.mockImplementation((_P: string, result: string) => {
     resultGitignore = result;
+    return Promise.resolve();
   });
 
   const gitIgnore = new GitIgnore();
   return gitIgnore.shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
 
-    return gitIgnore.apply().then(() => {
+    return gitIgnore.apply(true).then(() => {
       expect(resultGitignore).toEqual(
         '# comment\n' +
           '# another comment\n' +
@@ -91,7 +95,7 @@ test('shouldBeApplied should return false if .gitignore file contains every poss
 
   fs.readFile.mockReturnValue(Promise.resolve(gitignore));
 
-  ListStacks.getStacksIn = jest.fn(() => {
+  ListStacks.getAvailableStacksIn = jest.fn(() => {
     return Promise.resolve([
       {
         name(): string {

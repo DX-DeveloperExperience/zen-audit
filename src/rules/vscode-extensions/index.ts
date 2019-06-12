@@ -1,12 +1,12 @@
 import { RuleRegister } from '../rule-register';
 import { StackRegister } from '../../stacks/stack-register';
 import { ListStacks } from '../../stacks/list-stacks';
-import Choice from '../../choice';
+import { possibleChoices } from './constants';
 import * as fs from 'fs-extra';
 import * as cp from 'child_process';
-import { possibleChoices } from './constants';
-import * as util from 'util';
-import { Elasticsearch } from '../../stacks/elasticsearch';
+import Elasticsearch from '../../stacks/elasticsearch';
+import Choice from '../../choice';
+import { JSONhasObj } from '../rules-utils/index';
 
 @RuleRegister.register
 @StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
@@ -17,6 +17,7 @@ export class VSCodeExtensions {
   private parsedExtensionsFile: any;
   private extensionsFileExists: boolean;
   private missingRecommendations: string[] = [];
+  private initialized: boolean = false;
 
   constructor(rootPath: string = './') {
     this.rootPath = rootPath;
@@ -27,17 +28,26 @@ export class VSCodeExtensions {
       this.extensionsFileExists = true;
     } catch (e) {
       this.extensionsFileExists = false;
-      // console.log(e);
+    }
+  }
+
+  async init() {
+    if (!this.initialized) {
+      return this.getMissingRecommendations().then(() => {
+        this.initialized = true;
+      });
     }
   }
 
   async shouldBeApplied() {
-    return (
-      (this.dotVSCodeExists() && !this.extensionsFileExists) ||
-      (this.extensionsFileExists && !this.hasRecommendations()) ||
-      (!this.extensionsFileExists && this.codeIsInPath()) ||
-      (await this.getMissingRecommendations().length) !== 0
-    );
+    return this.init().then(() => {
+      return (
+        (this.dotVSCodeExists() && !this.extensionsFileExists) ||
+        (this.extensionsFileExists && !this.hasRecommendations()) ||
+        (!this.extensionsFileExists && this.codeIsInPath()) ||
+        this.missingRecommendations.length !== 0
+      );
+    });
   }
 
   private dotVSCodeExists(): boolean {
@@ -65,59 +75,66 @@ export class VSCodeExtensions {
 
   private hasRecommendations(): boolean {
     return (
-      this.parsedExtensionsFile.recommendations !== undefined &&
+      this.extensionsFileExists &&
+      JSONhasObj(this.extensionsJSONPath, 'recommendations') &&
       Array.isArray(this.parsedExtensionsFile.recommendations) &&
       this.parsedExtensionsFile.recommendations.length !== 0
     );
   }
 
-  private getMissingRecommendations(): string[] {
-    if (this.missingRecommendations.length === 0) {
-      this.getExtensionsList().then(extensionsList => {
-        extensionsList.forEach(choice => {
-          if (!this.parsedExtensionsFile.recommendations.includes(choice)) {
-            this.missingRecommendations.push(choice);
-          }
+  private getMissingRecommendations(): Promise<string[]> {
+    return this.getExtensionsList().then(extensionsList => {
+      if (!this.hasRecommendations()) {
+        this.missingRecommendations = extensionsList;
+      } else {
+        this.missingRecommendations = extensionsList.filter(extension => {
+          return !this.parsedExtensionsFile.recommendations.includes(extension);
         });
-      });
-    }
+      }
 
-    return this.missingRecommendations;
+      return this.missingRecommendations;
+    });
   }
 
   apply(answers: string[]) {
-    if (this.parsedExtensionsFile === undefined) {
-      this.parsedExtensionsFile = {
-        recommendations: [],
-      };
-    }
-
-    answers.forEach(mr => {
-      if (!this.parsedExtensionsFile.recommendations.includes(mr)) {
-        this.parsedExtensionsFile.recommendations.push(mr);
+    return this.init().then(() => {
+      if (this.parsedExtensionsFile === undefined) {
+        this.parsedExtensionsFile = {
+          recommendations: [],
+        };
       }
-    });
 
-    return fs
-      .ensureFile(this.extensionsJSONPath)
-      .catch(err => {
-        throw err;
-      })
-      .then(() => {
-        return fs.writeJSON(
-          this.extensionsJSONPath,
-          this.parsedExtensionsFile,
-          { spaces: '\t' },
+      const filteredAnswers = answers.filter(recommendation => {
+        return !this.parsedExtensionsFile.recommendations.includes(
+          recommendation,
         );
       });
+
+      this.parsedExtensionsFile.recommendations = this.parsedExtensionsFile.recommendations.concat(
+        filteredAnswers,
+      );
+
+      return fs
+        .ensureFile(this.extensionsJSONPath)
+        .catch(err => {
+          throw err;
+        })
+        .then(() => {
+          return fs.writeJSON(
+            this.extensionsJSONPath,
+            this.parsedExtensionsFile,
+            { spaces: '\t' },
+          );
+        });
+    });
   }
 
   getName() {
-    return 'VSCode extensions.json';
+    return 'VSCodeExtensions';
   }
 
   getDescription() {
-    return 'This rule will add extension suggestions to your Visual Studio Code app. Please check the extensions you would like to install:';
+    return 'This rule will add extension suggestions to your Visual Studio Code app.';
   }
 
   getPromptType() {
@@ -131,11 +148,12 @@ export class VSCodeExtensions {
   }
 
   getChoices(): Promise<Choice[]> {
-    const stackNamesPromise = ListStacks.getStacksIn(this.rootPath).then(
-      stacks =>
-        stacks.map(stack => {
-          return stack.name();
-        }),
+    const stackNamesPromise = ListStacks.getAvailableStacksIn(
+      this.rootPath,
+    ).then(stacks =>
+      stacks.map(stack => {
+        return stack.name();
+      }),
     );
 
     return stackNamesPromise.then(stackNames => {

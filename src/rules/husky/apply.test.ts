@@ -1,39 +1,41 @@
-import { Node } from '../../stacks/node/index';
+import Node from '../../stacks/node/index';
 import { Husky } from './index';
-import * as fs from 'fs-extra';
-import * as Path from 'path';
 
-const rootPath = Path.resolve('./src/rules/husky/__mocks__/') + '/';
+const rootPath = './husky/';
 
-const packageJSON = {
-  devDependencies: { dep1: 'dep1', dep2: 'dep2' },
-  otherDep: { other: 'other' },
-};
+const util = require('util');
 
-beforeEach(() => {
-  fs.ensureFileSync(`${rootPath}package.json`);
-  fs.writeJSONSync(`${rootPath}package.json`, packageJSON, { spaces: '\t' });
-});
+const cp = require('child_process');
+jest.mock('child_process');
+
+const fs = require('fs-extra');
+jest.mock('fs-extra');
+
+require('../../logger');
+jest.mock('../../logger');
 
 afterEach(() => {
-  fs.removeSync(rootPath);
+  jest.resetModules();
 });
 
-jest.setTimeout(60000);
-
 test('Method apply() should add husky to devDependencies', () => {
+  jest.mock('./husky/package.json', () => ({}), { virtual: true });
+
   const husky = new Husky(rootPath);
   const node = new Node(rootPath);
 
-  expect(node.isAvailable()).toBeTruthy();
+  node.isAvailable = jest.fn(() => {
+    return Promise.resolve(true);
+  });
 
-  return husky.apply().then(() => {
-    const packageJSONRead = fs.readFileSync(`${rootPath}package.json`, {
-      encoding: 'utf-8',
-    });
-    const parsedPackage = JSON.parse(packageJSONRead);
+  util.promisify = jest.fn((exec: (cmd: string) => {}) => {
+    return (cmd: string) => {
+      exec(cmd);
+      return Promise.resolve();
+    };
+  });
 
-    expect(parsedPackage.devDependencies.husky).toBeDefined();
-    expect(parsedPackage.husky.hooks['pre-push']).toEqual('exit 1');
+  return husky.apply(true).then(() => {
+    expect(cp.exec).toBeCalled();
   });
 });

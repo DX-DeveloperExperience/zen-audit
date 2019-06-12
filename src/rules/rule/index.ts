@@ -4,7 +4,7 @@ import Choice from '../../choice';
  */
 export default interface Rule {
   shouldBeApplied(): Promise<boolean>;
-  apply?: (answers?: any) => Promise<void>;
+  apply?: (answers: boolean | string[]) => Promise<void>;
   getName(): string;
   getDescription(): string;
   getPromptType(): string;

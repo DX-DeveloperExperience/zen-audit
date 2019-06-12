@@ -1,15 +1,17 @@
 import { Linter } from './index';
-import { TypeScript } from '../../stacks/typescript';
+import { ListStacks } from '../../stacks/list-stacks/index';
+import Stack from '../../stacks/stack/index';
 const rootPath = 'linter/';
+const util = require('util');
 
 const cp = require('child_process');
 jest.mock('child_process');
 
-const util = require('util');
-jest.mock('util');
-
 const fs = require('fs-extra');
 jest.mock('fs-extra');
+
+require('../../logger');
+jest.mock('../../logger');
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -24,24 +26,27 @@ fs.writeJson.mockImplementation((path: string, content: any) => {
   return Promise.resolve();
 });
 
-test('should install tslint as devDependencies and create tslint.json', done => {
+test('should install tslint as devDependencies and create tslint.json', () => {
   const packageJSON = {
     devDependencies: {
       typescript: 'test',
     },
   };
 
+  ListStacks.findAvailableStackIn = jest.fn(() => {
+    return Promise.resolve({} as Stack);
+  });
+
   jest.mock('linter/package.json', () => packageJSON, { virtual: true });
 
   const linterRule = new Linter(rootPath);
 
-  util.promisify.mockImplementation((exec: (cmd: string) => void) => {
+  util.promisify = jest.fn((exec: (cmd: string) => void) => {
     return (cmd: string) => {
       expect(cmd).toBe('npm i tslint typescript -DE');
-      done();
       return Promise.resolve();
     };
   });
 
-  return linterRule.apply();
+  return linterRule.apply(true);
 });

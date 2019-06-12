@@ -1,8 +1,8 @@
 import { RuleRegister } from '../../rule-register';
-import { Elasticsearch } from '../../../stacks/elasticsearch';
 import { StackRegister } from '../../../stacks/stack-register';
-import axios from 'axios';
 import { YesNo } from '../../../choice';
+import Elasticsearch from '../../../stacks/elasticsearch';
+import axios from 'axios';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
