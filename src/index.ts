@@ -8,6 +8,7 @@ import { StackRegister } from './stacks/stack-register';
 import { ListStacks } from './stacks/list-stacks/index';
 import { logger } from './logger/index';
 import * as fs from 'fs-extra';
+import { YesNo, Ok } from './choice/index';
 
 init();
 
@@ -41,6 +42,11 @@ class ProjectFillerCli extends Command {
     debug: flags.boolean({
       char: 'd',
       description: 'Debug mode',
+    }),
+    manual: flags.boolean({
+      char: 'm',
+      description:
+        'List all rules and prompt for each one of them to let you make a choice',
     }),
   };
 
@@ -82,7 +88,7 @@ class ProjectFillerCli extends Command {
       logger.level = 'debug';
     }
 
-    if (runFlags.rules) {
+    if (runFlags.rules || Object.keys(runFlags).length === 0) {
       cli.action.start('Searching for rules to apply');
       ListRules.getRulesToApplyIn(path)
         .then(rules => {
@@ -128,7 +134,32 @@ class ProjectFillerCli extends Command {
         });
     }
 
-    if (Object.keys(runFlags).length === 0) {
+    if (runFlags.apply) {
+      cli.action.start('Search for rules');
+      ListRules.getRulesToApplyIn(path)
+        .then(foundRules => {
+          foundRules.forEach(async rule => {
+            const choices = await rule.getChoices();
+            const apply = rule.apply;
+            if (apply) {
+              if (choices === YesNo || choices === Ok) {
+                return apply.call(rule, true);
+              } else {
+                const choicesStr = choices.map(choice => {
+                  return choice.value.toString();
+                });
+                return apply.call(rule, choicesStr);
+              }
+            }
+          });
+        })
+        .catch(err => {
+          logger.error('Error searching for rules to apply');
+          logger.debug(err);
+        });
+    }
+
+    if (runFlags.manual) {
       cli.action.start('Searching for rules');
       ListRules.getRulesToApplyIn(path)
         .then(foundRules => {
