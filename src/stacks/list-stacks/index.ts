@@ -32,7 +32,7 @@ export class ListStacks {
   }
 
   static findAvailableStackIn(
-    ctor: Function,
+    ctor: Constructor<Stack>,
     path: string,
   ): Promise<Stack | undefined> {
     return ListStacks.getAvailableStacksIn(path).then(stacks => {
