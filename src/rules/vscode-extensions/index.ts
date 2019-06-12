@@ -90,7 +90,7 @@ export class VSCodeExtensions {
         this.missingRecommendations = extensionsList.filter(extension => {
           return !this.parsedExtensionsFile.recommendations.includes(extension);
         });
-        }
+      }
 
       return this.missingRecommendations;
     });
@@ -130,11 +130,11 @@ export class VSCodeExtensions {
   }
 
   getName() {
-    return 'VSCode extensions.json';
+    return 'VSCodeExtensions';
   }
 
   getDescription() {
-    return 'This rule will add extension suggestions to your Visual Studio Code app. Please check the extensions you would like to install:';
+    return 'This rule will add extension suggestions to your Visual Studio Code app.';
   }
 
   getPromptType() {
