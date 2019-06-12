@@ -67,7 +67,7 @@ export class GitIgnore {
 
   private getMissingGitRules(): Promise<string[]> {
     if (this.missingRules !== undefined) {
-      Promise.resolve(this.missingRules);
+      return Promise.resolve(this.missingRules);
     }
 
     return ListStacks.getAvailableStacksIn(this.rootPath).then(
