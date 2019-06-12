@@ -75,6 +75,7 @@ export class VSCodeExtensions {
 
   private hasRecommendations(): boolean {
     return (
+      this.extensionsFileExists &&
       JSONhasObj(this.extensionsJSONPath, 'recommendations') &&
       Array.isArray(this.parsedExtensionsFile.recommendations) &&
       this.parsedExtensionsFile.recommendations.length !== 0
@@ -83,11 +84,14 @@ export class VSCodeExtensions {
 
   private getMissingRecommendations(): Promise<string[]> {
     return this.getExtensionsList().then(extensionsList => {
-      extensionsList.forEach(choice => {
-        if (!this.parsedExtensionsFile.recommendations.includes(choice)) {
-          this.missingRecommendations.push(choice);
+      if (!this.hasRecommendations()) {
+        this.missingRecommendations = extensionsList;
+      } else {
+        this.missingRecommendations = extensionsList.filter(extension => {
+          return !this.parsedExtensionsFile.recommendations.includes(extension);
+        });
         }
-      });
+
       return this.missingRecommendations;
     });
   }
