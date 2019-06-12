@@ -8,6 +8,7 @@ jest.mock('child_process');
 
 afterEach(() => {
   jest.resetAllMocks();
+  jest.resetModules();
 });
 
 const rootPath = 'test/';
@@ -18,7 +19,9 @@ test('should return true if .vscode/extensions.json and .vscode folder do not ex
     return 'code -v mocked result';
   });
 
-  expect(new VSCodeExtensions().shouldBeApplied()).toBeTruthy();
+  return new VSCodeExtensions().shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
 test('Method shouldBeApplied() should return true if .vscode/extension.json does not exist but .vscode folder do', () => {
@@ -34,13 +37,17 @@ test('Method shouldBeApplied() should return true if .vscode/extension.json does
     throw new Error();
   });
 
-  expect(new VSCodeExtensions().shouldBeApplied()).toBeTruthy();
+  return new VSCodeExtensions().shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
 test('should return true if .vscode/extensions.json is empty', () => {
   jest.mock(extensionsJSONPath, () => ({}), { virtual: true });
 
-  expect(new VSCodeExtensions().shouldBeApplied()).toBeTruthy();
+  return new VSCodeExtensions().shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
 test('should return true if .vscode/extensions.json has no recommendations array', () => {
@@ -59,8 +66,9 @@ test('should return true if .vscode/extensions.json has no recommendations array
     virtual: true,
   });
 
-  const vscext = new VSCodeExtensions();
-  expect(vscext.shouldBeApplied()).toBeTruthy();
+  return new VSCodeExtensions().shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
 test('should return true if .vscode/extensions.json contains an empty "recommendations" array', () => {
@@ -77,7 +85,9 @@ test('should return true if .vscode/extensions.json contains an empty "recommend
     virtual: true,
   });
 
-  expect(new VSCodeExtensions().shouldBeApplied()).toBeTruthy();
+  return new VSCodeExtensions().shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
 test('should return true if .vscode/extension.json does not contains all recommended extensions', () => {
@@ -104,7 +114,9 @@ test('should return true if .vscode/extension.json does not contains all recomme
     ]);
   });
 
-  expect(vsCodeExtension.shouldBeApplied()).toBeTruthy();
+  return vsCodeExtension.shouldBeApplied().then(result => {
+    expect(result).toBeTruthy();
+  });
 });
 
 test('should return false if .vscode/extension.json contains all recommended extensions', () => {
