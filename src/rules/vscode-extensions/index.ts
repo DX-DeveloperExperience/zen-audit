@@ -6,7 +6,7 @@ import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import Elasticsearch from '../../stacks/elasticsearch';
 import Choice from '../../choice';
-import { JSONhasObj } from '../rules-utils/index';
+import { JSONhasObj } from '../../utils/json/index';
 
 @RuleRegister.register
 @StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })

@@ -1,5 +1,5 @@
 import { StackRegister } from '../stack-register';
-import { existsPaths } from '../../file-utils/index';
+import { existsPaths } from '../../utils/file-utils/index';
 
 @StackRegister.register
 export default class Node {

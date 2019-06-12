@@ -5,7 +5,7 @@ import * as util from 'util';
 import * as cp from 'child_process';
 import TypeScript from '../../stacks/typescript';
 import Node from '../../stacks/node';
-import { hasDevDependencies } from '../rules-utils/index';
+import { hasDevDependencies } from '../../utils/json/index';
 /**
  * Looks for Prettier dependency in package.json, and add it if necessary.
  */

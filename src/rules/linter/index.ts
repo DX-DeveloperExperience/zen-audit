@@ -8,7 +8,7 @@ import Node from '../../stacks/node/index';
 import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import * as util from 'util';
-import { hasDevDependencies } from '../rules-utils';
+import { hasDevDependencies } from '../../utils/json';
 import { YesNo } from '../../choice/index';
 
 @RuleRegister.register

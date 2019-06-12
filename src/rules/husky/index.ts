@@ -7,7 +7,7 @@ import TypeScript from '../../stacks/typescript';
 import * as fs from 'fs-extra';
 import * as util from 'util';
 import * as cp from 'child_process';
-import { hasDevDependencies } from '../rules-utils';
+import { hasDevDependencies } from '../../utils/json';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
