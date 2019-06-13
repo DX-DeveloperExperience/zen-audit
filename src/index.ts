@@ -142,9 +142,11 @@ class ProjectFillerCli extends Command {
             const choices = await rule.getChoices();
             const apply = rule.apply;
             if (apply) {
+              // We call apply with true as answer because it is a YesNo or an Ok Choice List
               if (choices === YesNo || choices === Ok) {
                 return apply.call(rule, true);
               } else {
+                // Else we call it with all the possible choices
                 const choicesStr = choices.map(choice => {
                   return choice.value.toString();
                 });
