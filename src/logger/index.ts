@@ -12,7 +12,13 @@ export const logger = createLogger({
     format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',
     }),
-    format.printf(info => `[${info.level}]: ${info.message}`),
+    format.printf(info => {
+      let stackTrace = '';
+      if (logger.level === 'debug') {
+        stackTrace = '\n' + info.stack;
+      }
+      return `[${info.level}]: ${info.message} ${stackTrace}`;
+    }),
   ),
   transports: [new transports.Console()],
 });
