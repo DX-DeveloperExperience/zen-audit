@@ -94,7 +94,7 @@ class ProjectFillerCli extends Command {
       ListRules.getRulesToApplyIn(path)
         .then(rules => {
           rules.forEach(rule => {
-            this.log(`${rule.getName()}: ${rule.getDescription()}`);
+            this.log(`${rule.getName()}: ${rule.getShortDescription()}`);
           });
         })
         .catch(err => {
@@ -169,7 +169,7 @@ class ProjectFillerCli extends Command {
           const promptsProm = foundRules.map(async rule => {
             return {
               name: rule.constructor.name,
-              message: rule.getDescription(),
+              message: rule.getShortDescription(),
               type: rule.getPromptType(),
               choices: await rule.getChoices(),
             };
