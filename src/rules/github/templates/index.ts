@@ -70,7 +70,7 @@ export class GitHubTemplates {
     return 'GitHub Issue Templates';
   }
 
-  getDescription(): string {
+  getShortDescription(): string {
     return 'Check for existing GitHub issue templates, if none is found, create one with default template';
   }
 

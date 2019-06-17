@@ -146,7 +146,7 @@ export class GitIgnore {
     return 'GitIgnore';
   }
 
-  getDescription() {
+  getShortDescription() {
     return `${
       this.description
     }This rule will add rules to your .gitignore, corresponding to found stacks. Would you like to apply it ?`;

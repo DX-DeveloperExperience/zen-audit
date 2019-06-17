@@ -29,7 +29,7 @@ export class ElasticsearchNodesVersion {
     return 'Elasticsearch Version';
   }
 
-  getDescription() {
+  getShortDescription() {
     return 'An Elasticsearch cluster should have all nodes using the same version of Elasticsearch';
   }
 

@@ -24,7 +24,7 @@ export class ElasticsearchNodesNumber {
     return 'Elasticsearch Nodes';
   }
 
-  getDescription() {
+  getShortDescription() {
     return 'An Elasticsearch cluster should at least has 3 nodes';
   }
 

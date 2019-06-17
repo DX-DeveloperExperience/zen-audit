@@ -53,7 +53,7 @@ export class Prettier {
     return 'Prettier';
   }
 
-  getDescription() {
+  getShortDescription() {
     return 'Prettier keeps your code well formatted. Would you like to install it ?';
   }
 

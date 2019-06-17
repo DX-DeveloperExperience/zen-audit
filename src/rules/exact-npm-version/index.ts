@@ -134,7 +134,7 @@ export class ExactNpmVersion {
     return 'Exact npm version';
   }
 
-  getDescription() {
+  getShortDescription() {
     return `Strict version: in order to avoid breaking changes when running "npm install", \
     you should use a strict version for your dependencies. Would you like to do so ?`;
   }

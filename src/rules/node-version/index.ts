@@ -69,7 +69,7 @@ export class NodeVersion {
     return 'Node Version';
   }
 
-  getDescription() {
+  getShortDescription() {
     if (this.isOutdated()) {
       const endDate = this.nodeVersionSchedule[this.shortNodeVersion].end;
       return `Your NodeJS version : ${this.nodeVersion}

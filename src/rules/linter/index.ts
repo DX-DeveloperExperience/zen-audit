@@ -142,7 +142,7 @@ export class Linter {
     return 'Linter';
   }
 
-  getDescription() {
+  getShortDescription() {
     return 'Linter: you may use a linter (tslint or eslint) to keep your code error free and syntaxically correct. Would you like to add it ?';
   }
 

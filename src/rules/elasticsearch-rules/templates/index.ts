@@ -30,7 +30,7 @@ export class ElasticsearchTemplate {
     return 'Elasticsearch Template';
   }
 
-  getDescription() {
+  getShortDescription() {
     return 'You should use templates for configuring your indices';
   }
 

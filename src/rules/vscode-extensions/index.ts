@@ -133,7 +133,7 @@ export class VSCodeExtensions {
     return 'VSCodeExtensions';
   }
 
-  getDescription() {
+  getShortDescription() {
     return 'This rule will add extension suggestions to your Visual Studio Code app.';
   }
 
