@@ -29,6 +29,16 @@ export function hasKeyInObject(
   }
 }
 
+export function pathExistsInJSON(parsedJSON: any, objs: string[]): boolean {
+  if (objs.length === 0) {
+    return true;
+  }
+  const [head, ...tail] = objs;
+  return (
+    parsedJSON[head] !== undefined && pathExistsInJSON(parsedJSON[head], tail)
+  );
+}
+
 export function JSONhasObj(JSONPath: string, obj: string) {
   const parsedJSON = require(JSONPath);
 
