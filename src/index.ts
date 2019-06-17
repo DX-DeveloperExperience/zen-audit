@@ -14,6 +14,7 @@ init();
 
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
+  static path: string = './';
 
   static flags = {
     // add --version flag to show CLI version
@@ -93,7 +94,7 @@ class ProjectFillerCli extends Command {
       ListRules.getRulesToApplyIn(path)
         .then(rules => {
           rules.forEach(rule => {
-            this.log(`${rule.getName()}: ${rule.getShortDescription()}`);
+            this.log(`${rule.getName()}: ${rule.getDescription()}`);
           });
         })
         .catch(err => {
@@ -168,7 +169,7 @@ class ProjectFillerCli extends Command {
           const promptsProm = foundRules.map(async rule => {
             return {
               name: rule.constructor.name,
-              message: rule.getShortDescription(),
+              message: rule.getDescription(),
               type: rule.getPromptType(),
               choices: await rule.getChoices(),
             };
