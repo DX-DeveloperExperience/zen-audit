@@ -57,6 +57,10 @@ export class Prettier {
     return 'Prettier keeps your code well formatted. Would you like to install it ?';
   }
 
+  getLongDescription() {
+    return 'Laborum exercitation incididunt nulla veniam labore esse. Pariatur adipisicing sint aliqua adipisicing culpa consequat reprehenderit excepteur eiusmod. Est irure voluptate fugiat enim minim laborum. Magna anim eiusmod consectetur voluptate. Proident ad ex laborum in adipisicing sit minim aliquip duis. Do non voluptate mollit officia consequat proident ex mollit dolore qui esse sit reprehenderit.';
+  }
+
   getPromptType() {
     return 'list';
   }

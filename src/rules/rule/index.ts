@@ -7,6 +7,7 @@ export default interface Rule {
   apply?: (answers: boolean | string[]) => Promise<void>;
   getName(): string;
   getShortDescription(): string;
+  getLongDescription(): string;
   getPromptType(): string;
   getChoices(): Choice[] | Promise<Choice[]>;
 }
