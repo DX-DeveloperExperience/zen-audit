@@ -1,7 +1,6 @@
-import { Linter } from '.';
 import { ListStacks } from '../../stacks/list-stacks/index';
 import Stack from '../../stacks/stack/index';
-import TypeScript from '../../stacks/typescript/index';
+import { Linter } from './index';
 
 const rootPath = 'linter/';
 const packageJSONPath = `${rootPath}package.json`;

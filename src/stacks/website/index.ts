@@ -2,7 +2,6 @@ import { StackRegister } from '../stack-register';
 import axios from 'axios';
 import { pathExistsInJSON } from '../../utils/json/index';
 import Globals from '../../utils/globals';
-// import ProjectFillerCli = require('../../index');
 
 @StackRegister.register
 export class Website {
