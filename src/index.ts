@@ -9,6 +9,7 @@ import { ListStacks } from './stacks/list-stacks/index';
 import { logger } from './logger/index';
 import * as fs from 'fs-extra';
 import { YesNo, Ok } from './choice/index';
+import { generateReport } from './templating';
 import Globals from './utils/globals/index';
 
 init();
@@ -99,6 +100,17 @@ class ProjectFillerCli extends Command {
         .then(rules => {
           rules.forEach(rule => {
             this.log(`${rule.getName()}: ${rule.getShortDescription()}`);
+          });
+          generateReport({
+            rulesInfos: rules.map(rule => {
+              return {
+                name: rule.getName(),
+                shortDescription: rule.getShortDescription(),
+                longDescription: rule.getLongDescription(),
+              };
+            }),
+          }).then(() => {
+            this.log('Rapport généré');
           });
         })
         .catch(err => {
