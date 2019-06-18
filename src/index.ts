@@ -9,6 +9,7 @@ import { ListStacks } from './stacks/list-stacks/index';
 import { logger } from './logger/index';
 import * as fs from 'fs-extra';
 import { YesNo, Ok } from './choice/index';
+import Globals from './utils/globals/index';
 
 init();
 
@@ -72,6 +73,9 @@ class ProjectFillerCli extends Command {
       if (!path.endsWith('/')) {
         path = path + '/';
       }
+
+      Globals.rootPath = path;
+
       const fileStat = fs.statSync(path);
       if (!fileStat.isDirectory()) {
         logger.error(`The provided path: ${path} is not a directory.`);
