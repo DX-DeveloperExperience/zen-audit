@@ -111,8 +111,6 @@ class ProjectFillerCli extends Command {
                 longDescription: rule.getLongDescription(),
               };
             }),
-          }).then(() => {
-            this.log('Rapport généré');
           });
         })
         .catch(err => {
