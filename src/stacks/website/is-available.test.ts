@@ -1,5 +1,5 @@
 import { Website } from './index';
-import ProjectFillerCli = require('../../index');
+import Globals from '../../utils/globals';
 const axios = require('axios');
 
 afterEach(() => {
@@ -7,7 +7,7 @@ afterEach(() => {
 });
 
 test('should return false if path does not start with http or https', () => {
-  ProjectFillerCli.path = 'path/to/project';
+  Globals.rootPath = 'path/to/project';
 
   const website = new Website();
 
@@ -17,7 +17,7 @@ test('should return false if path does not start with http or https', () => {
 });
 
 test('should return false if response is not html text', () => {
-  ProjectFillerCli.path = 'http://unknown-path.test';
+  Globals.rootPath = 'http://unknown-path.test';
 
   axios.get = jest.fn(() => {
     return Promise.resolve({
@@ -33,7 +33,7 @@ test('should return false if response is not html text', () => {
 });
 
 test('should return true if path starts with http:// or https:// and response is text/html', () => {
-  ProjectFillerCli.path = 'https://unknown-path.test';
+  Globals.rootPath = 'https://unknown-path.test';
 
   axios.get = jest.fn(() => {
     return Promise.resolve({
