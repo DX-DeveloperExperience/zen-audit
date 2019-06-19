@@ -42,5 +42,9 @@ export function generateReport(rules: {
           );
           logger.debug(err.stack);
         });
+    })
+    .catch(err => {
+      logger.error(`Unable to read file: ${__dirname + '/repord.md'}`);
+      logger.debug(err.stack);
     });
 }
