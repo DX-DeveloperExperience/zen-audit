@@ -96,28 +96,6 @@ class ProjectFillerCli extends Command {
       logger.level = 'debug';
     }
 
-    if (runFlags.rules) {
-      cli.action.start('Searching for rules to apply');
-      ListRules.getRulesToApplyIn(path)
-        .then(rules => {
-          rules.forEach(rule => {
-            this.log(`${rule.getName()}: ${rule.getShortDescription()}`);
-          });
-          generateReport({
-            rulesInfos: rules.map(rule => {
-              return {
-                name: rule.getName(),
-                shortDescription: rule.getShortDescription(),
-                longDescription: rule.getLongDescription(),
-              };
-            }),
-          });
-        })
-        .catch(err => {
-          logger.error(err);
-        });
-    }
-
     if (runFlags.list) {
       cli.action.start('Retrieving rules and stacks');
       const stacks = StackRegister.getConstructors();
@@ -131,9 +109,7 @@ class ProjectFillerCli extends Command {
               .join(', '),
         },
       });
-    }
-
-    if (runFlags.stacks) {
+    } else if (runFlags.stacks) {
       cli.action.start('Searching for available stacks');
       const stacksFoundProm = ListStacks.getAvailableStacksIn(path);
       stacksFoundProm
@@ -149,9 +125,7 @@ class ProjectFillerCli extends Command {
         .catch(err => {
           logger.error(err);
         });
-    }
-
-    if (runFlags.apply) {
+    } else if (runFlags.apply) {
       cli.action.start('Search for rules');
       ListRules.getRulesToApplyIn(path)
         .then(foundRules => {
@@ -176,9 +150,7 @@ class ProjectFillerCli extends Command {
           logger.error('Error searching for rules to apply');
           logger.debug(err);
         });
-    }
-
-    if (runFlags.manual) {
+    } else if (runFlags.manual) {
       cli.action.start('Searching for rules');
       ListRules.getRulesToApplyIn(path)
         .then(foundRules => {
@@ -217,6 +189,26 @@ class ProjectFillerCli extends Command {
             .catch(err => {
               logger.error(err);
             });
+        })
+        .catch(err => {
+          logger.error(err);
+        });
+    } else if (runFlags.rules) {
+      cli.action.start('Searching for rules to apply');
+      ListRules.getRulesToApplyIn(path)
+        .then(rules => {
+          rules.forEach(rule => {
+            this.log(`${rule.getName()}: ${rule.getShortDescription()}`);
+          });
+          generateReport({
+            rulesInfos: rules.map(rule => {
+              return {
+                name: rule.getName(),
+                shortDescription: rule.getShortDescription(),
+                longDescription: rule.getLongDescription(),
+              };
+            }),
+          });
         })
         .catch(err => {
           logger.error(err);
