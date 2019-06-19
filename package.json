@@ -74,7 +74,7 @@
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
     "test": "jest",
     "test:cov": "jest --coverage --runInBand",
-    "jest-cache": "jest --clearCache --detectOpenHandles",
+    "jest-cache": "jest --clearCache --detectOpenHandles --runInBand",
     "audit": "npm audit",
     "oclif-pack": "oclif-dev pack",
     "prettier-test": "prettier -c \"src/**/*.ts\" \"test/**/*.ts\"",
