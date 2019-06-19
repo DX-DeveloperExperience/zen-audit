@@ -32,7 +32,9 @@ class ProjectFillerCli extends Command {
     }),
     rules: flags.boolean({
       char: 'r',
-      description: 'Search for rules that may apply to your project',
+      default: true,
+      description:
+        'Search for rules that may apply to your project (default flag)',
     }),
     stacks: flags.boolean({
       char: 's',
@@ -94,7 +96,7 @@ class ProjectFillerCli extends Command {
       logger.level = 'debug';
     }
 
-    if (runFlags.rules || Object.keys(runFlags).length === 0) {
+    if (runFlags.rules) {
       cli.action.start('Searching for rules to apply');
       ListRules.getRulesToApplyIn(path)
         .then(rules => {
