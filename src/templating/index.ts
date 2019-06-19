@@ -10,8 +10,7 @@ export function generateReport(rules: {
     longDescription: string;
   }>;
 }) {
-  return fs
-    .readFile(__dirname + '/report.md', { encoding: 'utf-8' })
+  fs.readFile(__dirname + '/report.md', { encoding: 'utf-8' })
     .then((markdown: string) => {
       const output = mustache.render(markdown, rules);
       const date = new Date();
@@ -19,8 +18,7 @@ export function generateReport(rules: {
         1}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
       const reportDirPath = `${Globals.rootPath}zodit-reports`;
       const reportFilePath = `${reportDirPath}/report-${dateString}.md`;
-      return fs
-        .ensureDir(reportDirPath)
+      fs.ensureDir(reportDirPath)
         .then(() => {
           return fs
             .writeFile(reportFilePath, output, {
