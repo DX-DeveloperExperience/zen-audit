@@ -1,9 +1,8 @@
 import { VSCodeExtensions } from '.';
+import Globals from '../../utils/globals';
 
 const fs = require('fs-extra');
 jest.mock('fs-extra');
-
-const rootPath = 'root/';
 
 test('should not add extensions if they already exist', () => {
   const extensionsJSON = {
@@ -14,7 +13,7 @@ test('should not add extensions if they already exist', () => {
     virtual: true,
   });
 
-  const vscodeExtensions = new VSCodeExtensions(rootPath);
+  const vscodeExtensions = new VSCodeExtensions();
 
   let writtenJSON: string;
   fs.writeJSON.mockImplementation((_A: string, resultJSON: any, _B: {}) => {
