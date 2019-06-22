@@ -1,3 +1,4 @@
+import * as Path from 'path';
 export default class Globals {
-  static rootPath: string;
+  static rootPath: string = Path.resolve('.') + '/';
 }

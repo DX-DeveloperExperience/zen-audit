@@ -1,8 +1,9 @@
 import { ListStacks } from '../../stacks/list-stacks/index';
 import Stack from '../../stacks/stack';
 import { VSCodeExtensions } from './index';
+import Globals from '../../utils/globals';
 
-const rootPath = 'root/';
+Globals.rootPath = 'root/';
 
 require('constants');
 jest.mock('./constants');
@@ -27,7 +28,7 @@ test('should give us a list of choices corresponding to stacks', () => {
     ]);
   });
 
-  const vsCodeExtensions = new VSCodeExtensions(rootPath);
+  const vsCodeExtensions = new VSCodeExtensions();
 
   return vsCodeExtensions.getChoices().then(choices => {
     expect(choices.length).toEqual(2);
@@ -53,7 +54,7 @@ test('should not add already existing extensions in choice list', () => {
     ]);
   });
 
-  const vsCodeExtensions = new VSCodeExtensions(rootPath);
+  const vsCodeExtensions = new VSCodeExtensions();
 
   return vsCodeExtensions.getChoices().then(choices => {
     expect(choices.length).toEqual(1);

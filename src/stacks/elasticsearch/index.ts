@@ -1,12 +1,12 @@
 import { StackRegister } from '../stack-register';
 import axios from 'axios';
+import Globals from '../../utils/globals/index';
 
 @StackRegister.register
 export default class Elasticsearch {
-  constructor(private readonly rootPath: string = './') {}
   private isElasticsearchResponse() {
     return axios
-      .get(this.rootPath, {
+      .get(Globals.rootPath, {
         timeout: 3000,
       })
       .then(result => {
@@ -19,7 +19,7 @@ export default class Elasticsearch {
   }
 
   async isAvailable(): Promise<boolean> {
-    if (this.rootPath.startsWith(`http`)) {
+    if (Globals.rootPath.startsWith(`http`)) {
       const isElasticsearchResponse = await this.isElasticsearchResponse();
 
       return Promise.resolve(isElasticsearchResponse);

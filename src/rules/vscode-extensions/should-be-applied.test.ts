@@ -1,4 +1,5 @@
 import { VSCodeExtensions } from '.';
+import Globals from '../../utils/globals/index';
 
 const fs = require('fs');
 jest.mock('fs');
@@ -13,6 +14,9 @@ afterEach(() => {
 
 const rootPath = 'test/';
 const extensionsJSONPath = rootPath + '.vscode/extensions.json';
+
+Globals.rootPath = 'should-be-applied/';
+const extensionsJSONPath = Globals.rootPath + '.vscode/extensions.json';
 
 test('should return true if .vscode/extensions.json and .vscode folder do not exist but vscode is installed', () => {
   cp.execSync.mockImplementation(() => {
@@ -105,14 +109,7 @@ test('should return true if .vscode/extension.json does not contains all recomme
     }
   });
 
-  const vsCodeExtension = new VSCodeExtensions(rootPath);
-
-  vsCodeExtension.getChoices = jest.fn(() => {
-    return Promise.resolve([
-      { name: 'extension1', value: 'ext1' },
-      { name: 'extension3', value: 'ext3' },
-    ]);
-  });
+  const vsCodeExtension = new VSCodeExtensions();
 
   return vsCodeExtension.shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
@@ -134,7 +131,7 @@ test('should return false if .vscode/extension.json contains all recommended ext
     }
   });
 
-  const vsCodeExtension = new VSCodeExtensions(rootPath);
+  const vsCodeExtension = new VSCodeExtensions();
 
   vsCodeExtension.getChoices = jest.fn(() => {
     return Promise.resolve([
