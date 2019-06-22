@@ -4,6 +4,10 @@ import Globals from '../../utils/globals';
 const fs = require('fs-extra');
 jest.mock('fs-extra');
 
+jest.mock('./constants');
+
+Globals.rootPath = 'apply/';
+
 test('should not add extensions if they already exist', () => {
   const extensionsJSON = {
     recommendations: ['extension1', 'extension2'],
