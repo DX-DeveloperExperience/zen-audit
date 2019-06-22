@@ -6,7 +6,6 @@ import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import Elasticsearch from '../../stacks/elasticsearch';
 import Choice from '../../choice';
-import { JSONhasObj } from '../../utils/json/index';
 import Globals from '../../utils/globals';
 
 @RuleRegister.register
@@ -15,7 +14,6 @@ export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
   private extensionsJSONPath: string;
   private parsedExtensionsFile: any;
-  private extensionsFileExists: boolean;
   private missingExtensions: Choice[] = [];
   private initialized: boolean = false;
 
@@ -24,12 +22,16 @@ export class VSCodeExtensions {
 
     try {
       this.parsedExtensionsFile = require(this.extensionsJSONPath);
-      this.extensionsFileExists = true;
+      if (
+        !this.parsedExtensionsFile.recommendations ||
+        !Array.isArray(this.parsedExtensionsFile.recommendations)
+      ) {
+        this.parsedExtensionsFile.recommendations = [];
+      }
     } catch (e) {
       this.parsedExtensionsFile = {
         recommendations: [],
       };
-      this.extensionsFileExists = false;
     }
   }
 
@@ -46,9 +48,7 @@ export class VSCodeExtensions {
     return this.init().then(() => {
       return (
         this.missingExtensions.length !== 0 &&
-        (this.dotVSCodeExists() ||
-          (!this.extensionsFileExists && this.codeIsInPath()) ||
-          (this.extensionsFileExists && !this.hasRecommendations()))
+        (this.dotVSCodeExists() || this.codeIsInPath())
       );
     });
   }
@@ -70,15 +70,6 @@ export class VSCodeExtensions {
     } catch (err) {
       return false;
     }
-  }
-
-  private hasRecommendations(): boolean {
-    return (
-      this.extensionsFileExists &&
-      JSONhasObj(this.extensionsJSONPath, 'recommendations') &&
-      Array.isArray(this.parsedExtensionsFile.recommendations) &&
-      this.parsedExtensionsFile.recommendations.length !== 0
-    );
   }
 
   apply(answers: string[]) {
@@ -166,7 +157,6 @@ export class VSCodeExtensions {
           }) === i
         );
       });
-
       return result;
     });
   }
