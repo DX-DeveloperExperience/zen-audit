@@ -6,6 +6,7 @@ import { YesNo } from '../../choice';
 import Node from '../../stacks/node/index';
 import TypeScript from '../../stacks/typescript/index';
 import { logger } from '../../logger';
+import Globals from '../../utils/globals';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
@@ -14,7 +15,6 @@ import { logger } from '../../logger';
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class ExactNpmVersion {
-  readonly rootPath: string;
   private packageJSONPath: string;
   private parsedPackageJSON: any;
   readonly semverRegex = new RegExp(
@@ -23,9 +23,8 @@ export class ExactNpmVersion {
   );
   private jsonObjToCheckFound: string[] = [];
 
-  constructor(rootPath: string = './') {
-    this.rootPath = rootPath;
-    this.packageJSONPath = `${this.rootPath}package.json`;
+  constructor() {
+    this.packageJSONPath = `${Globals.rootPath}package.json`;
     this.parsedPackageJSON = require(this.packageJSONPath);
     this.jsonObjToCheckFound = this.findJsonObjectsToCheck();
   }

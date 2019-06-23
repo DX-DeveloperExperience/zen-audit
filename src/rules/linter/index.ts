@@ -10,11 +10,11 @@ import * as cp from 'child_process';
 import * as util from 'util';
 import { hasDevDependencies } from '../../utils/json';
 import { YesNo } from '../../choice/index';
+import Globals from '../../utils/globals';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([TypeScript, Node])
 export class Linter {
-  readonly rootPath: string;
   private packageJSONPath: string;
   private linterPaths: { [path: string]: string };
   private parsedPackageJSON: any;
@@ -23,12 +23,11 @@ export class Linter {
   private linterhasConfigFile: boolean = false;
   private linterInDevDep: boolean = false;
 
-  constructor(rootPath: string = './') {
-    this.rootPath = rootPath;
-    this.packageJSONPath = `${this.rootPath}package.json`;
+  constructor() {
+    this.packageJSONPath = `${Globals.rootPath}package.json`;
     this.linterPaths = {
-      tslint: `${this.rootPath}tslint.json`,
-      eslint: `${this.rootPath}eslint.json`,
+      tslint: `${Globals.rootPath}tslint.json`,
+      eslint: `${Globals.rootPath}eslint.json`,
     };
 
     this.parsedPackageJSON = require(this.packageJSONPath);
@@ -36,7 +35,7 @@ export class Linter {
 
   private async init(): Promise<void> {
     if (!this.initialized) {
-      return ListStacks.findAvailableStackIn(TypeScript, this.rootPath).then(
+      return ListStacks.findAvailableStackIn(TypeScript, Globals.rootPath).then(
         stack => {
           this.linterChoice = stack !== undefined ? 'tslint' : 'eslint';
         },
@@ -66,7 +65,7 @@ export class Linter {
                   ? 'npm i tslint typescript -DE'
                   : 'npm i eslint -DE';
 
-              return exec(installCmd, { cwd: this.rootPath })
+              return exec(installCmd, { cwd: Globals.rootPath })
                 .then(() => {
                   logger.info(`Installed ${this.linterChoice} succesfully`);
                 })

@@ -1,8 +1,9 @@
 import { GitHubTemplates } from './index';
+import Globals from '../../../utils/globals/index';
 const fs = require('fs-extra');
 jest.mock('fs-extra');
 
-const rootPath = 'github/';
+Globals.rootPath = 'github/';
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -11,7 +12,7 @@ afterEach(() => {
 test('Should return true if .github/ISSUE_TEMPLATE folder does not exist', () => {
   fs.pathExists.mockReturnValue(Promise.resolve(false));
 
-  const templates = new GitHubTemplates(rootPath);
+  const templates = new GitHubTemplates();
 
   return templates.shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
@@ -23,7 +24,7 @@ test('Should return true if .github/ISSUE_TEMPLATE is empty', () => {
   fs.pathExists.mockReturnValue(Promise.resolve(true));
   fs.readdir.mockReturnValue(Promise.resolve([]));
 
-  const templates = new GitHubTemplates(rootPath);
+  const templates = new GitHubTemplates();
 
   return templates.shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
@@ -38,7 +39,7 @@ test('Should return true if .github/ISSUE_TEMPLATE is not empty but has no .md',
     Promise.resolve(['a_file.ts', 'a_file.testmd', 'a_file']),
   );
 
-  const templates = new GitHubTemplates(rootPath);
+  const templates = new GitHubTemplates();
 
   return templates.shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
@@ -58,7 +59,7 @@ test('Should return false if .github/ISSUE_TEMPLATE contains .md files', () => {
     ]),
   );
 
-  const templates = new GitHubTemplates(rootPath);
+  const templates = new GitHubTemplates();
 
   return templates.shouldBeApplied().then(result => {
     expect(result).toBeFalsy();

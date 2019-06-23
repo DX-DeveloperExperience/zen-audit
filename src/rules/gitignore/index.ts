@@ -6,6 +6,7 @@ import { ListStacks } from '../../stacks/list-stacks';
 import * as fs from 'fs-extra';
 import Elasticsearch from '../../stacks/elasticsearch';
 import axios from 'axios';
+import Globals from '../../utils/globals';
 
 /**
  * This Rule will look for a .gitignore file. If it doesn't exist, applying this rule will
@@ -16,7 +17,6 @@ import axios from 'axios';
 @StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
 export class GitIgnore {
   readonly requiredFiles: string[] = ['.gitignore'];
-  readonly rootPath: string;
   private gitIgnoreContent: string = '';
   private gitIgnorePath: string;
   private gitIgnoreExists: boolean = false;
@@ -24,9 +24,8 @@ export class GitIgnore {
   private missingRules: string[] | undefined = undefined;
   private initialized: boolean = false;
 
-  constructor(rootPath: string = './') {
-    this.rootPath = rootPath;
-    this.gitIgnorePath = `${this.rootPath}.gitignore`;
+  constructor() {
+    this.gitIgnorePath = `${Globals.rootPath}.gitignore`;
   }
 
   private async init() {
@@ -70,7 +69,7 @@ export class GitIgnore {
       return Promise.resolve(this.missingRules);
     }
 
-    return ListStacks.getAvailableStacksIn(this.rootPath).then(
+    return ListStacks.getAvailableStacksIn(Globals.rootPath).then(
       availableStacks => {
         const getKeptRules = availableStacks.map(stack => {
           const getNewRules: Promise<string[]> = axios

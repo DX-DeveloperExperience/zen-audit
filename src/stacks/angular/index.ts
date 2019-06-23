@@ -1,12 +1,13 @@
 import { StackRegister } from '../stack-register';
+import Globals from '../../utils/globals';
 
 @StackRegister.register
 export default class Angular {
-  constructor(private readonly rootPath: string = './') {}
+  constructor() {}
 
   async isAvailable(): Promise<boolean> {
     try {
-      const packageJSON = require(`${this.rootPath}package.json`);
+      const packageJSON = require(`${Globals.rootPath}package.json`);
       if (packageJSON.dependencies !== undefined) {
         return Object.keys(packageJSON.dependencies).includes('@angular/core');
       }

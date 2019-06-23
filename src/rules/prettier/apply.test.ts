@@ -1,6 +1,7 @@
 import { Prettier } from '.';
+import Globals from '../../utils/globals/index';
 
-const rootPath = './prettier/';
+Globals.rootPath = './prettier/';
 
 const util = require('util');
 
@@ -11,9 +12,9 @@ require('../../logger');
 jest.mock('../../logger');
 
 test('Should run npm i prettier -DE command', () => {
-  jest.mock(rootPath + 'package.json', () => ({}), { virtual: true });
+  jest.mock(Globals.rootPath + 'package.json', () => ({}), { virtual: true });
 
-  const prettier = new Prettier(rootPath);
+  const prettier = new Prettier();
 
   util.promisify = jest.fn((exec: (cmd: string) => {}) => {
     return (cmd: string) => {

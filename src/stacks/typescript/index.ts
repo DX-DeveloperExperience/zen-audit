@@ -1,13 +1,14 @@
 import { StackRegister } from '../stack-register';
 import { logger } from '../../logger/index';
+import Globals from '../../utils/globals';
 
 @StackRegister.register
 export default class TypeScript {
-  constructor(private readonly rootPath: string = './') {}
+  constructor() {}
 
   async isAvailable() {
     try {
-      const packageJSON = require(`${this.rootPath}package.json`);
+      const packageJSON = require(`${Globals.rootPath}package.json`);
       if (packageJSON.devDependencies !== undefined) {
         return Object.keys(packageJSON.devDependencies).includes('typescript');
       }
@@ -17,8 +18,8 @@ export default class TypeScript {
         return false;
       }
       logger.error(
-        `Error trying to read ${
-          this.rootPath
+        `TypeScript Stack: Error trying to read ${
+          Globals.rootPath
         }package.json, run in debug mode to find why.`,
       );
       logger.debug(e);

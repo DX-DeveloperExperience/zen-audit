@@ -1,7 +1,8 @@
 import Node from '../../stacks/node/index';
 import { Husky } from './index';
+import Globals from '../../utils/globals/index';
 
-const rootPath = './husky/';
+Globals.rootPath = 'husky/';
 
 const util = require('util');
 
@@ -19,10 +20,10 @@ afterEach(() => {
 });
 
 test('Method apply() should add husky to devDependencies', () => {
-  jest.mock('./husky/package.json', () => ({}), { virtual: true });
+  jest.mock(`${Globals.rootPath}package.json`, () => ({}), { virtual: true });
 
-  const husky = new Husky(rootPath);
-  const node = new Node(rootPath);
+  const husky = new Husky();
+  const node = new Node();
 
   node.isAvailable = jest.fn(() => {
     return Promise.resolve(true);

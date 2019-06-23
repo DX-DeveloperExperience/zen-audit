@@ -3,20 +3,14 @@ import Elasticsearch from '../../../stacks/elasticsearch';
 import { StackRegister } from '../../../stacks/stack-register';
 import axios from 'axios';
 import { YesNo } from '../../../choice';
+import Globals from '../../../utils/globals';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
 export class ElasticsearchTemplate {
-  requiredFiles = [''];
-  rootPath: string;
-
-  constructor(rootPath: string = './') {
-    this.rootPath = rootPath;
-  }
-
   async shouldBeApplied(): Promise<boolean> {
     return axios
-      .get(`${this.rootPath}_template`)
+      .get(`${Globals.rootPath}_template`)
       .then(({ data: templates }) => {
         return (
           Object.keys(templates).filter(

@@ -1,11 +1,12 @@
 import { StackRegister } from '../stack-register';
 import { hasDependency } from '../../utils/json/index';
+import Globals from '../../utils/globals';
 
 @StackRegister.register
 export class React {
-  constructor(private readonly rootPath: string) {}
+  constructor() {}
   async isAvailable(): Promise<boolean> {
-    return hasDependency(this.rootPath, 'react');
+    return hasDependency(Globals.rootPath, 'react');
   }
 
   name(): string {

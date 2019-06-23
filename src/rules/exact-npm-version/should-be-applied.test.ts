@@ -1,4 +1,5 @@
 import { ExactNpmVersion } from '.';
+import Globals from '../../utils/globals/index';
 jest.mock('./constants');
 
 afterEach(() => {
@@ -6,7 +7,7 @@ afterEach(() => {
   jest.resetModules();
 });
 
-const rootPath = './exact-npm-version/';
+Globals.rootPath = 'exact-npm-version/';
 
 test('Should return false if no incorrect semver is found', () => {
   const packageJSON = {
@@ -19,11 +20,11 @@ test('Should return false if no incorrect semver is found', () => {
       dep4: '1.2.5',
     },
   };
-  jest.mock('./exact-npm-version/package.json', () => packageJSON, {
+  jest.mock(`${Globals.rootPath}package.json`, () => packageJSON, {
     virtual: true,
   });
 
-  return new ExactNpmVersion(rootPath).shouldBeApplied().then(result => {
+  return new ExactNpmVersion().shouldBeApplied().then(result => {
     expect(result).toBeFalsy();
   });
 });
@@ -40,11 +41,11 @@ test('Should return true if incorrect semver with ^ is found', () => {
     },
   };
 
-  jest.mock('./exact-npm-version/package.json', () => packageJSON, {
+  jest.mock(`${Globals.rootPath}package.json`, () => packageJSON, {
     virtual: true,
   });
 
-  return new ExactNpmVersion(rootPath).shouldBeApplied().then(result => {
+  return new ExactNpmVersion().shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
   });
 });
@@ -61,11 +62,11 @@ test('Should return true if incorrect semver with ~ is found', () => {
     },
   };
 
-  jest.mock('./exact-npm-version/package.json', () => packageJSON, {
+  jest.mock(`${Globals.rootPath}package.json`, () => packageJSON, {
     virtual: true,
   });
 
-  return new ExactNpmVersion(rootPath).shouldBeApplied().then(result => {
+  return new ExactNpmVersion().shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
   });
 });
@@ -86,11 +87,11 @@ test('Should return false if incorrect semver is in json object that does not ne
     },
   };
 
-  jest.mock('./exact-npm-version/package.json', () => packageJSON, {
+  jest.mock(`${Globals.rootPath}package.json`, () => packageJSON, {
     virtual: true,
   });
 
-  return new ExactNpmVersion(rootPath).shouldBeApplied().then(result => {
+  return new ExactNpmVersion().shouldBeApplied().then(result => {
     expect(result).toBeFalsy();
   });
 });

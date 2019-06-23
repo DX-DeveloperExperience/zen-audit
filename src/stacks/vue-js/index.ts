@@ -1,12 +1,13 @@
 import { StackRegister } from '../stack-register';
+import Globals from '../../utils/globals';
 
 @StackRegister.register
 export default class VueJS {
-  constructor(private readonly rootPath: string = './') {}
+  constructor() {}
 
   async isAvailable(): Promise<boolean> {
     try {
-      const packageJson = require(`${this.rootPath}/package.json`);
+      const packageJson = require(`${Globals.rootPath}/package.json`);
       if (packageJson.dependencies !== undefined) {
         return Object.keys(packageJson.dependencies).includes('vue');
       }

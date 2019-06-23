@@ -1,4 +1,5 @@
 import { Prettier } from '../../rules/prettier';
+import Globals from '../../utils/globals/index';
 
 beforeEach(() => {
   jest.resetAllMocks();
@@ -11,11 +12,11 @@ test('Should return true if prettier is not in devDependencies', () => {
       dep2: 'dep2',
     },
   };
-  const path: string = './test1/';
+  Globals.rootPath = './test1/';
 
   jest.mock('./test1/package.json', () => packageJSON, { virtual: true });
 
-  return new Prettier(path).shouldBeApplied().then(result => {
+  return new Prettier().shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
   });
 });
@@ -27,11 +28,12 @@ test('Should return false if prettier is in devDependencies', () => {
       prettier: 'dev1',
     },
   };
-  const path: string = './test2/';
 
-  jest.mock(`./test2/package.json`, () => packageJSON, { virtual: true });
+  jest.mock(`${Globals.rootPath}package.json`, () => packageJSON, {
+    virtual: true,
+  });
 
-  return new Prettier(path).shouldBeApplied().then(result => {
+  return new Prettier().shouldBeApplied().then(result => {
     expect(result).toBeFalsy();
   });
 });
@@ -46,11 +48,12 @@ test('Should return true if prettier is something else than a dependency in devD
       prettier: 'prettier',
     },
   };
-  const path: string = './test3/';
 
-  jest.mock(`./test3/package.json`, () => packageJSON, { virtual: true });
+  jest.mock(`${Globals.rootPath}package.json`, () => packageJSON, {
+    virtual: true,
+  });
 
-  return new Prettier(path).shouldBeApplied().then(result => {
+  return new Prettier().shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
   });
 });
