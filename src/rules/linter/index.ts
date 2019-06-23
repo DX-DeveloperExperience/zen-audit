@@ -8,7 +8,7 @@ import Node from '../../stacks/node/index';
 import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import * as util from 'util';
-import { hasDevDependencies } from '../rules-utils';
+import { hasDevDependencies } from '../../utils/json';
 import { YesNo } from '../../choice/index';
 
 @RuleRegister.register
@@ -142,8 +142,12 @@ export class Linter {
     return 'Linter';
   }
 
-  getDescription() {
+  getShortDescription() {
     return 'Linter: you may use a linter (tslint or eslint) to keep your code error free and syntaxically correct. Would you like to add it ?';
+  }
+
+  getLongDescription() {
+    return 'Proident duis cillum incididunt ipsum. Sint quis ut proident excepteur nulla cillum laborum qui mollit quis do nulla. Quis minim ipsum duis anim voluptate quis sit nisi. Aliqua exercitation elit adipisicing aliquip nisi cupidatat anim ut anim cillum exercitation. Sint excepteur commodo aliqua et mollit aliquip nisi aute ad. Anim nisi Lorem quis sunt. Ut ullamco laborum officia dolore aute non sunt do sint sit ipsum.';
   }
 
   getPromptType() {

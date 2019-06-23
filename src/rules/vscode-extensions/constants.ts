@@ -1,6 +1,6 @@
 import Choice from '../../choice';
 
-interface ChoiceList {
+export interface ChoiceList {
   [stack: string]: Choice[];
 }
 

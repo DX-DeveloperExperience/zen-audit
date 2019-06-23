@@ -6,35 +6,40 @@ import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import Elasticsearch from '../../stacks/elasticsearch';
 import Choice from '../../choice';
-import { JSONhasObj } from '../rules-utils/index';
+import Globals from '../../utils/globals';
 
 @RuleRegister.register
 @StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
 export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
-  readonly rootPath: string;
   private extensionsJSONPath: string;
   private parsedExtensionsFile: any;
-  private extensionsFileExists: boolean;
-  private missingRecommendations: string[] = [];
+  private missingExtensions: Choice[] = [];
   private initialized: boolean = false;
 
-  constructor(rootPath: string = './') {
-    this.rootPath = rootPath;
-    this.extensionsJSONPath = `${this.rootPath}.vscode/extensions.json`;
+  constructor() {
+    this.extensionsJSONPath = `${Globals.rootPath}.vscode/extensions.json`;
 
     try {
       this.parsedExtensionsFile = require(this.extensionsJSONPath);
-      this.extensionsFileExists = true;
+      if (
+        !this.parsedExtensionsFile.recommendations ||
+        !Array.isArray(this.parsedExtensionsFile.recommendations)
+      ) {
+        this.parsedExtensionsFile.recommendations = [];
+      }
     } catch (e) {
-      this.extensionsFileExists = false;
+      this.parsedExtensionsFile = {
+        recommendations: [],
+      };
     }
   }
 
   async init() {
     if (!this.initialized) {
-      return this.getMissingRecommendations().then(() => {
+      return this.getMissingExtensions().then(result => {
         this.initialized = true;
+        this.missingExtensions = result;
       });
     }
   }
@@ -42,10 +47,8 @@ export class VSCodeExtensions {
   async shouldBeApplied() {
     return this.init().then(() => {
       return (
-        (this.dotVSCodeExists() && !this.extensionsFileExists) ||
-        (this.extensionsFileExists && !this.hasRecommendations()) ||
-        (!this.extensionsFileExists && this.codeIsInPath()) ||
-        this.missingRecommendations.length !== 0
+        this.missingExtensions.length !== 0 &&
+        (this.dotVSCodeExists() || this.codeIsInPath())
       );
     });
   }
@@ -53,12 +56,8 @@ export class VSCodeExtensions {
   private dotVSCodeExists(): boolean {
     let fileStat;
     try {
-      fileStat = fs.lstatSync(`${this.rootPath}.vscode`);
-      if (fileStat.isDirectory()) {
-        return true;
-      } else {
-        return false;
-      }
+      fileStat = fs.lstatSync(`${Globals.rootPath}.vscode`);
+      return fileStat.isDirectory();
     } catch (err) {
       return false;
     }
@@ -73,37 +72,8 @@ export class VSCodeExtensions {
     }
   }
 
-  private hasRecommendations(): boolean {
-    return (
-      this.extensionsFileExists &&
-      JSONhasObj(this.extensionsJSONPath, 'recommendations') &&
-      Array.isArray(this.parsedExtensionsFile.recommendations) &&
-      this.parsedExtensionsFile.recommendations.length !== 0
-    );
-  }
-
-  private getMissingRecommendations(): Promise<string[]> {
-    return this.getExtensionsList().then(extensionsList => {
-      if (!this.hasRecommendations()) {
-        this.missingRecommendations = extensionsList;
-      } else {
-        this.missingRecommendations = extensionsList.filter(extension => {
-          return !this.parsedExtensionsFile.recommendations.includes(extension);
-        });
-      }
-
-      return this.missingRecommendations;
-    });
-  }
-
   apply(answers: string[]) {
     return this.init().then(() => {
-      if (this.parsedExtensionsFile === undefined) {
-        this.parsedExtensionsFile = {
-          recommendations: [],
-        };
-      }
-
       const filteredAnswers = answers.filter(recommendation => {
         return !this.parsedExtensionsFile.recommendations.includes(
           recommendation,
@@ -129,27 +99,13 @@ export class VSCodeExtensions {
     });
   }
 
-  getName() {
-    return 'VSCodeExtensions';
-  }
-
-  getDescription() {
-    return 'This rule will add extension suggestions to your Visual Studio Code app.';
-  }
-
   getPromptType() {
     return 'checkbox';
   }
 
-  getExtensionsList(): Promise<string[]> {
-    return this.getChoices().then((choices: Choice[]) => {
-      return choices.map(choice => choice.value as string);
-    });
-  }
-
-  getChoices(): Promise<Choice[]> {
+  private getMissingExtensions(): Promise<Choice[]> {
     const stackNamesPromise = ListStacks.getAvailableStacksIn(
-      this.rootPath,
+      Globals.rootPath,
     ).then(stacks =>
       stacks.map(stack => {
         return stack.name();
@@ -157,12 +113,10 @@ export class VSCodeExtensions {
     );
 
     return stackNamesPromise.then(stackNames => {
-      let existingRecommendations: string[] = [];
-      if (this.parsedExtensionsFile !== undefined) {
-        existingRecommendations = this.parsedExtensionsFile.recommendations;
-      }
+      const existingRecommendations: string[] = this.parsedExtensionsFile
+        .recommendations;
 
-      return stackNames.reduce(
+      let result = stackNames.reduce(
         (keptChoices, stackName) => {
           let choicesByStack: Choice[];
 
@@ -194,6 +148,32 @@ export class VSCodeExtensions {
         },
         [] as Choice[],
       );
+
+      // remove duplicates
+      result = result.filter((val, i) => {
+        return (
+          result.findIndex(choice => {
+            return choice.value === val.value;
+          }) === i
+        );
+      });
+      return result;
     });
+  }
+
+  getChoices(): Promise<Choice[]> {
+    return this.getMissingExtensions();
+  }
+
+  getName() {
+    return 'VSCodeExtensions';
+  }
+
+  getShortDescription() {
+    return 'This rule will add extension suggestions to your Visual Studio Code app.';
+  }
+
+  getLongDescription() {
+    return 'Laborum exercitation incididunt nulla veniam labore esse. Pariatur adipisicing sint aliqua adipisicing culpa consequat reprehenderit excepteur eiusmod. Est irure voluptate fugiat enim minim laborum. Magna anim eiusmod consectetur voluptate. Proident ad ex laborum in adipisicing sit minim aliquip duis. Do non voluptate mollit officia consequat proident ex mollit dolore qui esse sit reprehenderit.';
   }
 }

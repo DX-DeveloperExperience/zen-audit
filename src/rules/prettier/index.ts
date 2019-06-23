@@ -5,7 +5,7 @@ import * as util from 'util';
 import * as cp from 'child_process';
 import TypeScript from '../../stacks/typescript';
 import Node from '../../stacks/node';
-import { hasDevDependencies } from '../rules-utils/index';
+import { hasDevDependencies } from '../../utils/json/index';
 /**
  * Looks for Prettier dependency in package.json, and add it if necessary.
  */
@@ -53,8 +53,12 @@ export class Prettier {
     return 'Prettier';
   }
 
-  getDescription() {
+  getShortDescription() {
     return 'Prettier keeps your code well formatted. Would you like to install it ?';
+  }
+
+  getLongDescription() {
+    return 'Laborum exercitation incididunt nulla veniam labore esse. Pariatur adipisicing sint aliqua adipisicing culpa consequat reprehenderit excepteur eiusmod. Est irure voluptate fugiat enim minim laborum. Magna anim eiusmod consectetur voluptate. Proident ad ex laborum in adipisicing sit minim aliquip duis. Do non voluptate mollit officia consequat proident ex mollit dolore qui esse sit reprehenderit.';
   }
 
   getPromptType() {

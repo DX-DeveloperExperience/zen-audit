@@ -8,11 +8,15 @@ import { StackRegister } from './stacks/stack-register';
 import { ListStacks } from './stacks/list-stacks/index';
 import { logger } from './logger/index';
 import * as fs from 'fs-extra';
+import { YesNo, Ok } from './choice/index';
+import { generateReport } from './templating';
+import Globals from './utils/globals/index';
 
 init();
 
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
+  static path: string = './';
 
   static flags = {
     // add --version flag to show CLI version
@@ -28,7 +32,9 @@ class ProjectFillerCli extends Command {
     }),
     rules: flags.boolean({
       char: 'r',
-      description: 'Search for rules that may apply to your project',
+      default: true,
+      description:
+        'Search for rules that may apply to your project (default flag)',
     }),
     stacks: flags.boolean({
       char: 's',
@@ -41,6 +47,11 @@ class ProjectFillerCli extends Command {
     debug: flags.boolean({
       char: 'd',
       description: 'Debug mode',
+    }),
+    manual: flags.boolean({
+      char: 'm',
+      description:
+        'List all rules and prompt for each one of them to let you make a choice',
     }),
   };
 
@@ -65,6 +76,9 @@ class ProjectFillerCli extends Command {
       if (!path.endsWith('/')) {
         path = path + '/';
       }
+
+      Globals.rootPath = path;
+
       const fileStat = fs.statSync(path);
       if (!fileStat.isDirectory()) {
         logger.error(`The provided path: ${path} is not a directory.`);
@@ -82,19 +96,6 @@ class ProjectFillerCli extends Command {
       logger.level = 'debug';
     }
 
-    if (runFlags.rules) {
-      cli.action.start('Searching for rules to apply');
-      ListRules.getRulesToApplyIn(path)
-        .then(rules => {
-          rules.forEach(rule => {
-            this.log(`${rule.getName()}: ${rule.getDescription()}`);
-          });
-        })
-        .catch(err => {
-          logger.error(err);
-        });
-    }
-
     if (runFlags.list) {
       cli.action.start('Retrieving rules and stacks');
       const stacks = StackRegister.getConstructors();
@@ -108,9 +109,7 @@ class ProjectFillerCli extends Command {
               .join(', '),
         },
       });
-    }
-
-    if (runFlags.stacks) {
+    } else if (runFlags.stacks) {
       cli.action.start('Searching for available stacks');
       const stacksFoundProm = ListStacks.getAvailableStacksIn(path);
       stacksFoundProm
@@ -126,16 +125,39 @@ class ProjectFillerCli extends Command {
         .catch(err => {
           logger.error(err);
         });
-    }
-
-    if (Object.keys(runFlags).length === 0) {
+    } else if (runFlags.apply) {
+      cli.action.start('Search for rules');
+      ListRules.getRulesToApplyIn(path)
+        .then(foundRules => {
+          foundRules.forEach(async rule => {
+            const choices = await rule.getChoices();
+            const apply = rule.apply;
+            if (apply) {
+              // We call apply with true as answer because it is a YesNo or an Ok Choice List
+              if (choices === YesNo || choices === Ok) {
+                return apply.call(rule, true);
+              } else {
+                // Else we call it with all the possible choices
+                const choicesStr = choices.map(choice => {
+                  return choice.value.toString();
+                });
+                return apply.call(rule, choicesStr);
+              }
+            }
+          });
+        })
+        .catch(err => {
+          logger.error('Error searching for rules to apply');
+          logger.debug(err);
+        });
+    } else if (runFlags.manual) {
       cli.action.start('Searching for rules');
       ListRules.getRulesToApplyIn(path)
         .then(foundRules => {
           const promptsProm = foundRules.map(async rule => {
             return {
               name: rule.constructor.name,
-              message: rule.getDescription(),
+              message: rule.getShortDescription(),
               type: rule.getPromptType(),
               choices: await rule.getChoices(),
             };
@@ -167,6 +189,26 @@ class ProjectFillerCli extends Command {
             .catch(err => {
               logger.error(err);
             });
+        })
+        .catch(err => {
+          logger.error(err);
+        });
+    } else if (runFlags.rules) {
+      cli.action.start('Searching for rules to apply');
+      ListRules.getRulesToApplyIn(path)
+        .then(rules => {
+          rules.forEach(rule => {
+            this.log(`${rule.getName()}: ${rule.getShortDescription()}`);
+          });
+          generateReport({
+            rulesInfos: rules.map(rule => {
+              return {
+                name: rule.getName(),
+                shortDescription: rule.getShortDescription(),
+                longDescription: rule.getLongDescription(),
+              };
+            }),
+          });
         })
         .catch(err => {
           logger.error(err);

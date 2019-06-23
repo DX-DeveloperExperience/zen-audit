@@ -1,17 +1,19 @@
 {
   "name": "@dxdeveloperexperience/project-starter",
   "description": "A tool to gather everything you need to deploy a new project",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": "Zenika - Demey Emmanuel - Lafrance Antoine",
   "bin": {
     "project-starter-cli": "./bin/run"
   },
   "bugs": "https://github.com/DX-DeveloperExperience/project-starter/issues",
   "dependencies": {
+    "@types/mustache": "0.8.32",
     "axios": "0.19.0",
     "check-node-version": "3.3.0",
     "fs-extra": "8.0.1",
     "inquirer": "6.2.2",
+    "mustache": "3.0.1",
     "request": "2.88.0",
     "sync-request": "6.1.0",
     "tslib": "1.9.3",
@@ -70,9 +72,9 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p . -t stylish",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "jest",
+    "test": "jest --runInBand",
     "test:cov": "jest --coverage --runInBand",
-    "jest-cache": "jest --clearCache --detectOpenHandles",
+    "jest-cache": "jest --clearCache --detectOpenHandles ",
     "audit": "npm audit",
     "oclif-pack": "oclif-dev pack",
     "prettier-test": "prettier -c \"src/**/*.ts\" \"test/**/*.ts\"",
