@@ -3,6 +3,7 @@ import Globals from '../../utils/globals/index';
 
 beforeEach(() => {
   jest.resetAllMocks();
+  jest.resetModules();
 });
 
 test('Should return true if prettier is not in devDependencies', () => {
