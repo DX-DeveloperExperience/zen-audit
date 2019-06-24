@@ -1,23 +1,64 @@
 import { StackRegister } from '../stack-register';
 import Globals from '../../utils/globals';
+import { pathExistsInJSON } from '../../utils/json/index';
+import { getExactSemver } from '../../utils/semver/index';
 
 @StackRegister.register
 export default class Angular {
-  constructor() {}
+  readonly libraryVersion: string = '';
+  readonly generatedCLI: boolean = false;
+  private informations: string[] = [];
+  private hasAngularDependency: boolean = false;
+  private parsedJSON: any;
 
-  async isAvailable(): Promise<boolean> {
+  constructor() {
     try {
-      const packageJSON = require(`${Globals.rootPath}package.json`);
-      if (packageJSON.dependencies !== undefined) {
-        return Object.keys(packageJSON.dependencies).includes('@angular/core');
+      this.parsedJSON = require(`${Globals.rootPath}package.json`);
+      if (
+        pathExistsInJSON(this.parsedJSON, ['dependencies', '@angular/core'])
+      ) {
+        this.libraryVersion = this.getLibraryVersion();
+        this.generatedCLI = this.isGeneratedCLI();
+      } else {
+        this.hasAngularDependency = false;
       }
-      return false;
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND') {
-        return false;
+        this.hasAngularDependency = false;
       }
       throw e;
     }
+  }
+
+  async isAvailable(): Promise<boolean> {
+    return this.hasAngularDependency;
+  }
+
+  private isGeneratedCLI(): boolean {
+    const isGeneratedCLI = pathExistsInJSON(this.parsedJSON, [
+      'devDependencies',
+      '@angular/cli',
+    ]);
+
+    this.informations.push(
+      'This Angular application has been generated with the Angular CLI',
+    );
+
+    return isGeneratedCLI;
+  }
+
+  private getLibraryVersion(): string {
+    const version = getExactSemver(
+      this.parsedJSON.dependencies['@angular/core'],
+    );
+
+    this.informations.push(`Angular version: ${version}`);
+
+    return version;
+  }
+
+  getInformations(): string[] {
+    return this.informations;
   }
 
   name() {
