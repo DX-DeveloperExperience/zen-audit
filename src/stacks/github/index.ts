@@ -7,8 +7,6 @@ import Globals from '../../utils/globals';
 
 @StackRegister.register
 export default class GitHub {
-  constructor() {}
-
   async isAvailable(): Promise<boolean> {
     const exec = util.promisify(cp.exec);
 

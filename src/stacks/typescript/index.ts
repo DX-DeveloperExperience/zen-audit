@@ -4,8 +4,6 @@ import Globals from '../../utils/globals';
 
 @StackRegister.register
 export default class TypeScript {
-  constructor() {}
-
   async isAvailable() {
     try {
       const packageJSON = require(`${Globals.rootPath}package.json`);

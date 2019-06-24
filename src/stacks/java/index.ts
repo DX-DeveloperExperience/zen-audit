@@ -4,8 +4,6 @@ import Globals from '../../utils/globals';
 
 @StackRegister.register
 export default class Java {
-  constructor() {}
-
   isAvailable() {
     return existsPaths(
       `${Globals.rootPath}pom.xml`,
