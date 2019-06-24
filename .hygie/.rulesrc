@@ -1,0 +1,57 @@
+---
+options:
+  enableRules: true
+  enableGroups: true
+  allRuleResultInOne: false
+  executeAllRules: true
+
+rules:
+  # BRANCH
+  - name: branchName
+    options:
+      regexp: '.*'
+    onSuccess:
+      - callback: CreatePullRequestRunnable
+        args:
+          title: 'WIP: {{data.branch}}'
+          description: 'Work in Progress Pull Request'
+          draft: true
+
+  # COMMITS
+  - name: commitMessage
+    options:
+      regexp: '^(build|ci|docs|feat|fix|perf|refactor|style|test|release|chore)(\([a-zA-Z-]*\))?:\s(.*?)(\(#[1-9][0-9]*(?:, #[1-9][0-9]*)*\))?$'
+      maxLength: 72
+      branches:
+        ignore:
+          - gh-pages
+    onBoth:
+      - callback: UpdateCommitStatusRunnable
+        args:
+          successTargetUrl: 'https://gist.github.com/stephenparish/9941e89d80e2bc58a153#examples'
+          failTargetUrl: 'https://gist.github.com/stephenparish/9941e89d80e2bc58a153#examples'
+          successDescriptionMessage: 'Commit message matches the Good Practices!'
+          failDescriptionMessage: 'Caution, your commit message do not matches the Good Practices!'
+
+groups:
+  #ISSUES
+  - groupName: 'Issues'
+    rules:
+      - name: issueComment
+        options:
+          regexp: '.*'
+          users:
+            ignore:
+              - ig1na
+      - name: issueTitle
+        options:
+          regexp: '.*'
+          users:
+            ignore:
+              - ig1na
+    onSuccess:
+      - callback: SendEmailRunnable
+        args:
+          to: antoine.lafrance@zenika.com
+          subject: '[Issue]"{{data.issue.title}}" (#{{data.issue.number}})'
+          message: '<b>{{data.issue.title}}</b> has been created/commented!<br>{{data.issue.description}}'
