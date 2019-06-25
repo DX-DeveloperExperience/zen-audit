@@ -6,8 +6,6 @@ const packagePath = Globals.rootPath + 'package.json';
 
 const util = require('util');
 
-util.promisify.mockClear();
-
 afterEach(() => {
   jest.resetAllMocks();
   jest.resetModules();
