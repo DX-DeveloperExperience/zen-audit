@@ -11,6 +11,11 @@ jest.mock('child_process');
 require('../../logger');
 jest.mock('../../logger');
 
+afterEach(() => {
+  jest.resetAllMocks();
+  jest.resetModules();
+});
+
 test('Should run npm i prettier -DE command', () => {
   jest.mock(Globals.rootPath + 'package.json', () => ({}), { virtual: true });
 

@@ -16,6 +16,7 @@ require('../../logger');
 jest.mock('../../logger');
 
 afterEach(() => {
+  jest.resetAllMocks();
   jest.resetModules();
 });
 
