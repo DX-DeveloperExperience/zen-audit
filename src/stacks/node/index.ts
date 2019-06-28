@@ -4,19 +4,13 @@ import Globals from '../../utils/globals';
 
 @StackRegister.register
 export default class Node {
-  private packagePath: string;
-
-  constructor() {
-    this.packagePath = `${Globals.rootPath}package.json`;
-  }
-
   isAvailable(): Promise<boolean> {
-    return existsPaths(this.packagePath);
+    return existsPaths(Globals.packageJSONPath);
   }
 
   parsedPackage(): object {
     if (this.isAvailable()) {
-      return require(this.packagePath);
+      return require(Globals.packageJSONPath);
     }
 
     return {};

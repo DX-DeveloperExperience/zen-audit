@@ -14,7 +14,7 @@ export class React {
 
   constructor() {
     try {
-      this.parsedJSON = require(`${Globals.rootPath}package.json`);
+      this.parsedJSON = require(Globals.packageJSONPath);
       if (pathExistsInJSON(this.parsedJSON, ['dependencies', 'react'])) {
         this.libraryVersion = this.getLibraryVersion();
         this.generatedCLI = this.isGeneratedCLI();
