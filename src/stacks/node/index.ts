@@ -6,7 +6,7 @@ import { logger } from '../../logger/index';
 @StackRegister.register
 export default class Node {
   private packagePath: string;
-  private packageJSON: Object = {};
+  private packageJSON: object = {};
   private packageExists: boolean = false;
 
   constructor() {
