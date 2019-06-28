@@ -13,7 +13,7 @@ export class ListStacks {
 
     return Promise.all(isAvailablePromise).then(availableValues => {
       ListStacks.stacks = stacks.reduce(
-        (acc: Stack[], stack: Stack, i: number, stacks: Stack[]) => {
+        (acc: Stack[], stack: Stack, i: number) => {
           if (availableValues[i]) {
             let stacksToAdd = [stack];
             const subStacks = StackRegister.getSubStacksOf(stack);
