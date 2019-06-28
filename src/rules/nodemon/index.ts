@@ -1,6 +1,6 @@
 import { RuleRegister } from '../rule-register';
 import { YesNo } from '../../choice/index';
-import Choice from '../../../lib/choice/index';
+import Choice from '../../choice/index';
 import Globals from '../../utils/globals/index';
 import { StackRegister } from '../../stacks/stack-register';
 import { pathExistsInJSON } from '../../utils/json';
