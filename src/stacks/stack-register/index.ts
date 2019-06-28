@@ -76,7 +76,9 @@ export class StackRegister {
   }
 
   static getSubStacksOf(stack: Stack) {
-    return StackRegister.subStacks[stack.constructor.name];
+    return StackRegister.subStacks[stack.constructor.name].map(subStack => {
+      return new subStack();
+    });
   }
 
   static registerRuleForAll(options: RegisterRuleForAllOptions = {}) {
