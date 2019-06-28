@@ -67,7 +67,7 @@ export class StackRegister {
     T extends Constructor<Stack>
   >(stackCtor: T) {
     return (subStack: S) => {
-      if (StackRegister.subStacks[stackCtor.name] == undefined) {
+      if (StackRegister.subStacks[stackCtor.name] === undefined) {
         StackRegister.subStacks[stackCtor.name] = [subStack];
       } else {
         StackRegister.subStacks[stackCtor.name].push(subStack);
@@ -76,9 +76,12 @@ export class StackRegister {
   }
 
   static getSubStacksOf(stack: Stack) {
-    return StackRegister.subStacks[stack.constructor.name].map(subStack => {
-      return new subStack();
-    });
+    if (!!StackRegister.subStacks[stack.constructor.name]) {
+      return StackRegister.subStacks[stack.constructor.name].map(subStack => {
+        return new subStack();
+      });
+    }
+    return [];
   }
 
   static registerRuleForAll(options: RegisterRuleForAllOptions = {}) {
