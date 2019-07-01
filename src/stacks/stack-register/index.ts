@@ -15,16 +15,24 @@ interface RegisterRuleForAllOptions {
  * instead of using "implements Stack" in your class signature.
  */
 export class StackRegister {
-  private static implementations: Array<Constructor<Stack>> = [];
+  private static constructors: Array<Constructor<Stack>> = [];
+  private static stacks: Stack[] = [];
   private static rulesByStack: {
     [stackName: string]: Array<Constructor<Rule>>;
+  } = {};
+  private static subStacks: {
+    [stackName: string]: Array<Constructor<Stack>>;
   } = {};
 
   /**
    * Returns constructor of every class that implements the Stack interface.
    */
   static getConstructors(): Array<Constructor<Stack>> {
-    return StackRegister.implementations;
+    return StackRegister.constructors;
+  }
+
+  static getStacks(): Stack[] {
+    return StackRegister.stacks;
   }
 
   static getRulesByStack(stackName: string): Array<Constructor<Rule>> {
@@ -36,8 +44,10 @@ export class StackRegister {
    * and registers this class in an array.
    * @param ctor The constructor of the class that implements the Stack interface
    */
-  static register<P extends Constructor<Stack>>(ctor: P) {
-    StackRegister.implementations.push(ctor);
+  static register(ctor: Constructor<Stack>) {
+    const instanciatedStack = new ctor();
+    StackRegister.stacks.push(instanciatedStack);
+    StackRegister.constructors.push(ctor);
     StackRegister.rulesByStack[ctor.name] = [];
   }
 
@@ -47,9 +57,31 @@ export class StackRegister {
   >(stackCtors: T[]) {
     return (ruleCtor: P) => {
       stackCtors.forEach(stackCtor => {
-        this.rulesByStack[stackCtor.name].push(ruleCtor);
+        StackRegister.rulesByStack[stackCtor.name].push(ruleCtor);
       });
     };
+  }
+
+  static registerSubStackOf<
+    S extends Constructor<Stack>,
+    T extends Constructor<Stack>
+  >(stackCtor: T) {
+    return (subStack: S) => {
+      if (StackRegister.subStacks[stackCtor.name] === undefined) {
+        StackRegister.subStacks[stackCtor.name] = [subStack];
+      } else {
+        StackRegister.subStacks[stackCtor.name].push(subStack);
+      }
+    };
+  }
+
+  static getSubStacksOf(stack: Stack) {
+    if (!!StackRegister.subStacks[stack.constructor.name]) {
+      return StackRegister.subStacks[stack.constructor.name].map(subStack => {
+        return new subStack();
+      });
+    }
+    return [];
   }
 
   static registerRuleForAll(options: RegisterRuleForAllOptions = {}) {
