@@ -1,11 +1,12 @@
 import { ListStacks } from '../../stacks/list-stacks/index';
 import Stack from '../../stacks/stack/index';
 import { Linter } from './index';
+import Globals from '../../utils/globals/index';
 
-const rootPath = 'linter/';
-const packageJSONPath = `${rootPath}package.json`;
-const tslintPath = `${rootPath}tslint.json`;
-const eslintPath = `${rootPath}eslint.json`;
+Globals.rootPath = 'linter/';
+const packageJSONPath = `${Globals.rootPath}package.json`;
+const tslintPath = `${Globals.rootPath}tslint.json`;
+const eslintPath = `${Globals.rootPath}eslint.json`;
 
 const fs = require('fs-extra');
 
@@ -36,7 +37,7 @@ test('should return true if tslint or eslint not in devDependencies and tslint.j
 
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
-  const linter = new Linter(rootPath);
+  const linter = new Linter();
 
   return linter.shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
@@ -60,7 +61,7 @@ test('should return false if tslint in devDependencies and tslint.json exists', 
 
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
-  return new Linter(rootPath).shouldBeApplied().then(result => {
+  return new Linter().shouldBeApplied().then(result => {
     expect(fs.pathExists).toBeCalledWith(tslintPath);
     expect(result).toBeFalsy();
   });
@@ -83,7 +84,7 @@ test('should return true if tslint in devDependencies and tslint.json does not e
 
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
-  return new Linter(rootPath).shouldBeApplied().then(result => {
+  return new Linter().shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
     expect(fs.pathExists).toBeCalledWith(tslintPath);
   });
@@ -106,7 +107,7 @@ test('should return false if eslint in devDependencies and eslint.json exists', 
 
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
-  return new Linter(rootPath).shouldBeApplied().then(result => {
+  return new Linter().shouldBeApplied().then(result => {
     expect(result).toBeFalsy();
     expect(fs.pathExists).toBeCalledWith(eslintPath);
   });
@@ -129,7 +130,7 @@ test('should return true if eslint in devDependencies and eslint.json does not e
 
   jest.mock(packageJSONPath, () => packageJSON, { virtual: true });
 
-  return new Linter(rootPath).shouldBeApplied().then(result => {
+  return new Linter().shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
     expect(fs.pathExists).toBeCalledWith(eslintPath);
   });

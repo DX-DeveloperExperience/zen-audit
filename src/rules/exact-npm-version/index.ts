@@ -6,6 +6,8 @@ import { YesNo } from '../../choice';
 import Node from '../../stacks/node/index';
 import TypeScript from '../../stacks/typescript/index';
 import { logger } from '../../logger';
+import Globals from '../../utils/globals';
+import { getExactSemver, matchesSemver } from '../../utils/semver/index';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
@@ -14,18 +16,12 @@ import { logger } from '../../logger';
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class ExactNpmVersion {
-  readonly rootPath: string;
   private packageJSONPath: string;
   private parsedPackageJSON: any;
-  readonly semverRegex = new RegExp(
-    '^(\\^|\\~)((([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)$',
-    'g',
-  );
   private jsonObjToCheckFound: string[] = [];
 
-  constructor(rootPath: string = './') {
-    this.rootPath = rootPath;
-    this.packageJSONPath = `${this.rootPath}package.json`;
+  constructor() {
+    this.packageJSONPath = `${Globals.rootPath}package.json`;
     this.parsedPackageJSON = require(this.packageJSONPath);
     this.jsonObjToCheckFound = this.findJsonObjectsToCheck();
   }
@@ -40,7 +36,7 @@ export class ExactNpmVersion {
       const jsonObj = this.parsedPackageJSON[jsonObjStr];
 
       const jsonObjValues: string[] = Object.values(jsonObj);
-      if (this.valuesMatches(jsonObjValues, this.semverRegex)) {
+      if (this.valuesMatches(jsonObjValues)) {
         result = true;
       }
     });
@@ -52,8 +48,8 @@ export class ExactNpmVersion {
    * @param values An array of string containing the values to match the regexp
    * @param regex A RegExp that will try to match with values
    */
-  private valuesMatches(values: string[], regex: RegExp): boolean {
-    return values.some(val => !!val.match(regex));
+  private valuesMatches(values: string[]): boolean {
+    return values.some(val => matchesSemver(val));
   }
 
   /**
@@ -85,7 +81,6 @@ export class ExactNpmVersion {
     this.jsonObjToCheckFound.forEach(jsonObjName => {
       this.parsedPackageJSON[jsonObjName] = this.replaceMatchingEntriesForObj(
         jsonObjName,
-        this.semverRegex,
       );
     });
     return JSON.stringify(this.parsedPackageJSON, null, '\t');
@@ -96,18 +91,13 @@ export class ExactNpmVersion {
    * @param jsonObjName
    * @param regex
    */
-  private replaceMatchingEntriesForObj(jsonObjName: string, regex: RegExp) {
+  private replaceMatchingEntriesForObj(jsonObjName: string) {
     const entries: string[][] = Object.entries(
       this.parsedPackageJSON[jsonObjName],
     );
     const changedEntries = entries.map(([dep, val]) => {
-      if (val.match(regex)) {
-        return [
-          dep,
-          val.replace(regex, (_A: string, _B: string, c: string) => {
-            return c;
-          }),
-        ];
+      if (matchesSemver(val)) {
+        return [dep, getExactSemver(val)];
       }
       return [dep, val];
     });

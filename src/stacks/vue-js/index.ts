@@ -1,22 +1,62 @@
 import { StackRegister } from '../stack-register';
+import Globals from '../../utils/globals';
+import { pathExistsInJSON } from '../../utils/json/index';
+import { getExactSemver } from '../../utils/semver/index';
 
 @StackRegister.register
 export default class VueJS {
-  constructor(private readonly rootPath: string = './') {}
+  readonly libraryVersion: string = '';
+  readonly generatedCLI: boolean = false;
+  private informations: string[] = [];
+  private hasVueDependency: boolean = false;
+  private parsedJSON: any;
 
-  async isAvailable(): Promise<boolean> {
+  constructor() {
     try {
-      const packageJson = require(`${this.rootPath}/package.json`);
-      if (packageJson.dependencies !== undefined) {
-        return Object.keys(packageJson.dependencies).includes('vue');
+      this.parsedJSON = require(Globals.packageJSONPath);
+      if (pathExistsInJSON(this.parsedJSON, ['dependencies', 'vue'])) {
+        this.libraryVersion = this.getLibraryVersion();
+        this.generatedCLI = this.isGeneratedCLI();
+
+        this.hasVueDependency = true;
       }
-      return false;
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND') {
-        return false;
+        this.hasVueDependency = false;
       }
       throw e;
     }
+  }
+
+  async isAvailable(): Promise<boolean> {
+    return this.hasVueDependency;
+  }
+
+  private isGeneratedCLI(): boolean {
+    const isGeneratedCLI = pathExistsInJSON(this.parsedJSON, [
+      'devDependencies',
+      '@vue/cli-service',
+    ]);
+
+    if (isGeneratedCLI) {
+      this.informations.push(
+        'This Vue application has been generated using the Vue CLI',
+      );
+    }
+
+    return isGeneratedCLI;
+  }
+
+  private getLibraryVersion(): string {
+    const version = getExactSemver(this.parsedJSON.dependencies.vue);
+
+    this.informations.push(`Vue version: ${version}`);
+
+    return version;
+  }
+
+  getInformations() {
+    return this.informations;
   }
 
   name() {

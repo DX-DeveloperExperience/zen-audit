@@ -1,4 +1,5 @@
 import { ExactNpmVersion } from '.';
+import Globals from '../../utils/globals/index';
 
 const fs = require('fs-extra');
 
@@ -13,7 +14,7 @@ afterEach(() => {
   jest.resetModules();
 });
 
-const rootPath = './exact-npm-version/';
+Globals.rootPath = 'exact-npm-version/';
 
 test('Should replace ^ or ~ in package.json', () => {
   const packageJSON = {
@@ -41,7 +42,7 @@ test('Should replace ^ or ~ in package.json', () => {
     '\t',
   );
 
-  jest.mock('./exact-npm-version/package.json', () => packageJSON, {
+  jest.mock(`${Globals.rootPath}package.json`, () => packageJSON, {
     virtual: true,
   });
 
@@ -51,7 +52,7 @@ test('Should replace ^ or ~ in package.json', () => {
     return Promise.resolve();
   });
 
-  return new ExactNpmVersion(rootPath).apply(true).then(() => {
+  return new ExactNpmVersion().apply(true).then(() => {
     expect(correctSemverNotation).toEqual(correctedJSON);
   });
 });
@@ -91,7 +92,7 @@ test('Should not replace ^ or ~ in package.json for object that does not need to
     '\t',
   );
 
-  jest.mock('./exact-npm-version/package.json', () => packageJSON, {
+  jest.mock(`${Globals.rootPath}package.json`, () => packageJSON, {
     virtual: true,
   });
 
@@ -101,7 +102,7 @@ test('Should not replace ^ or ~ in package.json for object that does not need to
     return Promise.resolve();
   });
 
-  return new ExactNpmVersion(rootPath).apply(true).then(() => {
+  return new ExactNpmVersion().apply(true).then(() => {
     expect(correctSemverNotation).toEqual(correctedJSON);
   });
 });

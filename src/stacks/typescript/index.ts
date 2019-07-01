@@ -1,29 +1,32 @@
 import { StackRegister } from '../stack-register';
 import { logger } from '../../logger/index';
+import Globals from '../../utils/globals';
+import { pathExistsInJSON } from '../../utils/json';
 
 @StackRegister.register
 export default class TypeScript {
-  constructor(private readonly rootPath: string = './') {}
+  private parsedPackage: object = {};
+  private hasDevDependency: boolean = false;
+
+  constructor() {
+    try {
+      this.parsedPackage = require(Globals.packageJSONPath);
+      this.hasDevDependency = pathExistsInJSON(this.parsedPackage, [
+        'devDependencies',
+        'typescript',
+      ]);
+    } catch (err) {
+      logger.error(
+        `TypeScript Stack: Error while reading/parsing ${
+          Globals.packageJSONPath
+        }.`,
+      );
+      logger.debug(err);
+    }
+  }
 
   async isAvailable() {
-    try {
-      const packageJSON = require(`${this.rootPath}package.json`);
-      if (packageJSON.devDependencies !== undefined) {
-        return Object.keys(packageJSON.devDependencies).includes('typescript');
-      }
-      return false;
-    } catch (e) {
-      if (e.code === 'MODULE_NOT_FOUND') {
-        return false;
-      }
-      logger.error(
-        `Error trying to read ${
-          this.rootPath
-        }package.json, run in debug mode to find why.`,
-      );
-      logger.debug(e);
-      return false;
-    }
+    return this.hasDevDependency;
   }
 
   name() {

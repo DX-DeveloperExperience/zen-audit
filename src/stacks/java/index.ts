@@ -1,14 +1,13 @@
 import { StackRegister } from '../stack-register';
 import { existsPaths } from '../../utils/file-utils';
+import Globals from '../../utils/globals';
 
 @StackRegister.register
 export default class Java {
-  constructor(readonly rootPath: string = './') {}
-
   isAvailable() {
     return existsPaths(
-      `${this.rootPath}pom.xml`,
-      `${this.rootPath}build.gradle`,
+      `${Globals.rootPath}pom.xml`,
+      `${Globals.rootPath}build.gradle`,
     );
   }
 

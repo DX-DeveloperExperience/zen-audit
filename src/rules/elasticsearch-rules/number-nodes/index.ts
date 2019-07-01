@@ -3,19 +3,13 @@ import { StackRegister } from '../../../stacks/stack-register';
 import { YesNo } from '../../../choice';
 import Elasticsearch from '../../../stacks/elasticsearch';
 import axios from 'axios';
+import Globals from '../../../utils/globals';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
 export class ElasticsearchNodesNumber {
-  requiredFiles = [''];
-  rootPath: string;
-
-  constructor(rootPath: string = './') {
-    this.rootPath = rootPath;
-  }
-
   async shouldBeApplied(): Promise<boolean> {
-    return axios.get(`${this.rootPath}_nodes`).then(result => {
+    return axios.get(`${Globals.rootPath}_nodes`).then(result => {
       return Object.keys(result.data.nodes).length < 3;
     });
   }

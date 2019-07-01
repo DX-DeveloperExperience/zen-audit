@@ -8,6 +8,7 @@ import * as fs from 'fs-extra';
 import * as util from 'util';
 import * as cp from 'child_process';
 import { hasDevDependencies } from '../../utils/json';
+import Globals from '../../utils/globals';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
@@ -15,8 +16,8 @@ export class Husky {
   private packagePath: string;
   private parsedPackage: any;
 
-  constructor(readonly rootPath: string = './') {
-    this.packagePath = `${this.rootPath}package.json`;
+  constructor() {
+    this.packagePath = `${Globals.rootPath}package.json`;
     this.parsedPackage = require(this.packagePath);
   }
 
@@ -24,7 +25,7 @@ export class Husky {
     if (apply) {
       const exec = util.promisify(cp.exec);
 
-      return exec('npm i -DE husky', { cwd: this.rootPath })
+      return exec('npm i -DE husky', { cwd: Globals.rootPath })
         .then((out: { stdout: string; stderr: string }) => {
           if (out !== undefined && out.stderr !== undefined) {
             throw new Error(out.stderr);

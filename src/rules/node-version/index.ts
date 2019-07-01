@@ -11,14 +11,12 @@ import axios from 'axios';
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class NodeVersion {
   readonly requiredFiles: string[] = [];
-  readonly rootPath: string;
   private nodeVersionSchedule: any;
   private nodeVersion: string = '';
   private shortNodeVersion: string = '';
   private initialized: boolean = false;
 
-  constructor(rootPath: string = './') {
-    this.rootPath = rootPath;
+  constructor() {
     this.nodeVersion = cp.execSync('node --version').toString();
     this.shortNodeVersion = this.nodeVersion.split('.')[0];
   }
