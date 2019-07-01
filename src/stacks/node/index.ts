@@ -5,19 +5,13 @@ import { logger } from '../../logger/index';
 
 @StackRegister.register
 export default class Node {
-  private packagePath: string;
-  private packageJSON: object = {};
-  private packageExists: boolean = false;
+  isAvailable(): Promise<boolean> {
+    return existsPaths(Globals.packageJSONPath);
+  }
 
-  constructor() {
-    this.packagePath = `${Globals.rootPath}package.json`;
-
-    try {
-      this.packageJSON = require(this.packagePath);
-      this.packageExists = true;
-    } catch (err) {
-      logger.info(`Node Stack: Error while parsing ${this.packagePath}`);
-      logger.debug(err);
+  parsedPackage(): object {
+    if (this.isAvailable()) {
+      return require(Globals.packageJSONPath);
     }
   }
 

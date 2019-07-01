@@ -13,7 +13,7 @@ export default class VueJS {
 
   constructor() {
     try {
-      this.parsedJSON = require(`${Globals.rootPath}/package.json`);
+      this.parsedJSON = require(Globals.packageJSONPath);
       if (pathExistsInJSON(this.parsedJSON, ['dependencies', 'vue'])) {
         this.libraryVersion = this.getLibraryVersion();
         this.generatedCLI = this.isGeneratedCLI();
