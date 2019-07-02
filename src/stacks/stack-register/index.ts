@@ -67,6 +67,7 @@ export class StackRegister {
     T extends Constructor<Stack>
   >(stackCtor: T) {
     return (subStack: S) => {
+      StackRegister.rulesByStack[subStack.name] = [];
       if (StackRegister.subStacks[stackCtor.name] === undefined) {
         StackRegister.subStacks[stackCtor.name] = [subStack];
       } else {
