@@ -5,64 +5,70 @@ import { logger } from '../../logger';
 import Node from '../../stacks/node';
 import TypeScript from '../../stacks/typescript';
 import * as fs from 'fs-extra';
-import * as util from 'util';
-import * as cp from 'child_process';
-import { hasDevDependencies } from '../../utils/json';
+import { hasDevDependency, pathExistsInJSON } from '../../utils/json';
 import Globals from '../../utils/globals';
+import { installNpmDevDep } from '../../utils/commands';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class Husky {
-  private packagePath: string;
   private parsedPackage: any;
 
   constructor() {
-    this.packagePath = `${Globals.rootPath}package.json`;
-    this.parsedPackage = require(this.packagePath);
+    this.parsedPackage = require(Globals.packageJSONPath);
   }
 
   async apply(apply: boolean): Promise<void> {
     if (apply) {
-      const exec = util.promisify(cp.exec);
+      return installNpmDevDep('husky').then(() => {
+        return this.writeHuskyHook();
+      });
+    }
+  }
 
-      return exec('npm i -DE husky', { cwd: Globals.rootPath })
-        .then((out: { stdout: string; stderr: string }) => {
-          if (out !== undefined && out.stderr !== undefined) {
-            throw new Error(out.stderr);
-          }
-          return fs.readFile(this.packagePath, { encoding: 'utf-8' });
-        })
-        .then(data => {
-          const parsed = JSON.parse(data);
+  private async writeHuskyHook(): Promise<void> {
+    if (!pathExistsInJSON(this.parsedPackage, ['husky', 'hooks', 'pre-push'])) {
+      return fs
+        .readJSON(Globals.packageJSONPath, { encoding: 'utf-8' })
+        .then(parsed => {
           parsed.husky = {
             hooks: {
               'pre-push': 'exit 1',
             },
           };
 
-          return fs.writeFile(
-            this.packagePath,
-            JSON.stringify(parsed, null, '\t'),
-            {
-              encoding: 'utf-8',
-            },
-          );
+          return fs
+            .writeJSON(Globals.packageJSONPath, parsed, {
+              spaces: '\t',
+            })
+            .then(() => {
+              logger.info(
+                `Husky Rule: Succesfully written pre-push hook to ${
+                  Globals.packageJSONPath
+                }. You may update this hook with a npm script for it to launch before pushing to git.`,
+              );
+            })
+            .catch(err => {
+              logger.error(
+                `Husky Rule: Error trying to write pre-push hook to ${
+                  Globals.packageJSONPath
+                }`,
+              );
+              logger.debug(err);
+            });
         })
-        .catch((err: Error) => {
-          logger.error(err);
+        .catch(err => {
+          logger.error(
+            `Husky Rule: Error trying to read ${Globals.packageJSONPath} file.`,
+          );
+          logger.debug(err);
         });
     }
+    return Promise.resolve();
   }
 
-  async shouldBeApplied() {
-    return !this.isInDevDep();
-  }
-
-  isInDevDep(): boolean {
-    return (
-      hasDevDependencies(this.parsedPackage) &&
-      this.parsedPackage.devDependencies.husky !== undefined
-    );
+  async shouldBeApplied(): Promise<boolean> {
+    return !hasDevDependency(this.parsedPackage, 'husky');
   }
 
   getName(): string {
@@ -78,7 +84,7 @@ export class Husky {
   }
 
   getPromptType() {
-    return 'checkbox';
+    return 'list';
   }
 
   getChoices() {
