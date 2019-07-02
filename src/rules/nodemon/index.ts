@@ -40,18 +40,12 @@ export class Nodemon {
     if (apply) {
       const exec = util.promisify(cp.exec);
 
-      exec('npm i -DE nodemon', { cwd: Globals.rootPath })
-        .then((out: { stdout: string; stderr: string }) => {
-          if (out !== undefined && out.stderr !== undefined) {
-            logger.error(
-              'Nodemon: Error trying to install Nodemon as a devDependency, please run in debug mode to know more',
-            );
-            logger.debug(out.stderr);
-            throw new Error(out.stderr);
-          }
+      return exec('npm i -DE nodemon', { cwd: Globals.rootPath })
+        .then(() => {
           logger.info(
             'Nodemon: Succesfully installed nodemon as dev dependency. Checking for existing script.',
           );
+
           fs.readJSON(this.packagePath, { encoding: 'utf-8' })
             .then(packageJSON => {
               if (!pathExistsInJSON(packageJSON, ['scripts', 'nodemon'])) {
