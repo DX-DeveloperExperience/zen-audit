@@ -11,9 +11,7 @@ Globals.rootPath = 'front-app-debug/';
 const fs = require('fs-extra');
 const launchFilePath = `${Globals.rootPath}.vscode/launch.json`;
 
-beforeEach(() => {
-  jest.mock('./constants');
-});
+jest.mock('./constants');
 
 afterEach(() => {
   jest.resetAllMocks();
