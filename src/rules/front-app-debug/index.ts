@@ -15,7 +15,6 @@ import { pathExistsInJSON } from '../../utils/json';
 @StackRegister.registerRuleForStacks([VueJS, Angular, React])
 export class FrontAppDebug {
   private parsedLaunchConf: LaunchConfFile;
-  private launchFileExists: boolean;
   private existingConfigs: LaunchConf[] = [];
   private readonly stacksToCheck: Array<Constructor<Stack>> = [
     VueJS,
@@ -27,10 +26,8 @@ export class FrontAppDebug {
   constructor() {
     try {
       this.parsedLaunchConf = require(`${Globals.rootPath}.vscode/launch.json`);
-      this.launchFileExists = true;
     } catch (err) {
       this.parsedLaunchConf = vscodeConfig;
-      this.launchFileExists = false;
     }
   }
 
@@ -48,9 +45,7 @@ export class FrontAppDebug {
 
   async shouldBeApplied(): Promise<boolean> {
     return this.init().then(() => {
-      return (
-        !this.launchFileExists || this.missingConfigurations().length !== 0
-      );
+      return this.missingConfigurations().length !== 0;
     });
   }
 
@@ -69,12 +64,9 @@ export class FrontAppDebug {
 
         let configsToAdd;
 
-        if (
-          this.existingConfigs !== undefined &&
-          configsToAddStackName !== undefined
-        ) {
+        if (configsToAddStackName !== undefined) {
           configsToAdd = configsToAddStackName.confs.filter(configToAdd => {
-            return this.existingConfigs.find(existingConfig => {
+            return !this.existingConfigs.some(existingConfig => {
               return configToAdd.type === existingConfig.type;
             });
           });
@@ -83,7 +75,7 @@ export class FrontAppDebug {
 
         return [...prevMissingConfig];
       },
-      [{}],
+      [],
     );
   }
 
