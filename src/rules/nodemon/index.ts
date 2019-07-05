@@ -9,15 +9,16 @@ import * as cp from 'child_process';
 import Node from '../../stacks/node';
 import { logger } from '../../logger/index';
 import * as fs from 'fs-extra';
-import { installNpmDevDep } from '../../utils/commands';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node])
 export class Nodemon {
   private parsedJSON: any;
+  private packagePath: string;
 
   constructor() {
-    this.parsedJSON = require(Globals.packageJSONPath);
+    this.packagePath = Globals.rootPath + 'package.json';
+    this.parsedJSON = require(this.packagePath);
   }
 
   async shouldBeApplied(): Promise<boolean> {

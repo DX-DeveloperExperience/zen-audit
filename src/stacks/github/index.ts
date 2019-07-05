@@ -27,9 +27,6 @@ export default class GitHub {
           });
       })
       .catch(err => {
-        if (err.code === 'ENOENT') {
-          return false;
-        }
         logger.debug(err);
         return false;
       });
