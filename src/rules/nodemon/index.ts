@@ -37,58 +37,49 @@ export class Nodemon {
 
   async apply(apply: boolean): Promise<void> {
     if (apply) {
-      const exec = util.promisify(cp.exec);
+      return installNpmDevDep('nodemon').then(() => {
+        logger.info(
+          'Nodemon: Succesfully installed nodemon as dev dependency. Checking for existing script.',
+        );
 
-      return installNpmDevDep('nodemon')
-        .then(() => {
-          logger.info(
-            'Nodemon: Succesfully installed nodemon as dev dependency. Checking for existing script.',
-          );
-
-          fs.readJSON(Globals.packageJSONPath, { encoding: 'utf-8' })
-            .then(packageJSON => {
-              if (!pathExistsInJSON(packageJSON, ['scripts', 'nodemon'])) {
-                if (!pathExistsInJSON(packageJSON, ['scripts'])) {
-                  packageJSON.scripts = { nodemon: 'nodemon' };
-                } else {
-                  packageJSON.scripts.nodemon = 'nodemon';
-                }
-
-                fs.writeJSON(Globals.packageJSONPath, packageJSON, {
-                  spaces: '\t',
-                })
-                  .then(() => {
-                    logger.info(
-                      'Nodemon: Succesfully added nodemon script. Run "npm run nodemon" to run it.',
-                    );
-                  })
-                  .catch(err => {
-                    logger.error(
-                      `Nodemon: Error trying to write to ${
-                        Globals.packageJSONPath
-                      }, please run in debug mode to know more.`,
-                    );
-                    logger.debug(err);
-                  });
+        fs.readJSON(Globals.packageJSONPath, { encoding: 'utf-8' })
+          .then(packageJSON => {
+            if (!pathExistsInJSON(packageJSON, ['scripts', 'nodemon'])) {
+              if (!pathExistsInJSON(packageJSON, ['scripts'])) {
+                packageJSON.scripts = { nodemon: 'nodemon' };
               } else {
-                logger.info('Nodemon: Script already existing.');
+                packageJSON.scripts.nodemon = 'nodemon';
               }
-            })
-            .catch(err => {
-              logger.error(
-                `Nodemon: Error trying to read ${
-                  Globals.packageJSONPath
-                }, please run in debug mode to know more`,
-              );
-              logger.debug(err);
-            });
-        })
-        .catch(err => {
-          logger.error(
-            'Nodemon: Error trying to execute npm i -DE nodemon command, please run in debug mode to know more',
-          );
-          logger.debug(err);
-        });
+
+              fs.writeJSON(Globals.packageJSONPath, packageJSON, {
+                spaces: '\t',
+              })
+                .then(() => {
+                  logger.info(
+                    'Nodemon: Succesfully added nodemon script. Run "npm run nodemon" to run it.',
+                  );
+                })
+                .catch(err => {
+                  logger.error(
+                    `Nodemon: Error trying to write to ${
+                      Globals.packageJSONPath
+                    }, please run in debug mode to know more.`,
+                  );
+                  logger.debug(err);
+                });
+            } else {
+              logger.info('Nodemon: Script already existing.');
+            }
+          })
+          .catch(err => {
+            logger.error(
+              `Nodemon: Error trying to read ${
+                Globals.packageJSONPath
+              }, please run in debug mode to know more`,
+            );
+            logger.debug(err);
+          });
+      });
     }
   }
 
