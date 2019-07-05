@@ -1,6 +1,5 @@
 import { StackRegister, Constructor } from '../stack-register';
 import Stack from '../stack';
-import Globals from '../../utils/globals';
 
 export class ListStacks {
   static stacks: Stack[];
@@ -46,15 +45,5 @@ export class ListStacks {
         return stack.constructor.name === ctor.name;
       });
     });
-  }
-
-  static findAvailableStack(
-    ctor: Constructor<Stack>,
-  ): Promise<Stack | undefined> {
-    return this.findAvailableStackIn(ctor, Globals.rootPath);
-  }
-
-  static async stackIsAvailable(ctor: Constructor<Stack>): Promise<boolean> {
-    return this.findAvailableStack(ctor) !== undefined;
   }
 }
