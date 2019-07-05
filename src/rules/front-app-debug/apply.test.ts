@@ -1,9 +1,9 @@
 import { ListStacks } from '../../stacks/list-stacks/index';
 import { Constructor } from '../../stacks/stack-register/index';
-import Stack from '../../../lib/stacks/stack/index';
 import VueJS from '../../stacks/vue-js/index';
 import { FrontAppDebug } from './index';
 import Globals from '../../utils/globals';
+import Stack from '../../stacks/stack';
 
 Globals.rootPath = 'front-app-debug/';
 
