@@ -12,6 +12,8 @@ import { YesNo, Ok } from './choice/index';
 import { generateReport } from './templating';
 import Globals from './utils/globals/index';
 
+init();
+
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
   static path: string = './';
@@ -89,8 +91,6 @@ class ProjectFillerCli extends Command {
       logger.debug(err);
       return;
     }
-
-    init();
 
     if (runFlags.debug) {
       logger.level = 'debug';
@@ -178,18 +178,7 @@ class ProjectFillerCli extends Command {
                   Object.entries(answers).forEach(([_, answer], i) => {
                     const apply = foundRules[i].apply;
                     if (apply) {
-                      cli.action.start('Applying rules, please wait');
-                      apply
-                        .call(foundRules[i], answer)
-                        .then(() => {
-                          cli.action.stop('Rules applied ! Congratulations !');
-                        })
-                        .catch(err => {
-                          logger.error(
-                            'An error occured while applying rules.',
-                          );
-                          logger.debug(err);
-                        });
+                      const applyResult = apply.call(foundRules[i], answer);
                     }
                   });
                 })
