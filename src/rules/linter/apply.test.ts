@@ -2,7 +2,10 @@ import { Linter } from './index';
 import { ListStacks } from '../../stacks/list-stacks/index';
 import Stack from '../../stacks/stack/index';
 import Globals from '../../utils/globals/index';
-const commands = require('../../utils/commands/index');
+const util = require('util');
+
+const cp = require('child_process');
+jest.mock('child_process');
 
 const fs = require('fs-extra');
 jest.mock('fs-extra');
@@ -40,8 +43,11 @@ test('should install tslint as devDependencies and create tslint.json', () => {
 
   const linterRule = new Linter();
 
-  commands.installNpmDevDep = jest.fn(() => {
-    return Promise.resolve();
+  util.promisify = jest.fn((exec: (cmd: string) => void) => {
+    return (cmd: string) => {
+      expect(cmd).toBe('npm i tslint typescript -DE');
+      return Promise.resolve();
+    };
   });
 
   return linterRule.apply(true);
