@@ -6,11 +6,10 @@ import { logger } from '../../logger/index';
 import TypeScript from '../../stacks/typescript/index';
 import Node from '../../stacks/node/index';
 import * as fs from 'fs-extra';
-import * as cp from 'child_process';
-import * as util from 'util';
-import { hasDevDependencies } from '../../utils/json';
+import { hasDevDependency } from '../../utils/json';
 import { YesNo } from '../../choice/index';
 import Globals from '../../utils/globals';
+import { installNpmDevDep } from '../../utils/commands';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([TypeScript, Node])
@@ -22,6 +21,10 @@ export class Linter {
   private linterChoice: string = '';
   private linterhasConfigFile: boolean = false;
   private linterInDevDep: boolean = false;
+  private documentation: { [linter: string]: string } = {
+    tslint: 'https://palantir.github.io/tslint/usage/configuration/',
+    eslint: 'https://eslint.org/docs/user-guide/configuring',
+  };
 
   constructor() {
     this.packageJSONPath = `${Globals.rootPath}package.json`;
@@ -41,100 +44,77 @@ export class Linter {
         },
       );
     }
-    return;
   }
 
   async shouldBeApplied() {
     return this.init().then(async () => {
       this.linterhasConfigFile = await this.hasConfigFile(this.linterChoice);
-      this.linterInDevDep = this.isInDevDep(this.linterChoice);
+      this.linterInDevDep = hasDevDependency(
+        this.parsedPackageJSON,
+        this.linterChoice,
+      );
 
       return !this.linterInDevDep || !this.linterhasConfigFile;
     });
   }
 
-  async apply(apply: boolean) {
-    return this.init().then(() => {
-      if (apply) {
-        const exec = util.promisify(cp.exec);
-        return this.init()
-          .then(() => {
-            if (!this.linterInDevDep) {
-              const installCmd =
-                this.linterChoice === 'tslint'
-                  ? 'npm i tslint typescript -DE'
-                  : 'npm i eslint -DE';
+  async apply(apply: boolean): Promise<void> {
+    if (apply) {
+      return this.init().then(() => {
+        if (this.linterInDevDep) {
+          logger.info(`${this.linterChoice} already installed.`);
+        } else {
+          const linterToInstall =
+            this.linterChoice === 'tslint' ? 'tslint typescript' : 'eslint';
 
-              return exec(installCmd, { cwd: Globals.rootPath })
-                .then(() => {
-                  logger.info(`Installed ${this.linterChoice} succesfully`);
-                })
-                .catch(() => {
-                  logger.error(
-                    `Could notCould not install ${
-                      this.linterChoice
-                    }, try installing it using "${installCmd}" command.`,
-                  );
-                });
-            } else {
-              logger.info(`${this.linterChoice} already installed.`);
-            }
-          })
-          .then(() => {
+          return installNpmDevDep(linterToInstall).then(() => {
             if (!this.linterhasConfigFile) {
-              const documentation: { [linter: string]: string } = {
-                tslint:
-                  'https://palantir.github.io/tslint/usage/configuration/',
-                eslint: 'https://eslint.org/docs/user-guide/configuring',
-              };
-              this.writeLinterFile()
-                .then(() => {
-                  logger.info(
-                    ` ${
-                      this.linterChoice
-                    }.json succesfully written to root folder. You may add more rules if you like, find documentation at : ${
-                      documentation[this.linterChoice]
-                    }`,
-                  );
-                })
-                .catch(err => {
-                  logger.error(`Error writing to ${this.linterChoice} file.`);
-                  logger.debug(err);
-                });
+              return this.writeLinterFile();
             } else {
               logger.info(`${this.linterChoice}.json file already existing.`);
             }
           });
-      }
-    });
+        }
+      });
+    }
   }
 
   private writeLinterFile() {
     return fs
       .ensureFile(this.linterPaths[this.linterChoice])
       .catch(err => {
-        logger.error(`Error creating ${this.linterChoice}.json`);
+        logger.error(`Error creating ${this.linterPaths[this.linterChoice]}`);
         logger.debug(err);
-        return;
+        return Promise.reject(err);
       })
       .then(() => {
-        return fs.writeJson(
-          this.linterPaths[this.linterChoice],
-          linterJSON[this.linterChoice],
-          { spaces: '\t' },
-        );
+        return fs
+          .writeJson(
+            this.linterPaths[this.linterChoice],
+            linterJSON[this.linterChoice],
+            { spaces: '\t' },
+          )
+          .then(() => {
+            logger.info(
+              `Succesfully written ${
+                this.linterPaths[this.linterChoice]
+              }. You may add more rules if you like, find documentation at : ${
+                this.documentation[this.linterChoice]
+              }`,
+            );
+          })
+          .catch(err => {
+            logger.error(
+              `Linter Rule: Error trying to write to ${
+                this.linterPaths[this.linterChoice]
+              }`,
+            );
+          });
       });
   }
 
   hasConfigFile(linter: string): Promise<boolean> {
     return fs.pathExists(this.linterPaths[linter]);
-  }
-
-  isInDevDep(linter: string): boolean {
-    return (
-      hasDevDependencies(this.parsedPackageJSON) &&
-      this.parsedPackageJSON.devDependencies[linter] !== undefined
-    );
   }
 
   getName() {
