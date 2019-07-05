@@ -9,16 +9,15 @@ import * as cp from 'child_process';
 import Node from '../../stacks/node';
 import { logger } from '../../logger/index';
 import * as fs from 'fs-extra';
+import { installNpmDevDep } from '../../utils/commands';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node])
 export class Nodemon {
   private parsedJSON: any;
-  private packagePath: string;
 
   constructor() {
-    this.packagePath = Globals.rootPath + 'package.json';
-    this.parsedJSON = require(this.packagePath);
+    this.parsedJSON = require(Globals.packageJSONPath);
   }
 
   async shouldBeApplied(): Promise<boolean> {
@@ -40,13 +39,13 @@ export class Nodemon {
     if (apply) {
       const exec = util.promisify(cp.exec);
 
-      return exec('npm i -DE nodemon', { cwd: Globals.rootPath })
+      return installNpmDevDep('nodemon')
         .then(() => {
           logger.info(
             'Nodemon: Succesfully installed nodemon as dev dependency. Checking for existing script.',
           );
 
-          fs.readJSON(this.packagePath, { encoding: 'utf-8' })
+          fs.readJSON(Globals.packageJSONPath, { encoding: 'utf-8' })
             .then(packageJSON => {
               if (!pathExistsInJSON(packageJSON, ['scripts', 'nodemon'])) {
                 if (!pathExistsInJSON(packageJSON, ['scripts'])) {
@@ -55,7 +54,9 @@ export class Nodemon {
                   packageJSON.scripts.nodemon = 'nodemon';
                 }
 
-                fs.writeJSON(this.packagePath, packageJSON, { spaces: '\t' })
+                fs.writeJSON(Globals.packageJSONPath, packageJSON, {
+                  spaces: '\t',
+                })
                   .then(() => {
                     logger.info(
                       'Nodemon: Succesfully added nodemon script. Run "npm run nodemon" to run it.',
@@ -64,7 +65,7 @@ export class Nodemon {
                   .catch(err => {
                     logger.error(
                       `Nodemon: Error trying to write to ${
-                        this.packagePath
+                        Globals.packageJSONPath
                       }, please run in debug mode to know more.`,
                     );
                     logger.debug(err);
@@ -76,7 +77,7 @@ export class Nodemon {
             .catch(err => {
               logger.error(
                 `Nodemon: Error trying to read ${
-                  this.packagePath
+                  Globals.packageJSONPath
                 }, please run in debug mode to know more`,
               );
               logger.debug(err);
