@@ -26,13 +26,11 @@ export class React {
     } catch (err) {
       if (err.code === 'MODULE_NOT_FOUND') {
         this.hasReactDependency = false;
+        return;
       }
-      logger.error(
-        `React Stack: Error trying to read ${
-          Globals.rootPath
-        }package.json, use debug mode to know more.`,
-      );
-      logger.debug(err);
+      err.message = `React Stack: Error trying to read ${
+        Globals.rootPath
+      }package.json, use debug mode to know more.`;
       throw err;
     }
   }

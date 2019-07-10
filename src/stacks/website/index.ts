@@ -5,19 +5,27 @@ import Globals from '../../utils/globals';
 
 @StackRegister.register
 export class Website {
-  isAvailable(): Promise<boolean> {
+  async isAvailable(): Promise<boolean> {
     if (
       !Globals.rootPath.startsWith('http://') &&
       !Globals.rootPath.startsWith('https://')
     ) {
-      return Promise.resolve(false);
+      return false;
     } else {
-      return axios.get(Globals.rootPath).then(result => {
-        return Promise.resolve(
-          pathExistsInJSON(result, ['headers', 'content-type']) &&
-            result.headers['content-type'].startsWith('text/html'),
-        );
-      });
+      return axios
+        .get(Globals.rootPath)
+        .then(result => {
+          return Promise.resolve(
+            pathExistsInJSON(result, ['headers', 'content-type']) &&
+              result.headers['content-type'].startsWith('text/html'),
+          );
+        })
+        .catch(err => {
+          err.message = `Website Stack: Error while fetching data at url: ${
+            Globals.rootPath
+          }`;
+          throw err;
+        });
     }
   }
 

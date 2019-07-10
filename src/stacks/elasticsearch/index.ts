@@ -1,6 +1,7 @@
 import { StackRegister } from '../stack-register';
 import axios from 'axios';
 import Globals from '../../utils/globals/index';
+import { logger } from '../../logger';
 
 @StackRegister.register
 export default class Elasticsearch {
@@ -14,7 +15,10 @@ export default class Elasticsearch {
         return elasticSearchResponse.tagline === 'You Know, for Search';
       })
       .catch(err => {
-        return false;
+        err.message = `Elastic Search Stack: Error trying to fetch data at: ${
+          Globals.rootPath
+        }`;
+        throw err;
       });
   }
 
@@ -22,9 +26,9 @@ export default class Elasticsearch {
     if (Globals.rootPath.startsWith(`http`)) {
       const isElasticsearchResponse = await this.isElasticsearchResponse();
 
-      return Promise.resolve(isElasticsearchResponse);
+      return isElasticsearchResponse;
     }
-    return Promise.resolve(false);
+    return false;
   }
 
   name() {

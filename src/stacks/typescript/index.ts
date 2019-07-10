@@ -16,12 +16,14 @@ export default class TypeScript {
         'typescript',
       ]);
     } catch (err) {
-      logger.error(
-        `TypeScript Stack: Error while reading/parsing ${
-          Globals.packageJSONPath
-        }.`,
-      );
-      logger.debug(err);
+      if (err.code === 'MODULE_NOT_FOUND') {
+        this.hasDevDependency = false;
+        return;
+      }
+      err.message = `TypeScript Stack: Error while requiring ${
+        Globals.packageJSONPath
+      }.`;
+      throw err;
     }
   }
 

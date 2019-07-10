@@ -23,7 +23,11 @@ export default class VueJS {
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND') {
         this.hasVueDependency = false;
+        return;
       }
+      e.message = `VueJS Stack: Error while trying to require ${
+        Globals.packageJSONPath
+      }`;
       throw e;
     }
   }

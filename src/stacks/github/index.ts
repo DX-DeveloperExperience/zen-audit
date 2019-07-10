@@ -1,37 +1,37 @@
 import { StackRegister } from '../stack-register';
-import * as util from 'util';
-import * as cp from 'child_process';
-import { logger } from '../../logger/index';
 import * as fs from 'fs-extra';
 import Globals from '../../utils/globals';
+import { execInRootpath } from '../../utils/commands';
 
 @StackRegister.register
 export default class GitHub {
   async isAvailable(): Promise<boolean> {
-    const exec = util.promisify(cp.exec);
-
     return fs
       .lstat(`${Globals.rootPath}.git`)
+      .catch(err => {
+        err.message = `GitHub Stack: Error trying to get informations on directory: ${
+          Globals.rootPath
+        }.git`;
+        throw err;
+      })
       .then(lstat => {
         if (!lstat.isDirectory()) {
           return false;
         }
-        return exec(`git remote -v`, { cwd: Globals.rootPath })
+        return execInRootpath(`git remote -v`)
           .then((value: { stdout: string }) => {
             return value.stdout.includes('github.com');
           })
           .catch(err => {
-            logger.error('Could not execute "git" command, is git installed ?');
-            logger.debug(err);
-            return false;
+            err.message = `GitHub Stack: Error trying to execute "git remote -v" command`;
+            throw err;
           });
       })
       .catch(err => {
         if (err.code === 'ENOENT') {
           return false;
         }
-        logger.debug(err);
-        return false;
+        throw err;
       });
   }
 

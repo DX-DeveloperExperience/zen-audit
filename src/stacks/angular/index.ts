@@ -25,7 +25,11 @@ export default class Angular {
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND') {
         this.hasAngularDependency = false;
+        return;
       }
+      e.message = `Angular Stack: Error while requiring ${
+        Globals.packageJSONPath
+      }`;
       throw e;
     }
   }

@@ -5,18 +5,15 @@ import Globals from '../globals';
 
 const exec = util.promisify(cp.exec);
 
-export function installNpmDevDep(dependency: string) {
+export async function installNpmDevDep(dependency: string) {
   return execInRootpath(`npm i ${dependency} -DE`)
     .then(() => {
       logger.info(`Succesfully installed ${dependency}.`);
-      return Promise.resolve();
+      return;
     })
     .catch(err => {
-      logger.error(
-        `Error trying to install ${dependency}, try to install it with 'npm i ${dependency} -DE' command.`,
-      );
-      logger.debug(err);
-      return Promise.reject(err);
+      err.message = `Error trying to install ${dependency}, try to install it with 'npm i ${dependency} -DE' command.`;
+      throw err;
     });
 }
 
