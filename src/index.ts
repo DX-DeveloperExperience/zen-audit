@@ -14,7 +14,6 @@ import Globals from './utils/globals/index';
 
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
-  static path: string = './';
 
   static flags = {
     // add --version flag to show CLI version
@@ -57,30 +56,37 @@ class ProjectFillerCli extends Command {
 
   async run() {
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
-    let path;
 
     if (args.path === undefined) {
       logger.error('Please provide the path to the project to be audited.');
       return;
     }
 
-    path = args.path;
+    Globals.rootPath = args.path;
 
     try {
-      if (!path.startsWith('http') && !Path.isAbsolute(path)) {
-        path = Path.resolve(path);
+      if (
+        !Globals.rootPath.startsWith('http') &&
+        !Path.isAbsolute(Globals.rootPath)
+      ) {
+        Globals.rootPath = Path.resolve(Globals.rootPath);
 
-        const fileStat = fs.statSync(path);
+        const fileStat = fs.statSync(Globals.rootPath);
         if (!fileStat.isDirectory()) {
-          logger.error(`The provided path: ${path} is not a directory.`);
+          logger.error(
+            `The provided path: ${Globals.rootPath} is not a directory.`,
+          );
           return;
         }
-      }
-      if (!path.endsWith('/')) {
-        path = path + '/';
-      }
 
-      Globals.rootPath = path;
+        const splittedPath = Globals.rootPath.split('/');
+        Globals.projectName = splittedPath[splittedPath.length - 1];
+      } else {
+        Globals.projectName = Globals.rootPath;
+      }
+      if (!Globals.rootPath.endsWith('/')) {
+        Globals.rootPath = Globals.rootPath + '/';
+      }
     } catch (err) {
       logger.error(
         "An error occured while trying to parse arguments. Did you provide a path to your project's directory ?",
@@ -110,7 +116,7 @@ class ProjectFillerCli extends Command {
       });
     } else if (runFlags.stacks) {
       cli.action.start('Searching for available stacks');
-      const stacksFoundProm = ListStacks.getAvailableStacksIn(path);
+      const stacksFoundProm = ListStacks.getAvailableStacksIn(Globals.rootPath);
       stacksFoundProm
         .then(stacksFound => {
           if (stacksFound.length === 0) {
@@ -126,7 +132,7 @@ class ProjectFillerCli extends Command {
         });
     } else if (runFlags.apply) {
       cli.action.start('Search for rules');
-      ListRules.getRulesToApplyIn(path)
+      ListRules.getRulesToApplyIn(Globals.rootPath)
         .then(foundRules => {
           foundRules.forEach(async rule => {
             const choices = await rule.getChoices();
@@ -151,7 +157,7 @@ class ProjectFillerCli extends Command {
         });
     } else if (runFlags.manual) {
       cli.action.start('Searching for rules');
-      ListRules.getRulesToApplyIn(path)
+      ListRules.getRulesToApplyIn(Globals.rootPath)
         .then(foundRules => {
           const promptsProm = foundRules.map(async rule => {
             return {
@@ -205,12 +211,14 @@ class ProjectFillerCli extends Command {
         });
     } else if (runFlags.rules) {
       cli.action.start('Searching for rules to apply');
-      ListRules.getRulesToApplyIn(path)
+      ListRules.getRulesToApplyIn(Globals.rootPath)
         .then(rules => {
           rules.forEach(rule => {
             this.log(`${rule.getName()}: ${rule.getShortDescription()}`);
           });
+
           generateReport({
+            projectName: Globals.projectName,
             rulesInfos: rules.map(rule => {
               return {
                 name: rule.getName(),
