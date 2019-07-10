@@ -1,4 +1,4 @@
-# Audit report for {{folderName}}
+# Audit report for {{projectName}}
 
 ## Rules found in the project
 
@@ -11,6 +11,6 @@
 ## Longer rules descriptions
 
 {{#rulesInfos}}
-  ### {{name}}
-  {{longDescription}}
+### {{name}}
+{{longDescription}}
 {{/rulesInfos}}
