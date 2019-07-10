@@ -11,88 +11,118 @@ import { vscodeConfig, LaunchConfFile, configs, LaunchConf } from './constants';
 import Stack from '../../../../../stacks/stack';
 import { pathExistsInJSON } from '../../../../../utils/json';
 import * as fs from 'fs-extra';
+import { logger } from '../../../../../logger';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([VueJS, Angular, React])
 export class FrontAppDebug {
   private parsedLaunchConf: LaunchConfFile;
-  private existingConfigs: LaunchConf[] = [];
+  private existingConfigs: LaunchConf[] | undefined;
+  private missingConfigs: LaunchConf[] | undefined;
+  private foundStacks: Array<Constructor<Stack>> | undefined;
   private launchConfFilePath = `${Globals.rootPath}.vscode/launch.json`;
-  private missingConfigurations: LaunchConf[] = [];
-  private initialized: boolean = false;
   private readonly stacksToCheck: Array<Constructor<Stack>> = [
     VueJS,
     Angular,
     React,
   ];
-  private foundStacks: Array<Constructor<Stack>> = [];
 
   constructor() {
     try {
-      this.parsedLaunchConf = require(`${Globals.rootPath}.vscode/launch.json`);
+      this.parsedLaunchConf = require(this.launchConfFilePath);
     } catch (err) {
       this.parsedLaunchConf = vscodeConfig;
     }
   }
 
-  async init() {
-    if (!this.initialized) {
-      this.foundStacks = this.stacksToCheck.filter(async stackToCheck => {
-        return await ListStacks.stackIsAvailable(stackToCheck);
-      });
-
-      if (pathExistsInJSON(this.parsedLaunchConf, ['configurations'])) {
-        this.existingConfigs = this.parsedLaunchConf.configurations;
-      }
-
-      this.missingConfigurations = this.getMissingConfigurations();
-    }
-    return Promise.resolve();
-  }
-
   async shouldBeApplied(): Promise<boolean> {
-    return this.init().then(() => {
-      return this.getMissingConfigurations().length !== 0;
+    return this.getMissingConfigs().then(missingConfigs => {
+      return missingConfigs.length !== 0;
     });
   }
 
   async apply(apply: boolean): Promise<void> {
-    return this.init().then(() => {
-      this.addMissingConfigurations(this.missingConfigurations);
+    return this.addMissingConfigurations().then(() => {
       return fs.writeJSON(this.launchConfFilePath, this.parsedLaunchConf, {
         spaces: '\t',
       });
     });
   }
 
-  private addMissingConfigurations(missingConfigurations: LaunchConf[]): void {
-    missingConfigurations.forEach(missingConf => {
-      this.parsedLaunchConf.configurations.push(missingConf);
+  private addMissingConfigurations(): Promise<void> {
+    return this.getMissingConfigs()
+      .then(missingConfigs => {
+        missingConfigs.forEach(missingConf => {
+          this.parsedLaunchConf.configurations.push(missingConf);
+        });
+      })
+      .catch(err => {
+        logger.debug(err.stacktrace);
+        throw new Error(
+          'FrontAppDebug: Error trying to add missing configurations',
+        );
+      });
+  }
+
+  private async getMissingConfigs(): Promise<LaunchConf[]> {
+    if (this.missingConfigs !== undefined) {
+      return this.missingConfigs;
+    }
+
+    return this.getFoundStacks().then(foundStacks => {
+      this.missingConfigs = foundStacks.reduce(
+        (prevMissingConfig, foundStack: Constructor<Stack>, i) => {
+          const configsToAddStackName = Object.values(configs).find(obj => {
+            return obj.stack === foundStack;
+          });
+
+          let configsToAdd;
+
+          if (configsToAddStackName !== undefined) {
+            configsToAdd = configsToAddStackName.confs.filter(configToAdd => {
+              return !this.getExistingConfigs().some(existingConfig => {
+                return configToAdd.type === existingConfig.type;
+              });
+            });
+            return [...prevMissingConfig, ...configsToAdd];
+          }
+
+          return [...prevMissingConfig];
+        },
+        [],
+      );
+
+      return this.missingConfigs;
     });
   }
 
-  private getMissingConfigurations(): LaunchConf[] {
-    return this.foundStacks.reduce(
-      (prevMissingConfig, foundStack: Constructor<Stack>, i) => {
-        const configsToAddStackName = Object.values(configs).find(obj => {
-          return obj.stack === foundStack;
+  private getExistingConfigs() {
+    if (this.existingConfigs !== undefined) {
+      return this.existingConfigs;
+    }
+
+    if (pathExistsInJSON(this.parsedLaunchConf, ['configurations'])) {
+      return (this.existingConfigs = this.parsedLaunchConf.configurations);
+    } else {
+      return (this.existingConfigs = []);
+    }
+  }
+
+  private async getFoundStacks(): Promise<Array<Constructor<Stack>>> {
+    if (this.foundStacks !== undefined) {
+      return this.foundStacks;
+    } else {
+      const areAvailablePromise = this.stacksToCheck.map(stackToCheck => {
+        return ListStacks.stackIsAvailable(stackToCheck);
+      });
+
+      return Promise.all(areAvailablePromise).then(areAvailable => {
+        this.foundStacks = this.stacksToCheck.filter((stackToCheck, i) => {
+          return areAvailable[i];
         });
-
-        let configsToAdd;
-
-        if (configsToAddStackName !== undefined) {
-          configsToAdd = configsToAddStackName.confs.filter(configToAdd => {
-            return !this.existingConfigs.some(existingConfig => {
-              return configToAdd.type === existingConfig.type;
-            });
-          });
-          return [...prevMissingConfig, ...configsToAdd];
-        }
-
-        return [...prevMissingConfig];
-      },
-      [],
-    );
+        return this.foundStacks;
+      });
+    }
   }
 
   getName(): string {
