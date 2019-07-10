@@ -13,6 +13,7 @@
     "check-node-version": "3.3.0",
     "fs-extra": "8.0.1",
     "inquirer": "6.2.2",
+    "mdpdf": "2.0.4",
     "mustache": "3.0.1",
     "request": "2.88.0",
     "sync-request": "6.1.0",
