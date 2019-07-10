@@ -1,11 +1,12 @@
 import { StackRegister, Constructor } from '../stack-register';
 import Stack from '../stack';
 import Globals from '../../utils/globals';
+import { logger } from '../../logger';
 
 export class ListStacks {
-  static stacks: Stack[];
+  static stacks: Stack[] | undefined;
   static getAvailableStacksIn(rootPath: string) {
-    if (ListStacks.stacks) {
+    if (ListStacks.stacks !== undefined) {
       return Promise.resolve(ListStacks.stacks);
     }
 
