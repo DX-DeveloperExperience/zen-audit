@@ -1,7 +1,6 @@
 import { StackRegister } from '../stack-register';
 import axios from 'axios';
 import Globals from '../../utils/globals/index';
-import { logger } from '../../logger';
 
 @StackRegister.register
 export default class Elasticsearch {
