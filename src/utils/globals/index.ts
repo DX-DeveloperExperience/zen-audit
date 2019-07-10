@@ -4,4 +4,5 @@ export default class Globals {
   static get packageJSONPath(): string {
     return `${Globals.rootPath}package.json`;
   }
+  static projectName: string = '';
 }
