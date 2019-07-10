@@ -69,19 +69,18 @@ class ProjectFillerCli extends Command {
     try {
       if (!path.startsWith('http') && !Path.isAbsolute(path)) {
         path = Path.resolve(path);
-      }
 
+        const fileStat = fs.statSync(path);
+        if (!fileStat.isDirectory()) {
+          logger.error(`The provided path: ${path} is not a directory.`);
+          return;
+        }
+      }
       if (!path.endsWith('/')) {
         path = path + '/';
       }
 
       Globals.rootPath = path;
-
-      const fileStat = fs.statSync(path);
-      if (!fileStat.isDirectory()) {
-        logger.error(`The provided path: ${path} is not a directory.`);
-        return;
-      }
     } catch (err) {
       logger.error(
         "An error occured while trying to parse arguments. Did you provide a path to your project's directory ?",
