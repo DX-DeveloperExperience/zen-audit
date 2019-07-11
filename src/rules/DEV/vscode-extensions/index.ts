@@ -14,8 +14,7 @@ export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
   private extensionsJSONPath: string;
   private parsedExtensionsFile: any;
-  private missingExtensions: Choice[] = [];
-  private initialized: boolean = false;
+  private missingExtensions: Choice[] | undefined;
 
   constructor() {
     this.extensionsJSONPath = `${Globals.rootPath}.vscode/extensions.json`;
@@ -35,22 +34,12 @@ export class VSCodeExtensions {
     }
   }
 
-  async init() {
-    if (!this.initialized) {
-      return this.getMissingExtensions().then(result => {
-        this.initialized = true;
-        this.missingExtensions = result;
-      });
-    }
-  }
-
   async shouldBeApplied() {
-    return this.init().then(() => {
-      return (
-        this.missingExtensions.length !== 0 &&
-        (this.dotVSCodeExists() || this.codeIsInPath())
-      );
-    });
+    const missingExtensions = await this.getMissingExtensions();
+    return (
+      missingExtensions.length !== 0 &&
+      (this.dotVSCodeExists() || this.codeIsInPath())
+    );
   }
 
   private dotVSCodeExists(): boolean {
@@ -73,37 +62,39 @@ export class VSCodeExtensions {
   }
 
   apply(answers: string[]) {
-    return this.init().then(() => {
-      const filteredAnswers = answers.filter(recommendation => {
-        return !this.parsedExtensionsFile.recommendations.includes(
-          recommendation,
+    const filteredAnswers = answers.filter(recommendation => {
+      return !this.parsedExtensionsFile.recommendations.includes(
+        recommendation,
+      );
+    });
+
+    this.parsedExtensionsFile.recommendations = this.parsedExtensionsFile.recommendations.concat(
+      filteredAnswers,
+    );
+
+    return fs
+      .ensureFile(this.extensionsJSONPath)
+      .catch(err => {
+        throw err;
+      })
+      .then(() => {
+        return fs.writeJSON(
+          this.extensionsJSONPath,
+          this.parsedExtensionsFile,
+          { spaces: '\t' },
         );
       });
-
-      this.parsedExtensionsFile.recommendations = this.parsedExtensionsFile.recommendations.concat(
-        filteredAnswers,
-      );
-
-      return fs
-        .ensureFile(this.extensionsJSONPath)
-        .catch(err => {
-          throw err;
-        })
-        .then(() => {
-          return fs.writeJSON(
-            this.extensionsJSONPath,
-            this.parsedExtensionsFile,
-            { spaces: '\t' },
-          );
-        });
-    });
   }
 
   getPromptType() {
     return 'checkbox';
   }
 
-  private getMissingExtensions(): Promise<Choice[]> {
+  private async getMissingExtensions(): Promise<Choice[]> {
+    if (this.missingExtensions !== undefined) {
+      return this.missingExtensions;
+    }
+
     const stackNamesPromise = ListStacks.getAvailableStacksIn(
       Globals.rootPath,
     ).then(stacks =>

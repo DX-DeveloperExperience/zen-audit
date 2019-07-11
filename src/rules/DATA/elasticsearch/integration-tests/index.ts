@@ -41,7 +41,11 @@ export class IntegrationTests {
       .then((response: any) => {
         outputFile(this.templateFilePath, response.data).catch(err => {
           err.message = `Error writing file ${this.templateFilePath}`;
+          throw err;
         });
+      })
+      .catch(err => {
+        throw err;
       });
   }
 

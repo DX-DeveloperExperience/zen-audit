@@ -6,31 +6,39 @@ import { execInRootpath } from '../../utils/commands';
 @StackRegister.register
 export default class GitHub {
   async isAvailable(): Promise<boolean> {
+    return this.dotGitExists()
+      .then(dotGitExists => {
+        return dotGitExists && this.gitIsInstalled();
+      })
+      .catch(err => {
+        throw err;
+      });
+  }
+
+  async dotGitExists() {
     return fs
       .lstat(`${Globals.rootPath}.git`)
-      .catch(err => {
-        err.message = `GitHub Stack: Error trying to get informations on directory: ${
-          Globals.rootPath
-        }.git`;
-        throw err;
-      })
       .then(lstat => {
-        if (!lstat.isDirectory()) {
-          return false;
-        }
-        return execInRootpath(`git remote -v`)
-          .then((value: { stdout: string }) => {
-            return value.stdout.includes('github.com');
-          })
-          .catch(err => {
-            err.message = `GitHub Stack: Error trying to execute "git remote -v" command`;
-            throw err;
-          });
+        return lstat.isDirectory();
       })
       .catch(err => {
         if (err.code === 'ENOENT') {
           return false;
         }
+        err.message = `GitHub Stack: Error trying to get informations on directory: ${
+          Globals.rootPath
+        }.git`;
+        throw err;
+      });
+  }
+
+  async gitIsInstalled() {
+    return execInRootpath(`git remote -v`)
+      .then((value: { stdout: string }) => {
+        return value.stdout.includes('github.com');
+      })
+      .catch(err => {
+        err.message = `GitHub Stack: Error trying to execute "git remote -v" command`;
         throw err;
       });
   }

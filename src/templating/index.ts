@@ -1,3 +1,4 @@
+import { Ok } from './../choice/index';
 import * as fs from 'fs-extra';
 import * as mustache from 'mustache';
 import Globals from '../utils/globals/index';
@@ -24,19 +25,22 @@ export function generateReport(reportData: {
   }>;
 }) {
   fs.readFile(__dirname + '/report.md', { encoding: 'utf-8' })
-    .then((markdown: string) => {
-      const output = mustache.render(markdown, reportData);
-
-      generateMarkdown(output).then(() => {
-        markdownToPdfPrompt().then((convert: boolean) => {
-          if (convert) {
-            markdownToPdf();
-          }
-        });
-      });
-    })
     .catch(err => {
       logger.error(`Unable to read file: ${__dirname + '/repord.md'}`);
+      logger.debug(err.stack);
+    })
+    .then((markdown: string) => {
+      const output = mustache.render(markdown, reportData);
+      return generateMarkdown(output);
+    })
+    .then(() => {
+      return markdownToPdfPrompt();
+    })
+    .then(() => {
+      return markdownToPdf();
+    })
+    .catch(err => {
+      logger.error(err.message);
       logger.debug(err.stack);
     });
 }
@@ -44,28 +48,21 @@ export function generateReport(reportData: {
 async function generateMarkdown(data: string) {
   return fs
     .ensureDir(reportDirPath)
+    .catch(err => {
+      err.message = `Error trying to ensure existence of directory : ${reportDirPath}`;
+      throw err;
+    })
     .then(() => {
-      return fs
-        .writeFile(reportMarkdownPath, data, {
-          encoding: 'utf-8',
-        })
-        .then(() => {
-          logger.info(
-            `Generated Zodit markdown report at: ${reportMarkdownPath}`,
-          );
-        })
-        .catch(err => {
-          logger.error(
-            `Error trying to write report file : ${reportMarkdownPath}`,
-          );
-          logger.debug(err.stack);
-        });
+      return fs.writeFile(reportMarkdownPath, data, {
+        encoding: 'utf-8',
+      });
     })
     .catch(err => {
-      logger.error(
-        `Error trying to ensure existence of directory : ${reportDirPath}`,
-      );
-      logger.debug(err.stack);
+      err.message = `Error trying to write report file : ${reportMarkdownPath}`;
+      throw err;
+    })
+    .then(() => {
+      logger.info(`Generated Zodit markdown report at: ${reportMarkdownPath}`);
     });
 }
 
@@ -85,22 +82,19 @@ async function markdownToPdf() {
       );
     })
     .catch((err: any) => {
-      logger.error(`Error while converting markdown report to PDF`);
-      logger.debug(err.stack);
+      err.message = `Error while converting markdown report to PDF`;
+      throw err;
     });
 }
 
 async function markdownToPdfPrompt() {
-  return inquirer
-    .prompt([
-      {
-        name: 'convert',
-        message:
-          "We're about to convert your markdown generated report to PDF, you may update your markdown before the conversion, when you're ready, confirm for conversion.",
-        type: 'confirm',
-      },
-    ])
-    .then((answer: { convert: boolean }) => {
-      return answer.convert;
-    });
+  return inquirer.prompt([
+    {
+      name: 'convert',
+      message:
+        "We're about to convert your markdown generated report to PDF, you may update your markdown before the conversion, when you're ready, confirm for conversion.",
+      type: 'list',
+      choices: Ok,
+    },
+  ]);
 }
