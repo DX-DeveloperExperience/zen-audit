@@ -11,7 +11,7 @@ import { outputFile } from 'fs-extra';
 @StackRegister.registerRuleForStacks([Elasticsearch])
 export class IntegrationTests {
   private templateUrl: string =
-    'https://github.com/DX-DeveloperExperience/project-starter/releases/download/0.7.0/project-starter-cli-v0.7.0.tar.gz';
+    'https://github.com/DX-DeveloperExperience/testcontainer-elasticsearch/archive/1.0-SNAPSHOT.tar.gz';
   private templateFilePath: string = './elasticsearch-it-template.zip';
   async shouldBeApplied(): Promise<boolean> {
     cli.action.stop();
@@ -54,7 +54,7 @@ export class IntegrationTests {
   }
 
   getLongDescription(): string {
-    return 'long description long description long description long description long description long description long description long description long description long description long description long description long description long description long description ';
+    return 'This skeleton use the testcontainers library. You can have a look to the official documentation https://www.testcontainers.org';
   }
   getPromptType(): string {
     return 'list';
