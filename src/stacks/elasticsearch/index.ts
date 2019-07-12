@@ -4,6 +4,7 @@ import Globals from '../../utils/globals/index';
 
 @StackRegister.register
 export default class Elasticsearch {
+  static version: string = '';
   private isElasticsearchResponse() {
     return axios
       .get(Globals.rootPath, {
@@ -11,7 +12,11 @@ export default class Elasticsearch {
       })
       .then(result => {
         const elasticSearchResponse = result.data;
-        return elasticSearchResponse.tagline === 'You Know, for Search';
+        if (elasticSearchResponse.tagline === 'You Know, for Search') {
+          Elasticsearch.version = elasticSearchResponse.version.number;
+          return true;
+        }
+        return false;
       })
       .catch(err => {
         err.message = `Elastic Search Stack: Error trying to fetch data at: ${
