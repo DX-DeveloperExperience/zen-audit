@@ -95,9 +95,7 @@ export class VSCodeExtensions {
       return this.missingExtensions;
     }
 
-    const stackNamesPromise = ListStacks.getAvailableStacksIn(
-      Globals.rootPath,
-    ).then(stacks =>
+    const stackNamesPromise = ListStacks.getAvailableStacks().then(stacks =>
       stacks.map(stack => {
         return stack.name();
       }),

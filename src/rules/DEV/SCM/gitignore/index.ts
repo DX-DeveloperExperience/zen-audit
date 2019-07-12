@@ -69,41 +69,39 @@ export class GitIgnore {
       return Promise.resolve(this.missingRules);
     }
 
-    return ListStacks.getAvailableStacksIn(Globals.rootPath).then(
-      availableStacks => {
-        const getKeptRules = availableStacks.map(stack => {
-          const getNewRules: Promise<string[]> = axios
-            .get(`https://gitignore.io/api/${stack.name().toLowerCase()}`)
-            .then(result => {
-              return result.data
-                .split('\n')
-                .map((rule: string) => rule.trim())
-                .filter((rule: string) => rule !== '');
-            })
-            .catch(() => {
-              return [];
-            });
-
-          return getNewRules.then(newRules => {
-            const currRules = this.gitIgnoreContent
+    return ListStacks.getAvailableStacks().then(availableStacks => {
+      const getKeptRules = availableStacks.map(stack => {
+        const getNewRules: Promise<string[]> = axios
+          .get(`https://gitignore.io/api/${stack.name().toLowerCase()}`)
+          .then(result => {
+            return result.data
               .split('\n')
-              .map((rule: string) => rule.trim());
-
-            const filterRules = newRules.filter((newRule: string) => {
-              return !currRules.includes(newRule) && !newRule.startsWith('#');
-            });
-
-            return filterRules;
+              .map((rule: string) => rule.trim())
+              .filter((rule: string) => rule !== '');
+          })
+          .catch(() => {
+            return [];
           });
-        });
 
-        return Promise.all(getKeptRules).then(keptRules => {
-          return keptRules.reduce((acc: string[], curr: string[]) => {
-            return [...acc, ...curr];
-          }, []);
+        return getNewRules.then(newRules => {
+          const currRules = this.gitIgnoreContent
+            .split('\n')
+            .map((rule: string) => rule.trim());
+
+          const filterRules = newRules.filter((newRule: string) => {
+            return !currRules.includes(newRule) && !newRule.startsWith('#');
+          });
+
+          return filterRules;
         });
-      },
-    );
+      });
+
+      return Promise.all(getKeptRules).then(keptRules => {
+        return keptRules.reduce((acc: string[], curr: string[]) => {
+          return [...acc, ...curr];
+        }, []);
+      });
+    });
   }
 
   private missGitRules(): Promise<boolean> {

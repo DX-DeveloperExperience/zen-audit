@@ -5,9 +5,9 @@ import { logger } from '../../logger';
 
 export class ListStacks {
   static stacks: Stack[] | undefined;
-  static getAvailableStacksIn(rootPath: string) {
+  static async getAvailableStacks() {
     if (ListStacks.stacks !== undefined) {
-      return Promise.resolve(ListStacks.stacks);
+      return ListStacks.stacks;
     }
 
     const stacks = StackRegister.getStacks();
@@ -38,21 +38,14 @@ export class ListStacks {
     });
   }
 
-  static findAvailableStackIn(
+  static findAvailableStack(
     ctor: Constructor<Stack>,
-    path: string,
   ): Promise<Stack | undefined> {
-    return ListStacks.getAvailableStacksIn(path).then(stacks => {
+    return ListStacks.getAvailableStacks().then(stacks => {
       return stacks.find(stack => {
         return stack.constructor.name === ctor.name;
       });
     });
-  }
-
-  static findAvailableStack(
-    ctor: Constructor<Stack>,
-  ): Promise<Stack | undefined> {
-    return this.findAvailableStackIn(ctor, Globals.rootPath);
   }
 
   static async stackIsAvailable(ctor: Constructor<Stack>): Promise<boolean> {

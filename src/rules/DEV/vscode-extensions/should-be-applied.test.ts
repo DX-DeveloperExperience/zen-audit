@@ -16,7 +16,7 @@ afterEach(() => {
 });
 
 beforeEach(() => {
-  ListStacks.getAvailableStacksIn = jest.fn(() => {
+  ListStacks.getAvailableStacks = jest.fn(() => {
     return Promise.resolve([
       {
         name() {

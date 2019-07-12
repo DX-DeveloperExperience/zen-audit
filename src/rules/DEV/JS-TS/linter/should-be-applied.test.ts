@@ -27,7 +27,7 @@ test('should return true if tslint or eslint not in devDependencies and tslint.j
     },
   };
 
-  ListStacks.findAvailableStackIn = jest.fn(() => {
+  ListStacks.findAvailableStack = jest.fn(() => {
     return Promise.resolve({} as Stack);
   });
 
@@ -51,7 +51,7 @@ test('should return false if tslint in devDependencies and tslint.json exists', 
     },
   };
 
-  ListStacks.findAvailableStackIn = jest.fn(() => {
+  ListStacks.findAvailableStack = jest.fn(() => {
     return Promise.resolve({} as Stack);
   });
 
@@ -74,7 +74,7 @@ test('should return true if tslint in devDependencies and tslint.json does not e
     },
   };
 
-  ListStacks.findAvailableStackIn = jest.fn(() => {
+  ListStacks.findAvailableStack = jest.fn(() => {
     return Promise.resolve({} as Stack);
   });
 
@@ -97,7 +97,7 @@ test('should return false if eslint in devDependencies and eslint.json exists', 
     },
   };
 
-  ListStacks.findAvailableStackIn = jest.fn(() => {
+  ListStacks.findAvailableStack = jest.fn(() => {
     return Promise.resolve(undefined);
   });
 
@@ -120,7 +120,7 @@ test('should return true if eslint in devDependencies and eslint.json does not e
     },
   };
 
-  ListStacks.findAvailableStackIn = jest.fn(() => {
+  ListStacks.findAvailableStack = jest.fn(() => {
     return Promise.resolve(undefined);
   });
 

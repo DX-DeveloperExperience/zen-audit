@@ -32,7 +32,7 @@ test('should install tslint as devDependencies and create tslint.json', () => {
     },
   };
 
-  ListStacks.findAvailableStackIn = jest.fn(() => {
+  ListStacks.findAvailableStack = jest.fn(() => {
     return Promise.resolve({} as Stack);
   });
 
