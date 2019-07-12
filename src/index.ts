@@ -1,3 +1,4 @@
+import { NoRuleFound } from './errors/NoRuleFound';
 import { ListRules } from './rules/list-rules';
 import { Command, flags, run } from '@oclif/command';
 import { cli } from 'cli-ux';
@@ -102,136 +103,160 @@ class ProjectFillerCli extends Command {
     }
 
     if (runFlags.list) {
-      cli.action.start('Retrieving rules and stacks');
-      const stacks = StackRegister.getConstructors();
-      cli.action.stop();
-      cli.table(stacks, {
-        name: {},
-        rules: {
-          get: stack =>
-            StackRegister.getRulesByStack(stack.name)
-              .map(rule => rule.name)
-              .join(', '),
-        },
-      });
+      this.listAllStacksAndRules();
     } else if (runFlags.stacks) {
-      cli.action.start('Searching for available stacks');
-      const stacksFoundProm = ListStacks.getAvailableStacksIn(Globals.rootPath);
-      stacksFoundProm
-        .then(stacksFound => {
-          if (stacksFound.length === 0) {
-            cli.action.stop('No stack found.');
-          }
-          cli.action.stop('Stacks found: ');
-          stacksFound.map(stackFound => {
-            this.log(stackFound.name());
-          });
-        })
-        .catch(err => {
-          logger.error(err);
-        });
+      this.listFoundStacks();
     } else if (runFlags.apply) {
-      cli.action.start('Search for rules');
-      ListRules.getRulesToApplyIn(Globals.rootPath)
-        .then(foundRules => {
-          foundRules.forEach(async rule => {
-            const choices = await rule.getChoices();
-            const apply = rule.apply;
-            if (apply) {
-              // We call apply with true as answer because it is a YesNo or an Ok Choice List
-              if (choices === YesNo || choices === Ok) {
-                return apply.call(rule, true);
-              } else {
-                // Else we call it with all the possible choices
-                const choicesStr = choices.map(choice => {
-                  return choice.value.toString();
-                });
-                return apply.call(rule, choicesStr);
-              }
-            }
-          });
-        })
-        .catch(err => {
-          logger.error('Error searching for rules to apply');
-          logger.debug(err);
-        });
+      this.applyAllRules();
     } else if (runFlags.manual) {
-      cli.action.start('Searching for rules');
-      ListRules.getRulesToApplyIn(Globals.rootPath)
-        .then(foundRules => {
-          const promptsProm = foundRules.map(async rule => {
-            return {
-              name: rule.constructor.name,
-              message: rule.getShortDescription(),
-              type: rule.getPromptType(),
-              choices: await rule.getChoices(),
-            };
-          });
-
-          if (promptsProm.length === 0) {
-            cli.action.stop("No rule to apply, you're good to go ! :)");
-            return;
-          }
-
-          Promise.all(promptsProm)
-            .then(prompts => {
-              cli.action.stop(`${prompts.length} rules found ! Let's go !`);
-
-              inquirer
-                .prompt(prompts)
-                .then((answers: {}) => {
-                  Object.entries(answers).forEach(([_, answer], i) => {
-                    const apply = foundRules[i].apply;
-                    if (apply) {
-                      cli.action.start('Applying rules, please wait');
-                      apply
-                        .call(foundRules[i], answer)
-                        .then(() => {
-                          cli.action.stop('Rules applied ! Congratulations !');
-                        })
-                        .catch(err => {
-                          logger.error(
-                            'An error occured while applying rules.',
-                          );
-                          logger.debug(err);
-                        });
-                    }
-                  });
-                })
-                .catch(err => {
-                  logger.error(err);
-                });
-            })
-            .catch(err => {
-              logger.error(err);
-            });
-        })
-        .catch(err => {
-          logger.error(err);
-        });
+      this.applyFoundRulesManually();
     } else if (runFlags.rules) {
-      cli.action.start('Searching for rules to apply');
-      ListRules.getRulesToApplyIn(Globals.rootPath)
-        .then(rules => {
-          rules.forEach(rule => {
-            this.log(`${rule.getName()}: ${rule.getShortDescription()}`);
-          });
-
-          generateReport({
-            projectName: Globals.projectName,
-            rulesInfos: rules.map(rule => {
-              return {
-                name: rule.getName(),
-                shortDescription: rule.getShortDescription(),
-                longDescription: rule.getLongDescription(),
-              };
-            }),
-          });
-        })
-        .catch(err => {
-          logger.error(err);
-        });
+      this.listFoundRules();
     }
+  }
+
+  listAllStacksAndRules() {
+    cli.action.start('Retrieving rules and stacks');
+    const stacks = StackRegister.getConstructors();
+    cli.action.stop();
+    cli.table(stacks, {
+      name: {},
+      rules: {
+        get: stack =>
+          StackRegister.getRulesByStack(stack.name)
+            .map(rule => rule.name)
+            .join(', '),
+      },
+    });
+  }
+
+  listFoundStacks() {
+    cli.action.start('Searching for available stacks');
+    const stacksFoundProm = ListStacks.getAvailableStacks();
+    stacksFoundProm
+      .then(stacksFound => {
+        if (stacksFound.length === 0) {
+          cli.action.stop('No stack found.');
+        }
+        cli.action.stop('Stacks found: ');
+        stacksFound.map(stackFound => {
+          this.log(stackFound.name());
+        });
+      })
+      .catch(err => {
+        logger.error(err);
+      });
+  }
+
+  applyAllRules() {
+    cli.action.start('Search for rules');
+    ListRules.getRulesToApply()
+      .then(foundRules => {
+        foundRules.forEach(async rule => {
+          const choices = await rule.getChoices();
+          const apply = rule.apply;
+          if (apply) {
+            // We call apply with true as answer because it is a YesNo or an Ok Choice List
+            if (choices === YesNo || choices === Ok) {
+              return apply.call(rule, true);
+            } else {
+              // Else we call it with all the possible choices
+              const choicesStr = choices.map(choice => {
+                return choice.value.toString();
+              });
+              return apply.call(rule, choicesStr);
+            }
+          }
+        });
+      })
+      .catch(err => {
+        logger.error('Error searching for rules to apply');
+        logger.debug(err);
+      });
+  }
+
+  applyFoundRulesManually() {
+    cli.action.start('Searching for rules');
+    ListRules.getRulesToApply()
+      .then(async foundRules => {
+        const promptsProm = foundRules.map(async rule => {
+          return {
+            name: rule.constructor.name,
+            message: rule.getShortDescription(),
+            type: rule.getPromptType(),
+            choices: await rule.getChoices(),
+          };
+        });
+
+        if (promptsProm.length === 0) {
+          throw new NoRuleFound();
+        }
+
+        const prompts = await Promise.all(promptsProm);
+
+        cli.action.stop(
+          `${prompts.length} rule${
+            prompts.length > 0 ? 's' : ''
+          } found ! Let's go !`,
+        );
+
+        const answers: {} = await inquirer.prompt(prompts);
+
+        return Object.entries(answers).map(([_, answer], i) => {
+          const apply = foundRules[i].apply;
+
+          if (apply) {
+            return apply.call(foundRules[i], answer);
+          }
+        });
+      })
+      .then(applies => {
+        cli.action.start('Applying rules, please wait');
+        return Promise.all(applies);
+      })
+      .then(() => {
+        cli.action.stop('Rules applied ! Congratulations !');
+      })
+      .catch(err => {
+        if (err instanceof NoRuleFound) {
+          cli.action.stop();
+          logger.info("No rule to apply, you're goot to go ! :)");
+        }
+        logger.error('An error occured while applying rules.');
+        logger.debug(err);
+      });
+  }
+
+  listFoundRules() {
+    cli.action.start('Searching for rules to apply');
+    ListRules.getRulesToApply()
+      .then(rules => {
+        if (rules.length === 0) {
+          cli.action.stop();
+          this.log('No rule found. Your project seems fine ! :)');
+          return;
+        }
+
+        rules.forEach(rule => {
+          this.log(`${rule.getName()}: ${rule.getShortDescription()}`);
+        });
+
+        cli.action.stop();
+
+        generateReport({
+          projectName: Globals.projectName,
+          rulesInfos: rules.map(rule => {
+            return {
+              name: rule.getName(),
+              shortDescription: rule.getShortDescription(),
+              longDescription: rule.getLongDescription(),
+            };
+          }),
+        });
+      })
+      .catch(err => {
+        logger.error(err);
+      });
   }
 }
 
