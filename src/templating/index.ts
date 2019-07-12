@@ -9,12 +9,6 @@ const mdpdf = require('mdpdf');
 const date = new Date();
 const dateString = `${date.getFullYear()}-${date.getMonth() +
   1}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
-const reportDirPath = Globals.rootPath.startsWith('http')
-  ? './zodit-reports/'
-  : `${Globals.rootPath}zodit-reports/`;
-const reportFilePath = `${reportDirPath}report-${dateString}`;
-const reportMarkdownPath = `${reportFilePath}.md`;
-const reportPdfPath = `${reportFilePath}.pdf`;
 
 export function generateReport(reportData: {
   projectName: string;
@@ -24,20 +18,24 @@ export function generateReport(reportData: {
     longDescription: string;
   }>;
 }) {
+  const reportDirPath = Globals.rootPath.startsWith('http')
+    ? './zodit-reports/'
+    : `${Globals.rootPath}zodit-reports/`;
+
   fs.readFile(__dirname + '/report.md', { encoding: 'utf-8' })
     .catch(err => {
-      logger.error(`Unable to read file: ${__dirname + '/repord.md'}`);
+      logger.error(`Unable to read file: ${__dirname + '/report.md'}`);
       logger.debug(err.stack);
     })
     .then((markdown: string) => {
       const output = mustache.render(markdown, reportData);
-      return generateMarkdown(output);
+      return generateMarkdown(output, reportDirPath);
     })
     .then(() => {
       return markdownToPdfPrompt();
     })
     .then(() => {
-      return markdownToPdf();
+      return markdownToPdf(reportDirPath);
     })
     .catch(err => {
       logger.error(err.message);
@@ -45,7 +43,10 @@ export function generateReport(reportData: {
     });
 }
 
-async function generateMarkdown(data: string) {
+async function generateMarkdown(data: string, reportDirPath: string) {
+  const reportFilePath = `${reportDirPath}report-${dateString}`;
+  const reportMarkdownPath = `${reportFilePath}.md`;
+
   return fs
     .ensureDir(reportDirPath)
     .catch(err => {
@@ -66,7 +67,11 @@ async function generateMarkdown(data: string) {
     });
 }
 
-async function markdownToPdf() {
+async function markdownToPdf(reportDirPath: string) {
+  const reportFilePath = `${reportDirPath}report-${dateString}`;
+  const reportMarkdownPath = `${reportFilePath}.md`;
+  const reportPdfPath = `${reportFilePath}.pdf`;
+
   return mdpdf
     .convert({
       source: reportMarkdownPath,
