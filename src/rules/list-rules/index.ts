@@ -2,23 +2,19 @@ import Rule from '../rule';
 import { StackRegister, Constructor } from '../../stacks/stack-register/index';
 import { ListStacks } from '../../stacks/list-stacks/index';
 import Stack from '../../stacks/stack/index';
-import { logger } from '../../logger/index';
 
 /**
  * Returns an array of every stack instanciated object
  */
 export class ListRules {
-  private static rules: Rule[] = [];
-  private static path = '';
+  private static rules: Rule[] | undefined;
 
-  static getRulesToApplyIn(rootPath: string): Promise<Rule[]> {
-    if (this.rules.length === 0 || this.path !== rootPath) {
-      this.path = rootPath;
+  static async getRulesToApply(): Promise<Rule[]> {
+    if (ListRules.rules !== undefined) {
+      return ListRules.rules;
     }
 
-    const stackPromise: Promise<Stack[]> = ListStacks.getAvailableStacksIn(
-      rootPath,
-    );
+    const stackPromise: Promise<Stack[]> = ListStacks.getAvailableStacks();
 
     const rulesByStackPromise: Promise<
       Array<Constructor<Rule>>
@@ -34,7 +30,7 @@ export class ListRules {
     return rulesByStackPromise.then(rulesConstructors => {
       const uniqueRulesConstructors = new Set(rulesConstructors);
       const rules = Array.from(uniqueRulesConstructors).map(
-        ruleConstructor => new ruleConstructor(rootPath),
+        ruleConstructor => new ruleConstructor(),
       );
 
       return Promise.all(rules.map(rule => rule.shouldBeApplied())).then(
