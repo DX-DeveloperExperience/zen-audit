@@ -132,8 +132,7 @@ class ProjectFillerCli extends Command {
 
   listFoundStacks() {
     cli.action.start('Searching for available stacks');
-    const stacksFoundProm = ListStacks.getAvailableStacks();
-    stacksFoundProm
+    ListStacks.getAvailableStacks()
       .then(stacksFound => {
         if (stacksFound.length === 0) {
           cli.action.stop('No stack found.');
@@ -144,7 +143,8 @@ class ProjectFillerCli extends Command {
         });
       })
       .catch(err => {
-        logger.error(err);
+        logger.error(err.message);
+        logger.debug(err.stack);
       });
   }
 
@@ -170,8 +170,8 @@ class ProjectFillerCli extends Command {
         });
       })
       .catch(err => {
-        logger.error('Error searching for rules to apply');
-        logger.debug(err);
+        logger.error(err.message);
+        logger.debug(err.stack);
       });
   }
 
@@ -189,7 +189,7 @@ class ProjectFillerCli extends Command {
         });
 
         if (promptsProm.length === 0) {
-          throw new NoRuleFound();
+          return [];
         }
 
         const prompts = await Promise.all(promptsProm);
@@ -210,20 +210,20 @@ class ProjectFillerCli extends Command {
           }
         });
       })
-      .then(applies => {
-        cli.action.start('Applying rules, please wait');
-        return Promise.all(applies);
-      })
-      .then(() => {
-        cli.action.stop('Rules applied ! Congratulations !');
+      .then(async applies => {
+        if (applies.length === 0) {
+          logger.info("No rule to apply, you're good to go ! :)");
+          return;
+        } else {
+          cli.action.start('Applying rules, please wait');
+          return Promise.all(applies).then(() => {
+            cli.action.stop('Rules applied ! Congratulations !');
+          });
+        }
       })
       .catch(err => {
-        if (err instanceof NoRuleFound) {
-          cli.action.stop();
-          logger.info("No rule to apply, you're goot to go ! :)");
-        }
-        logger.error('An error occured while applying rules.');
-        logger.debug(err);
+        logger.error(err.message);
+        logger.debug(err.stack);
       });
   }
 
@@ -243,7 +243,7 @@ class ProjectFillerCli extends Command {
 
         cli.action.stop();
 
-        generateReport({
+        return generateReport({
           projectName: Globals.projectName,
           rulesInfos: rules.map(rule => {
             return {
@@ -255,7 +255,8 @@ class ProjectFillerCli extends Command {
         });
       })
       .catch(err => {
-        logger.error(err);
+        logger.error(err.message);
+        logger.debug(err.stack);
       });
   }
 }
