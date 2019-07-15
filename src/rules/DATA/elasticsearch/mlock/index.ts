@@ -1,3 +1,4 @@
+import { FetchDataError } from './../../../../errors/FetchData';
 import { RuleRegister } from '../../../rule-register/index';
 import { StackRegister } from '../../../../stacks/stack-register';
 import Elasticsearch from '../../../../stacks/elasticsearch';
@@ -9,12 +10,17 @@ import Axios from 'axios';
 @StackRegister.registerRuleForStacks([Elasticsearch])
 export class ElasticsearchMlock {
   async shouldBeApplied(): Promise<boolean> {
-    return Axios.get(`${Globals.rootPath}_nodes`).then(result => {
-      const mlockDisabled = Object.values(result.data.nodes).find(
-        (node: any) => !node.process.mlock,
-      );
-      return !!mlockDisabled;
-    });
+    const url = `${Globals.rootPath}_nodes`;
+    return Axios.get(url)
+      .then(result => {
+        const mlockDisabled = Object.values(result.data.nodes).find(
+          (node: any) => !node.process.mlock,
+        );
+        return !!mlockDisabled;
+      })
+      .catch(err => {
+        throw new FetchDataError(url, this.constructor.name);
+      });
   }
 
   getName() {

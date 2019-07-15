@@ -1,3 +1,4 @@
+import { FetchDataError } from './../../../../errors/FetchData';
 import Choice, { YesNo } from './../../../../choice/index';
 import { RuleRegister } from '../../../rule-register';
 import { StackRegister } from '../../../../stacks/stack-register';
@@ -31,22 +32,28 @@ export class IntegrationTests {
   }
 
   async apply(apply: boolean): Promise<void> {
-    Axios.get(this.templateUrl, { responseType: 'arraybuffer' })
-      .catch(err => {
-        err.message = `ElasticSearch Integration Tests: Error retrieving template at ${
-          this.templateUrl
-        }`;
-        throw err;
-      })
-      .then((response: any) => {
-        outputFile(this.templateFilePath, response.data).catch(err => {
-          err.message = `Error writing file ${this.templateFilePath}`;
-          throw err;
-        });
-      })
-      .catch(err => {
-        throw err;
-      });
+    return new Promise<void>((resolve, reject) => {
+      Axios.get(this.templateUrl, { responseType: 'arraybuffer' })
+        .then(
+          (response: any) => {
+            return outputFile(this.templateFilePath, response.data);
+          },
+          () => {
+            reject(new FetchDataError(this.templateUrl, this.constructor.name));
+          },
+        )
+        .then(
+          () => {
+            resolve();
+          },
+          err => {
+            err.message = `Error writing file ${this.templateFilePath}`;
+            reject(err);
+          },
+        );
+    }).catch(err => {
+      throw err;
+    });
   }
 
   getName(): string {

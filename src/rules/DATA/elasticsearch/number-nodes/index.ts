@@ -1,3 +1,4 @@
+import { FetchDataError } from './../../../../errors/FetchData';
 import { YesNo } from '../../../../choice/index';
 import Axios from 'axios';
 import { RuleRegister } from '../../../rule-register/index';
@@ -9,9 +10,14 @@ import Globals from '../../../../utils/globals';
 @StackRegister.registerRuleForStacks([Elasticsearch])
 export class ElasticsearchNodesNumber {
   async shouldBeApplied(): Promise<boolean> {
-    return Axios.get(`${Globals.rootPath}_nodes`).then(result => {
-      return Object.keys(result.data.nodes).length < 3;
-    });
+    const url = `${Globals.rootPath}_nodes`;
+    return Axios.get(url)
+      .then(result => {
+        return Object.keys(result.data.nodes).length < 3;
+      })
+      .catch(() => {
+        throw new FetchDataError(url, this.constructor.name);
+      });
   }
 
   getName() {

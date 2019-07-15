@@ -1,3 +1,4 @@
+import { FetchDataError } from './../../../../errors/FetchData';
 import { RuleRegister } from '../../../rule-register/index';
 import { StackRegister } from '../../../../stacks/stack-register';
 import Elasticsearch from '../../../../stacks/elasticsearch';
@@ -9,14 +10,19 @@ import Axios from 'axios';
 @StackRegister.registerRuleForStacks([Elasticsearch])
 export class ElasticsearchNodesVersion {
   async shouldBeApplied(): Promise<boolean> {
-    return Axios.get(`${Globals.rootPath}_nodes`).then(result => {
-      const versions = Object.values(result.data.nodes).map(
-        (node: any) => node.version,
-      );
+    const url = `${Globals.rootPath}_nodes`;
+    return Axios.get(url)
+      .then(result => {
+        const versions = Object.values(result.data.nodes).map(
+          (node: any) => node.version,
+        );
 
-      const set = new Set(versions);
-      return set.size > 1;
-    });
+        const set = new Set(versions);
+        return set.size > 1;
+      })
+      .catch(() => {
+        throw new FetchDataError(url, this.constructor.name);
+      });
   }
 
   getName() {
