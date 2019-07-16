@@ -15,9 +15,7 @@ afterEach(() => {
 });
 
 test('shouldBeApplied should return true if .gitignore file does not exist', () => {
-  fs.readFile.mockImplementation(() => {
-    return Promise.reject({ code: 'ENOENT' });
-  });
+  fs.pathExists.mockReturnValue(Promise.resolve(false));
 
   return new GitIgnore().shouldBeApplied().then(result => {
     expect(result).toBeTruthy();

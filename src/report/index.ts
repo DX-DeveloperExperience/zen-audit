@@ -1,11 +1,12 @@
+import { DirError } from './../errors/DirErrors';
+import { WriteFileError } from './../errors/FileErrors';
 import { Ok } from '../choice/index';
 import * as fs from 'fs-extra';
 import * as mustache from 'mustache';
 import Globals from '../utils/globals/index';
 import { logger } from '../logger/index';
 import * as inquirer from 'inquirer';
-import { throwFileError } from '../errors/FileErrorHandler';
-import { throwDirError } from '../errors/DirErrorHandler';
+import { ReadFileError } from '../errors/FileErrors';
 const mdpdf = require('mdpdf');
 
 const date = new Date();
@@ -33,7 +34,7 @@ export function generateReport(reportData: {
         },
         err => {
           reject(
-            throwFileError(err, __dirname + '/report.md', 'Generate Report'),
+            new ReadFileError(err, __dirname + '/report.md', 'Generate Report'),
           );
         },
       )
@@ -79,7 +80,7 @@ async function generateMarkdown(data: string, reportDirPath: string) {
           });
         },
         err => {
-          reject(throwDirError(err, reportDirPath, 'Generate Report'));
+          reject(new DirError(err, reportDirPath, 'Generate Report'));
         },
       )
       .then(
@@ -90,7 +91,9 @@ async function generateMarkdown(data: string, reportDirPath: string) {
           resolve();
         },
         err => {
-          reject(throwFileError(err, reportMarkdownPath, 'Generate Report'));
+          reject(
+            new WriteFileError(err, reportMarkdownPath, 'Generate Report'),
+          );
         },
       );
   }).catch(err => {

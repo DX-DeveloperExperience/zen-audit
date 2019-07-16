@@ -7,6 +7,7 @@ import TypeScript from '../../../../stacks/typescript';
 import Node from '../../../../stacks/node';
 import { hasDevDependency } from '../../../../utils/json/index';
 import Globals from '../../../../utils/globals';
+import { execInRootpath } from '../../../../utils/commands';
 /**
  * Looks for Prettier dependency in package.json, and add it if necessary.
  */
@@ -23,19 +24,12 @@ export class Prettier {
 
   async apply(apply: boolean) {
     if (apply) {
-      const exec = util.promisify(cp.exec);
-
-      exec('npm i prettier -DE', { cwd: Globals.rootPath })
-        .then((result: { stdout: string; stderr: string }) => {
+      return execInRootpath('npm i prettier -DE').then(
+        (result: { stdout: string; stderr: string }) => {
           logger.debug(result.stderr);
           logger.info('Succesfully installed prettier.');
-        })
-        .catch(err => {
-          logger.error(
-            'Could not install prettier, try installing it using "npm i prettier -DE" command in your terminal.',
-          );
-          logger.debug(err);
-        });
+        },
+      );
     }
   }
 

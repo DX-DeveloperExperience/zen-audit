@@ -1,19 +1,23 @@
+import { WriteFileError } from './../../../../../errors/FileErrors';
 import { RuleRegister } from '../../../../rule-register';
 import { StackRegister } from '../../../../../stacks/stack-register';
-import { nodeSchedule, setNodeSchedule } from './constants';
-import { YesNo } from '../../../../../choice';
+import { Ok } from '../../../../../choice';
 import * as cp from 'child_process';
 import TypeScript from '../../../../../stacks/typescript';
 import Node from '../../../../../stacks/node';
 import axios from 'axios';
+import { ReadFileError } from '../../../../../errors/FileErrors';
+import { readJSON, writeJSON } from 'fs-extra';
+import { logger } from '../../../../../logger';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class NodeVersion {
   readonly requiredFiles: string[] = [];
-  private nodeVersionSchedule: any;
+  private nodeVersionSchedule: {} | undefined;
   private nodeVersion: string = '';
   private shortNodeVersion: string = '';
+  private nodeScheduleFilePath = `${__dirname}/node_schedule.json`;
   private initialized: boolean = false;
 
   constructor() {
@@ -21,46 +25,102 @@ export class NodeVersion {
     this.shortNodeVersion = this.nodeVersion.split('.')[0];
   }
 
-  private async init() {
-    if (!this.initialized) {
-      return axios
-        .get(
-          'https://raw.githubusercontent.com/nodejs/Release/master/schedule.json',
-          { timeout: 3000 },
-        )
-        .catch(err => {
-          this.nodeVersionSchedule = nodeSchedule;
-          throw err;
-        })
-        .then(result => {
-          const fetchedSchedule = result.data;
-          this.nodeVersionSchedule = fetchedSchedule;
-          setNodeSchedule(fetchedSchedule);
-        });
+  async shouldBeApplied() {
+    return await (this.isCritical() || this.isOutdated());
+  }
+
+  async apply() {
+    const nodeSchedule = await this.getVersionSchedule();
+    if (this.isOutdated()) {
+      const endDate = nodeSchedule[this.shortNodeVersion].end;
+      logger.info(`Your NodeJS version : ${this.nodeVersion}
+      is outdated (${endDate}), you really should update it.`);
+    } else {
+      logger.info(`Your NodeJS version : ${this.nodeVersion}
+      is not maintained anymore, you should consider updating it.`);
     }
   }
 
-  async shouldBeApplied() {
-    return this.init().then(() => {
-      return this.isCritical() || this.isOutdated();
-    });
-  }
-
-  private isCritical() {
+  private async isCritical() {
+    const nodeVersionSchedule = await this.getVersionSchedule();
     const now = Date.now();
     const maintenance = Date.parse(
-      this.nodeVersionSchedule[this.shortNodeVersion].maintenance,
+      nodeVersionSchedule[this.shortNodeVersion].maintenance,
     );
-    const end = Date.parse(this.nodeVersionSchedule[this.shortNodeVersion].end);
+    const end = Date.parse(nodeVersionSchedule[this.shortNodeVersion].end);
 
     return maintenance < now && now < end;
   }
 
-  private isOutdated() {
+  private async isOutdated() {
+    const nodeVersionSchedule = await this.getVersionSchedule();
     const now = Date.now();
-    const end = Date.parse(this.nodeVersionSchedule[this.shortNodeVersion].end);
+    const end = Date.parse(nodeVersionSchedule[this.shortNodeVersion].end);
 
     return end < now;
+  }
+
+  private async getVersionSchedule(): Promise<any> {
+    if (this.nodeVersionSchedule !== undefined) {
+      return this.nodeVersionSchedule;
+    }
+
+    return axios
+      .get(
+        'https://raw.githubusercontent.com/nodejs/Release/master/schedule.json',
+        { timeout: 3000 },
+      )
+      .then(result => {
+        const fetchedSchedule = result.data;
+        this.nodeVersionSchedule = fetchedSchedule;
+        // this.updateScheduleJSON(fetchedSchedule);
+        return this.nodeVersionSchedule;
+      })
+      .catch(err => {
+        logger.error('NodeVersion: Error while fetching node version schedule');
+        logger.debug(err);
+        this.nodeVersionSchedule = require(this.nodeScheduleFilePath);
+        return this.nodeVersionSchedule;
+      });
+  }
+
+  private async updateScheduleJSON(newSchedule: any): Promise<void> {
+    return new Promise((resolve, reject) => {
+      return readJSON(this.nodeScheduleFilePath)
+        .then(
+          scheduleJSON => {
+            if (JSON.stringify(scheduleJSON) === JSON.stringify(newSchedule)) {
+              return writeJSON(this.nodeScheduleFilePath, scheduleJSON, {
+                spaces: '\t',
+              });
+            }
+            return Promise.resolve();
+          },
+          err => {
+            reject(
+              new ReadFileError(
+                err,
+                this.nodeScheduleFilePath,
+                this.constructor.name,
+              ),
+            );
+          },
+        )
+        .then(
+          () => {
+            resolve();
+          },
+          err => {
+            reject(
+              new WriteFileError(
+                err,
+                this.nodeScheduleFilePath,
+                this.constructor.name,
+              ),
+            );
+          },
+        );
+    });
   }
 
   getName() {
@@ -68,16 +128,7 @@ export class NodeVersion {
   }
 
   getShortDescription() {
-    if (this.isOutdated()) {
-      const endDate = this.nodeVersionSchedule[this.shortNodeVersion].end;
-      return `Your NodeJS version : ${this.nodeVersion}
-      is outdated (${endDate}), you really should update it.`;
-    } else {
-      const maintenanceDate = this.nodeVersionSchedule[this.shortNodeVersion]
-        .maintenance;
-      return `Your NodeJS version : ${this.nodeVersion}
-      is not maintained anymore, you should consider updating it.`;
-    }
+    return 'Node version: This rule will check your nodeJS version, and tell you if you should update it.';
   }
 
   getLongDescription() {
@@ -89,6 +140,6 @@ export class NodeVersion {
   }
 
   getChoices() {
-    return YesNo;
+    return Ok;
   }
 }

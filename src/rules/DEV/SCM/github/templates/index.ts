@@ -1,3 +1,5 @@
+import { WriteFileError } from './../../../../../errors/FileErrors';
+import { DirError } from './../../../../../errors/DirErrors';
 import { RuleRegister } from '../../../../rule-register/index';
 import { StackRegister } from '../../../../../stacks/stack-register';
 import GitHub from '../../../../../stacks/github';
@@ -16,22 +18,12 @@ export class GitHubTemplates {
   }
 
   shouldBeApplied(): Promise<boolean> {
-    return fs
-      .pathExists(this.templatesPath)
-      .catch(err => {
-        err.message =
-          'Error trying to check for .github/ISSUE_TEMPLATE path existence.';
-        throw err;
-      })
-      .then(pathExists => {
-        if (!pathExists) {
-          return true;
-        }
-        return this.hasNoMarkdownFile();
-      })
-      .catch(err => {
-        throw err;
-      });
+    return fs.pathExists(this.templatesPath).then(pathExists => {
+      if (!pathExists) {
+        return true;
+      }
+      return this.hasNoMarkdownFile();
+    });
   }
 
   async hasNoMarkdownFile() {
@@ -45,34 +37,37 @@ export class GitHubTemplates {
         );
       })
       .catch(err => {
-        err.message = 'Could not read .github/ISSUE_TEMPLATE directory.';
-        throw err;
+        throw new DirError(err, this.templatesPath, this.constructor.name);
       });
   }
 
   apply(answers: boolean): Promise<void> {
-    return fs
-      .ensureDir(this.templatesPath)
-      .catch(err => {
-        err.message =
-          'Could not create or ensure existence of .github/ISSUE_TEMPLATE directory.';
-        throw err;
-      })
-      .then(() => {
-        return fs.copy(`${__dirname}/template_files`, this.templatesPath);
-      })
-      .catch(err => {
-        err.message = 'Error trying to copy template files.';
-        throw err;
-      })
-      .then(() => {
-        logger.info(
-          'Succesully added issue templates file into .github/ISSUE_TEMPLATE directory. You may customize them to suit your needs.',
+    return new Promise((resolve, reject) => {
+      fs.ensureDir(this.templatesPath)
+        .then(
+          () => {
+            return fs.copy(`${__dirname}/template_files`, this.templatesPath);
+          },
+          err => {
+            reject(
+              new DirError(err, this.templatesPath, this.constructor.name),
+            );
+          },
+        )
+        .then(
+          () => {
+            logger.info(
+              'Succesully added issue templates file into .github/ISSUE_TEMPLATE directory. You may customize them to suit your needs.',
+            );
+            resolve();
+          },
+          err => {
+            err.message =
+              'Github Templates: Error trying to copy template files.';
+            reject(err);
+          },
         );
-      })
-      .catch(err => {
-        throw err;
-      });
+    });
   }
 
   getName(): string {

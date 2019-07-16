@@ -7,6 +7,7 @@ import * as fs from 'fs-extra';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import axios from 'axios';
 import Globals from '../../../../utils/globals';
+import { ReadFileError } from '../../../../errors/FileErrors';
 
 /**
  * This Rule will look for a .gitignore file. If it doesn't exist, applying this rule will
@@ -17,50 +18,66 @@ import Globals from '../../../../utils/globals';
 @StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
 export class GitIgnore {
   readonly requiredFiles: string[] = ['.gitignore'];
-  private gitIgnoreContent: string = '';
+  private gitIgnoreContent: string | undefined;
   private gitIgnorePath: string;
-  private gitIgnoreExists: boolean = false;
   private description: string = '';
-  private missingRules: string[] | undefined = undefined;
-  private initialized: boolean = false;
+  private missingRules: string[] | undefined;
 
   constructor() {
     this.gitIgnorePath = `${Globals.rootPath}.gitignore`;
   }
 
-  private async init() {
-    if (!this.initialized) {
-      return fs
-        .readFile(this.gitIgnorePath, {
-          encoding: 'utf-8',
-        })
-        .then((result: string) => {
-          this.gitIgnoreContent = result;
-          this.gitIgnoreExists = true;
-        })
-        .catch(e => {
-          if (
-            e.code === 'EACCESS' ||
-            e.code === 'EISDIR' ||
-            e.code === 'ENOENT'
-          ) {
-            this.gitIgnoreExists = false;
-          } else {
-            throw e;
-          }
-        });
+  private async gitIgnoreExists(): Promise<boolean> {
+    return fs.pathExists(this.gitIgnorePath);
+  }
+
+  private async getGitIgnoreContent(): Promise<string> {
+    if (this.gitIgnoreContent !== undefined) {
+      return this.gitIgnoreContent;
     }
+
+    return fs
+      .readFile(this.gitIgnorePath, {
+        encoding: 'utf-8',
+      })
+      .then((result: string) => {
+        this.gitIgnoreContent = result;
+        return this.gitIgnoreContent;
+      })
+      .catch(err => {
+        throw new ReadFileError(err, this.gitIgnorePath, this.constructor.name);
+      });
   }
 
   /**
    * Returns true if .gitignore
    */
   async shouldBeApplied(): Promise<boolean> {
-    return this.init().then(async () => {
-      const missGitRules = await this.missGitRules();
-      return (
-        !this.gitIgnoreExists || this.gitIgnoreContent === '' || missGitRules
-      );
+    return new Promise<boolean>((resolve, reject) => {
+      this.gitIgnoreExists()
+        .then(
+          result => {
+            if (result === false) {
+              resolve(true);
+            }
+            return this.getGitIgnoreContent();
+          },
+          err => {
+            reject(err);
+          },
+        )
+        .then(gitIgnoreContent => {
+          if (gitIgnoreContent === '') {
+            resolve(true);
+          }
+          return this.missGitRules();
+        })
+        .then(missGitRules => {
+          resolve(missGitRules);
+        })
+        .catch(err => {
+          reject(err);
+        });
     });
   }
 
@@ -83,8 +100,9 @@ export class GitIgnore {
             return [];
           });
 
-        return getNewRules.then(newRules => {
-          const currRules = this.gitIgnoreContent
+        return getNewRules.then(async newRules => {
+          const gitIgnoreContent = await this.getGitIgnoreContent();
+          const currRules = gitIgnoreContent
             .split('\n')
             .map((rule: string) => rule.trim());
 
@@ -106,23 +124,23 @@ export class GitIgnore {
 
   private missGitRules(): Promise<boolean> {
     return this.getMissingGitRules().then(missingGitRules => {
-      this.missingRules = missingGitRules;
       return missingGitRules.length !== 0;
     });
   }
 
   async apply(apply: boolean): Promise<void> {
     if (apply) {
-      return this.init().then(() => {
-        if (this.missingRules !== undefined) {
+      return Promise.all([
+        this.getMissingGitRules(),
+        this.getGitIgnoreContent(),
+      ]).then((result: [string[], string]) => {
+        const missingRules = result[0];
+        const gitIgnoreContent = result[1];
+        if (missingRules !== undefined) {
           return fs
             .writeFile(
               this.gitIgnorePath,
-              (
-                this.gitIgnoreContent +
-                '\n' +
-                this.missingRules.join('\n')
-              ).trim(),
+              (gitIgnoreContent + '\n' + missingRules.join('\n')).trim(),
               { encoding: 'utf-8' },
             )
             .then(() => {

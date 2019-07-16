@@ -5,6 +5,7 @@ import { RuleRegister } from '../../../rule-register/index';
 import { StackRegister } from '../../../../stacks/stack-register';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import Globals from '../../../../utils/globals';
+import { logger } from '../../../../logger';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
@@ -15,8 +16,8 @@ export class ElasticsearchNodesNumber {
       .then(result => {
         return Object.keys(result.data.nodes).length < 3;
       })
-      .catch(() => {
-        throw new FetchDataError(url, this.constructor.name);
+      .catch(err => {
+        throw new FetchDataError(err, url, this.constructor.name);
       });
   }
 

@@ -1,3 +1,4 @@
+import { ReadFileError, WriteFileError } from './../../../../errors/FileErrors';
 import { RuleRegister } from '../../../rule-register';
 import { StackRegister } from '../../../../stacks/stack-register';
 import { YesNo } from '../../../../choice/index';
@@ -28,41 +29,50 @@ export class Husky {
 
   private async writeHuskyHook(): Promise<void> {
     if (!pathExistsInJSON(this.parsedPackage, ['husky', 'hooks', 'pre-push'])) {
-      return fs
-        .readJSON(Globals.packageJSONPath, { encoding: 'utf-8' })
-        .then(parsed => {
-          parsed.husky = {
-            hooks: {
-              'pre-push': 'exit 1',
+      return new Promise<void>((resolve, reject) => {
+        return fs
+          .readJSON(Globals.packageJSONPath, { encoding: 'utf-8' })
+          .then(
+            parsed => {
+              parsed.husky = {
+                hooks: {
+                  'pre-push': 'exit 1',
+                },
+              };
+              return fs.writeJSON(Globals.packageJSONPath, parsed, {
+                spaces: '\t',
+              });
             },
-          };
-
-          return fs
-            .writeJSON(Globals.packageJSONPath, parsed, {
-              spaces: '\t',
-            })
-            .then(() => {
+            err => {
+              reject(
+                new ReadFileError(
+                  err,
+                  Globals.packageJSONPath,
+                  this.constructor.name,
+                ),
+              );
+            },
+          )
+          .then(
+            () => {
               logger.info(
                 `Husky Rule: Succesfully written pre-push hook to ${
                   Globals.packageJSONPath
                 }. You may update this hook with a npm script for it to launch before pushing to git.`,
               );
-            })
-            .catch(err => {
-              logger.error(
-                `Husky Rule: Error trying to write pre-push hook to ${
-                  Globals.packageJSONPath
-                }`,
+              resolve();
+            },
+            err => {
+              reject(
+                new WriteFileError(
+                  err,
+                  Globals.packageJSONPath,
+                  this.constructor.name,
+                ),
               );
-              logger.debug(err);
-            });
-        })
-        .catch(err => {
-          logger.error(
-            `Husky Rule: Error trying to read ${Globals.packageJSONPath} file.`,
+            },
           );
-          logger.debug(err);
-        });
+      });
     }
     return Promise.resolve();
   }

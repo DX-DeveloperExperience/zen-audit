@@ -1,3 +1,4 @@
+import { WriteFileError } from './../../../../errors/FileErrors';
 import { FetchDataError } from './../../../../errors/FetchData';
 import Choice, { YesNo } from './../../../../choice/index';
 import { RuleRegister } from '../../../rule-register';
@@ -7,6 +8,7 @@ import inquirer = require('inquirer');
 import { cli } from 'cli-ux';
 import Axios from 'axios';
 import { outputFile } from 'fs-extra';
+import { logger } from '../../../../logger';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
@@ -38,8 +40,10 @@ export class IntegrationTests {
           (response: any) => {
             return outputFile(this.templateFilePath, response.data);
           },
-          () => {
-            reject(new FetchDataError(this.templateUrl, this.constructor.name));
+          err => {
+            reject(
+              new FetchDataError(err, this.templateUrl, this.constructor.name),
+            );
           },
         )
         .then(
@@ -47,12 +51,16 @@ export class IntegrationTests {
             resolve();
           },
           err => {
-            err.message = `Error writing file ${this.templateFilePath}`;
-            reject(err);
+            logger.debug(err);
+            reject(
+              new WriteFileError(
+                err,
+                this.templateFilePath,
+                this.constructor.name,
+              ),
+            );
           },
         );
-    }).catch(err => {
-      throw err;
     });
   }
 

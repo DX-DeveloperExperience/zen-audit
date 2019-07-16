@@ -1,23 +1,28 @@
+import { FetchDataError } from './../../../../errors/FetchData';
 import { YesNo } from '../../../../choice/index';
 import { RuleRegister } from '../../../rule-register/index';
 import { StackRegister } from '../../../../stacks/stack-register';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import Axios from 'axios';
 import Globals from '../../../../utils/globals';
+import { logger } from '../../../../logger';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
 export class ElasticsearchTemplate {
   async shouldBeApplied(): Promise<boolean> {
-    return Axios.get(`${Globals.rootPath}_template`).then(
-      ({ data: templates }) => {
+    const url = `${Globals.rootPath}_template`;
+    return Axios.get(url)
+      .then(({ data: templates }) => {
         return (
           Object.keys(templates).filter(
             templateName => !templateName.startsWith('.'),
           ).length === 0
         );
-      },
-    );
+      })
+      .catch(err => {
+        throw new FetchDataError(err, url, this.constructor.name);
+      });
   }
 
   getName() {

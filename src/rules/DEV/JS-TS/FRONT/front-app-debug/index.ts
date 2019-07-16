@@ -1,3 +1,4 @@
+import { WriteFileError } from './../../../../../errors/FileErrors';
 import { Constructor } from '../../../../../stacks/stack-register/index';
 import { ListStacks } from '../../../../../stacks/list-stacks/index';
 import { RuleRegister } from '../../../../rule-register';
@@ -42,26 +43,50 @@ export class FrontAppDebug {
   }
 
   async apply(apply: boolean): Promise<void> {
-    return this.addMissingConfigurations().then(() => {
-      return fs.writeJSON(this.launchConfFilePath, this.parsedLaunchConf, {
-        spaces: '\t',
-      });
+    return new Promise<void>((resolve, reject) => {
+      this.addMissingConfigurations()
+        .then(
+          () => {
+            return fs.writeJSON(
+              this.launchConfFilePath,
+              this.parsedLaunchConf,
+              {
+                spaces: '\t',
+              },
+            );
+          },
+          err => {
+            reject(err);
+          },
+        )
+        .then(
+          () => {
+            logger.info(
+              `FrontAppDebug: Succesfully written VSCode debug configurations to: ${
+                this.launchConfFilePath
+              }`,
+            );
+            resolve();
+          },
+          err => {
+            reject(
+              new WriteFileError(
+                err,
+                this.launchConfFilePath,
+                this.constructor.name,
+              ),
+            );
+          },
+        );
     });
   }
 
   private addMissingConfigurations(): Promise<void> {
-    return this.getMissingConfigs()
-      .then(missingConfigs => {
-        missingConfigs.forEach(missingConf => {
-          this.parsedLaunchConf.configurations.push(missingConf);
-        });
-      })
-      .catch(err => {
-        logger.debug(err.stacktrace);
-        throw new Error(
-          'FrontAppDebug: Error trying to add missing configurations',
-        );
+    return this.getMissingConfigs().then(missingConfigs => {
+      missingConfigs.forEach(missingConf => {
+        this.parsedLaunchConf.configurations.push(missingConf);
       });
+    });
   }
 
   private async getMissingConfigs(): Promise<LaunchConf[]> {

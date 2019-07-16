@@ -14,6 +14,7 @@ class FileError extends Error {
     } else {
       super(`${className}: ${defaultMessage}: ${filePath}`);
     }
+    this.stack = err.stack;
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }
@@ -37,6 +38,18 @@ export class WriteFileError extends FileError {
       filePath,
       className,
       `${className}: Error while writing to file: ${filePath}`,
+    );
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
+
+export class CreateFileError extends FileError {
+  constructor(err: NodeJS.ErrnoException, filePath: string, className: string) {
+    super(
+      err,
+      filePath,
+      className,
+      `${className}: Error while creating file: ${filePath}`,
     );
     Object.setPrototypeOf(this, new.target.prototype);
   }

@@ -1,3 +1,7 @@
+import {
+  WriteFileError,
+  CreateFileError,
+} from './../../../../errors/FileErrors';
 import { RuleRegister } from '../../../rule-register';
 import { StackRegister } from '../../../../stacks/stack-register';
 import { ListStacks } from '../../../../stacks/list-stacks/index';
@@ -17,9 +21,8 @@ export class Linter {
   private packageJSONPath: string;
   private linterPaths: { [path: string]: string };
   private parsedPackageJSON: any;
-  private initialized: boolean | undefined = undefined;
-  private linterChoice: string = '';
-  private linterhasConfigFile: boolean = false;
+  private linterChoice: string | undefined;
+  private linterHasConfigFile: boolean | undefined;
   private linterInDevDep: boolean = false;
   private documentation: { [linter: string]: string } = {
     tslint: 'https://palantir.github.io/tslint/usage/configuration/',
@@ -36,83 +39,103 @@ export class Linter {
     this.parsedPackageJSON = require(this.packageJSONPath);
   }
 
-  private async init(): Promise<void> {
-    if (!this.initialized) {
-      return ListStacks.findAvailableStack(TypeScript).then(stack => {
-        this.linterChoice = stack !== undefined ? 'tslint' : 'eslint';
-      });
-    }
-  }
-
   async shouldBeApplied() {
-    return this.init().then(async () => {
-      this.linterhasConfigFile = await this.hasConfigFile(this.linterChoice);
-      this.linterInDevDep = hasDevDependency(
-        this.parsedPackageJSON,
-        this.linterChoice,
-      );
+    const linterChoice = await this.getLinterChoice();
+    this.linterHasConfigFile = await this.hasConfigFile(linterChoice);
+    this.linterInDevDep = hasDevDependency(
+      this.parsedPackageJSON,
+      linterChoice,
+    );
 
-      return !this.linterInDevDep || !this.linterhasConfigFile;
-    });
+    return !this.linterInDevDep || !this.linterHasConfigFile;
   }
 
   async apply(apply: boolean): Promise<void> {
+    const linterChoice = await this.getLinterChoice();
     if (apply) {
-      return this.init().then(() => {
-        if (this.linterInDevDep) {
-          logger.info(`${this.linterChoice} already installed.`);
-        } else {
-          const linterToInstall =
-            this.linterChoice === 'tslint' ? 'tslint typescript' : 'eslint';
+      if (this.linterInDevDep) {
+        logger.info(`${this.linterChoice} already installed.`);
+      } else {
+        const linterToInstall =
+          linterChoice === 'tslint' ? 'tslint typescript' : 'eslint';
 
-          return installNpmDevDep(linterToInstall).then(() => {
-            if (!this.linterhasConfigFile) {
-              return this.writeLinterFile();
-            } else {
-              logger.info(`${this.linterChoice}.json file already existing.`);
-            }
-          });
-        }
-      });
+        return installNpmDevDep(linterToInstall).then(() => {
+          if (!this.linterHasConfigFile) {
+            return this.writeLinterFile();
+          } else {
+            logger.info(`${this.linterChoice}.json file already existing.`);
+          }
+        });
+      }
     }
   }
 
-  private writeLinterFile() {
-    return fs
-      .ensureFile(this.linterPaths[this.linterChoice])
-      .catch(err => {
-        logger.error(`Error creating ${this.linterPaths[this.linterChoice]}`);
-        logger.debug(err);
-        return Promise.reject(err);
-      })
-      .then(() => {
-        return fs
-          .writeJson(
-            this.linterPaths[this.linterChoice],
-            linterJSON[this.linterChoice],
-            { spaces: '\t' },
-          )
-          .then(() => {
+  private async writeLinterFile(): Promise<void> {
+    const linterChoice = await this.getLinterChoice();
+    return new Promise<void>((resolve, reject) => {
+      fs.ensureFile(this.linterPaths[linterChoice])
+        .then(
+          () => {
+            return fs.writeJson(
+              this.linterPaths[linterChoice],
+              linterJSON[linterChoice],
+              {
+                spaces: '\t',
+              },
+            );
+          },
+          err => {
+            reject(
+              new CreateFileError(
+                err,
+                this.linterPaths[linterChoice],
+                this.constructor.name,
+              ),
+            );
+          },
+        )
+        .then(
+          () => {
             logger.info(
               `Succesfully written ${
-                this.linterPaths[this.linterChoice]
+                this.linterPaths[linterChoice]
               }. You may add more rules if you like, find documentation at : ${
-                this.documentation[this.linterChoice]
+                this.documentation[linterChoice]
               }`,
             );
-          })
-          .catch(err => {
-            logger.error(
-              `Linter Rule: Error trying to write to ${
-                this.linterPaths[this.linterChoice]
-              }`,
+            resolve();
+          },
+          err => {
+            reject(
+              new WriteFileError(
+                err,
+                this.linterPaths[linterChoice],
+                this.constructor.name,
+              ),
             );
-          });
-      });
+          },
+        );
+    });
   }
 
-  hasConfigFile(linter: string): Promise<boolean> {
-    return fs.pathExists(this.linterPaths[linter]);
+  async hasConfigFile(linter: string): Promise<boolean> {
+    if (this.linterHasConfigFile !== undefined) {
+      return this.linterHasConfigFile;
+    }
+
+    return fs.pathExists(this.linterPaths[linter]).then(result => {
+      return (this.linterHasConfigFile = result);
+    });
+  }
+
+  async getLinterChoice(): Promise<string> {
+    if (this.linterChoice !== undefined) {
+      return this.linterChoice;
+    }
+
+    return ListStacks.findAvailableStack(TypeScript).then(stack => {
+      return (this.linterChoice = stack !== undefined ? 'tslint' : 'eslint');
+    });
   }
 
   getName() {

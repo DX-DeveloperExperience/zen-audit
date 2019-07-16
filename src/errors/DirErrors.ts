@@ -1,4 +1,4 @@
-class DirError extends Error {
+export class DirError extends Error {
   constructor(
     err: NodeJS.ErrnoException,
     filePath: string,
@@ -12,6 +12,7 @@ class DirError extends Error {
     } else {
       super(`${className}: ${defaultMessage}: ${filePath}`);
     }
+    this.stack = err.stack;
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }

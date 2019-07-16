@@ -1,10 +1,9 @@
 import Globals from '../../../../../utils/globals/index';
 import { Nodemon } from './index';
+const commands = require('../../../../../utils/commands');
 
 Globals.rootPath = 'nodemon/';
 const packagePath = Globals.rootPath + 'package.json';
-
-const util = require('util');
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -21,11 +20,9 @@ test('should return true if nodemon is not in devDependencies nor installed glob
 
   jest.mock(packagePath, () => parsedJSON, { virtual: true });
 
-  util.promisify = jest.fn((exec: (cmd: string) => {}) => {
-    return (cmd: string) => {
-      expect(cmd).toBe('nodemon -v');
-      return Promise.reject();
-    };
+  commands.execInRootpath = jest.fn((cmd: string) => {
+    expect(cmd).toBe('nodemon -v');
+    return Promise.reject();
   });
 
   const nodemon = new Nodemon();
@@ -55,11 +52,9 @@ test('should return false if nodemon is in devDependencies', () => {
 test('should return false if nodemon is globally installed', () => {
   jest.mock(packagePath, () => ({}), { virtual: true });
 
-  util.promisify = jest.fn((exec: (cmd: string) => {}) => {
-    return (cmd: string) => {
-      expect(cmd).toBe('nodemon -v');
-      return Promise.resolve();
-    };
+  commands.execInRootpath = jest.fn((cmd: string) => {
+    expect(cmd).toBe('nodemon -v');
+    return Promise.resolve();
   });
 
   const nodemon = new Nodemon();

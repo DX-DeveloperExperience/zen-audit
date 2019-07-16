@@ -1,4 +1,3 @@
-import { NoRuleFound } from './errors/NoRuleFound';
 import { ListRules } from './rules/list-rules';
 import { Command, flags, run } from '@oclif/command';
 import { cli } from 'cli-ux';
@@ -10,7 +9,7 @@ import { ListStacks } from './stacks/list-stacks/index';
 import { logger } from './logger/index';
 import * as fs from 'fs-extra';
 import { YesNo, Ok } from './choice/index';
-import { generateReport } from './templating';
+import { generateReport } from './report';
 import Globals from './utils/globals/index';
 
 class ProjectFillerCli extends Command {

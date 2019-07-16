@@ -3,8 +3,6 @@ import * as cp from 'child_process';
 import { logger } from '../../logger';
 import Globals from '../globals';
 
-const exec = util.promisify(cp.exec);
-
 export async function installNpmDevDep(dependency: string) {
   return execInRootpath(`npm i ${dependency} -DE`)
     .then(() => {
@@ -18,5 +16,7 @@ export async function installNpmDevDep(dependency: string) {
 }
 
 export function execInRootpath(cmd: string) {
+  const exec = util.promisify(cp.exec);
+
   return exec(cmd, { cwd: Globals.rootPath });
 }

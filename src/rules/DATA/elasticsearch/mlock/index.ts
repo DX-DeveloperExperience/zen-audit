@@ -5,6 +5,7 @@ import Elasticsearch from '../../../../stacks/elasticsearch';
 import Globals from '../../../../utils/globals';
 import { YesNo } from '../../../../choice';
 import Axios from 'axios';
+import { logger } from '../../../../logger';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
@@ -19,7 +20,7 @@ export class ElasticsearchMlock {
         return !!mlockDisabled;
       })
       .catch(err => {
-        throw new FetchDataError(url, this.constructor.name);
+        throw new FetchDataError(err, url, this.constructor.name);
       });
   }
 

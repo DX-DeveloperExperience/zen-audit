@@ -1,3 +1,4 @@
+import { WriteFileError } from './../../../../errors/FileErrors';
 import { RuleRegister } from '../../../rule-register';
 import * as fs from 'fs-extra';
 import { StackRegister } from '../../../../stacks/stack-register';
@@ -16,13 +17,11 @@ import { getExactSemver, matchesSemver } from '../../../../utils/semver/index';
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class ExactNpmVersion {
-  private packageJSONPath: string;
   private parsedPackageJSON: any;
   private jsonObjToCheckFound: string[] = [];
 
   constructor() {
-    this.packageJSONPath = `${Globals.rootPath}package.json`;
-    this.parsedPackageJSON = require(this.packageJSONPath);
+    this.parsedPackageJSON = require(Globals.packageJSONPath);
     this.jsonObjToCheckFound = this.findJsonObjectsToCheck();
   }
 
@@ -58,7 +57,7 @@ export class ExactNpmVersion {
   async apply(apply: boolean) {
     if (apply) {
       return fs
-        .writeFile(this.packageJSONPath, this.correctSemverNotation(), {
+        .writeFile(Globals.packageJSONPath, this.correctSemverNotation(), {
           encoding: 'utf8',
         })
         .then(() => {
@@ -67,11 +66,14 @@ export class ExactNpmVersion {
           );
         })
         .catch(err => {
-          logger.error('Could not write to package.json');
           logger.debug(err);
+          throw new WriteFileError(
+            err,
+            Globals.packageJSONPath,
+            this.constructor.name,
+          );
         });
     }
-    return;
   }
 
   /**
