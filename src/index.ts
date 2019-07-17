@@ -3,7 +3,7 @@ import { Command, flags, run } from '@oclif/command';
 import { cli } from 'cli-ux';
 import * as inquirer from 'inquirer';
 import * as Path from 'path';
-import { init } from './init/index';
+import { init, importClassesIn } from './init/index';
 import { StackRegister } from './stacks/stack-register';
 import { ListStacks } from './stacks/list-stacks/index';
 import { logger } from './logger/index';
@@ -23,6 +23,10 @@ class ProjectFillerCli extends Command {
     name: flags.string({ char: 'n', description: 'name to print' }),
     // flag with no value (-f, --force)
     force: flags.boolean({ char: 'f' }),
+    custom: flags.string({
+      char: 'c',
+      description: 'Provide a path to a folder containing custom rules',
+    }),
     apply: flags.boolean({
       char: 'a',
       description: 'Apply rules',
@@ -96,6 +100,10 @@ class ProjectFillerCli extends Command {
     }
 
     init();
+
+    if (runFlags.custom) {
+      importClassesIn(runFlags.custom);
+    }
 
     if (runFlags.debug) {
       logger.level = 'debug';
@@ -236,11 +244,11 @@ class ProjectFillerCli extends Command {
           return;
         }
 
+        cli.action.stop();
+
         rules.forEach(rule => {
           this.log(`${rule.getName()}: ${rule.getShortDescription()}`);
         });
-
-        cli.action.stop();
 
         return generateReport({
           projectName: Globals.projectName,
