@@ -86,7 +86,7 @@ export class Husky {
   }
 
   getShortDescription(): string {
-    return 'Husky can prevent bad commits or bad push. Please select rules you would like to add.';
+    return 'Husky can prevent bad commits or bad push. Add it to your project ?';
   }
 
   getLongDescription() {
