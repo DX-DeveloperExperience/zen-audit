@@ -1,7 +1,7 @@
 import { StackRegister } from '../stack-register';
-import { logger } from '../../logger/index';
 import Globals from '../../utils/globals';
 import { pathExistsInJSON } from '../../utils/json';
+import { ReadFileError } from '../../errors/FileErrors';
 
 @StackRegister.register
 export default class TypeScript {
@@ -20,10 +20,11 @@ export default class TypeScript {
         this.hasDevDependency = false;
         return;
       }
-      err.message = `TypeScript Stack: Error while requiring ${
-        Globals.packageJSONPath
-      }.`;
-      throw err;
+      throw new ReadFileError(
+        err,
+        Globals.packageJSONPath,
+        this.constructor.name,
+      );
     }
   }
 

@@ -1,3 +1,4 @@
+import { FetchDataError } from './../../errors/FetchData';
 import { StackRegister } from '../stack-register';
 import axios from 'axios';
 import Globals from '../../utils/globals/index';
@@ -19,10 +20,7 @@ export default class Elasticsearch {
         return false;
       })
       .catch(err => {
-        err.message = `Elastic Search Stack: Error trying to fetch data at: ${
-          Globals.rootPath
-        }`;
-        throw err;
+        throw new FetchDataError(err, Globals.rootPath, this.constructor.name);
       });
   }
 

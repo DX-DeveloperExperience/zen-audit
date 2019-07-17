@@ -1,6 +1,7 @@
 import { StackRegister } from '../stack-register';
 import { existsPaths } from '../../utils/file-utils/index';
 import Globals from '../../utils/globals';
+import { ReadFileError } from '../../errors/FileErrors';
 
 @StackRegister.register
 export default class Node {
@@ -12,8 +13,11 @@ export default class Node {
       if (err.code === 'MODULE_NOT_FOUND') {
         return false;
       }
-      err.message = `Node Stack: Error reading file ${Globals.packageJSONPath}`;
-      throw err;
+      throw new ReadFileError(
+        err,
+        Globals.packageJSONPath,
+        this.constructor.name,
+      );
     }
   }
 

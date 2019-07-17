@@ -1,3 +1,4 @@
+import { FetchDataError } from './../../errors/FetchData';
 import { StackRegister } from '../stack-register';
 import axios from 'axios';
 import { pathExistsInJSON } from '../../utils/json/index';
@@ -21,10 +22,11 @@ export class Website {
           );
         })
         .catch(err => {
-          err.message = `Website Stack: Error while fetching data at url: ${
-            Globals.rootPath
-          }`;
-          throw err;
+          throw new FetchDataError(
+            err,
+            Globals.rootPath,
+            this.constructor.name,
+          );
         });
     }
   }

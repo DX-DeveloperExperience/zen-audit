@@ -2,6 +2,7 @@ import { StackRegister } from '../stack-register';
 import * as fs from 'fs-extra';
 import Globals from '../../utils/globals';
 import { execInRootpath } from '../../utils/commands';
+import { DirError } from '../../errors/DirErrors';
 
 @StackRegister.register
 export default class GitHub {
@@ -25,10 +26,11 @@ export default class GitHub {
         if (err.code === 'ENOENT') {
           return false;
         }
-        err.message = `GitHub Stack: Error trying to get informations on directory: ${
-          Globals.rootPath
-        }.git`;
-        throw err;
+        throw new DirError(
+          err,
+          `${Globals.rootPath}.git`,
+          this.constructor.name,
+        );
       });
   }
 
