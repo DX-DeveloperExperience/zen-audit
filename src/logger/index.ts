@@ -14,7 +14,7 @@ export const logger = createLogger({
     }),
     format.printf(info => {
       let stackTrace = '';
-      if (logger.level === 'debug') {
+      if (logger.level === 'debug' && info.stack !== undefined) {
         stackTrace = '\n' + info.stack;
       }
       return `[${info.level}]: ${info.message} ${stackTrace}`;
