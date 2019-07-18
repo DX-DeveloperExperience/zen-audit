@@ -18,6 +18,7 @@ export default class Angular {
       if (
         pathExistsInJSON(this.parsedJSON, ['dependencies', '@angular/core'])
       ) {
+        this.hasAngularDependency = true;
         this.libraryVersion = this.getLibraryVersion();
         this.generatedCLI = this.isGeneratedCLI();
       } else {
