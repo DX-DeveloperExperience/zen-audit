@@ -1,7 +1,7 @@
 {
   "name": "@dxdeveloperexperience/project-starter",
   "description": "A tool to gather everything you need to deploy a new project",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "author": "Zenika - Demey Emmanuel - Lafrance Antoine",
   "bin": {
     "project-starter-cli": "./bin/run"
