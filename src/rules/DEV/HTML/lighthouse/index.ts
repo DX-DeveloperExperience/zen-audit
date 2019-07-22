@@ -1,6 +1,5 @@
 import { WriteFileError } from './../../../../errors/FileErrors';
 import Choice, { YesNo } from './../../../../choice/index';
-import { Website } from './../../../../stacks/website/index';
 import { React } from './../../../../stacks/react/index';
 import { RuleRegister } from '../../../rule-register';
 import { StackRegister } from '../../../../stacks/stack-register';
