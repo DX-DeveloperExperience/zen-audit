@@ -12,7 +12,7 @@ class FileError extends Error {
     } else if (err.code === 'EISDIR') {
       super(`${className}: Given path is a directory: ${filePath}`);
     } else {
-      super(`${className}: ${defaultMessage}: ${filePath}`);
+      super(`${defaultMessage}`);
     }
     this.stack = err.stack;
     Object.setPrototypeOf(this, new.target.prototype);
