@@ -8,7 +8,6 @@ import { YesNo } from '../../../../../choice/index';
 import { logger } from '../../../../../logger/index';
 import Choice from '../../../../../choice/index';
 import Globals from '../../../../../utils/globals/index';
-import { bugReport, custom, featureRequest } from './constants';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([GitHub])
@@ -69,27 +68,7 @@ export class GitHubTemplates {
         fs.ensureDir(this.templatesPath)
           .then(
             () => {
-              const createBugReport = fs.writeFile(
-                `${this.templatesPath}bug_report.md`,
-                bugReport,
-                { encoding: 'utf-8' },
-              );
-              const createCustom = fs.writeFile(
-                `${this.templatesPath}custom.md`,
-                custom,
-                { encoding: 'utf-8' },
-              );
-              const createFeatReq = fs.writeFile(
-                `${this.templatesPath}feature_request.md`,
-                featureRequest,
-                { encoding: 'utf-8' },
-              );
-
-              return Promise.all([
-                createBugReport,
-                createCustom,
-                createFeatReq,
-              ]);
+              return fs.copy(`${__dirname}/template_files`, this.templatesPath);
             },
             err => {
               reject(
@@ -116,7 +95,6 @@ export class GitHubTemplates {
           );
       });
     }
-    return;
   }
 
   getName(): string {
