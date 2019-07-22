@@ -45,7 +45,7 @@ export class GitHubTemplates {
     });
   }
 
-  async hasNoMarkdownFile(folderPath: string) {
+  private async hasNoMarkdownFile(folderPath: string) {
     return fs
       .readdir(this.templatesPath)
       .then(fileNames => {
