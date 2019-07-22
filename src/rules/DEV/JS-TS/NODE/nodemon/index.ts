@@ -5,8 +5,6 @@ import Choice from '../../../../../choice/index';
 import Globals from '../../../../../utils/globals/index';
 import { StackRegister } from '../../../../../stacks/stack-register';
 import { pathExistsInJSON } from '../../../../../utils/json';
-import * as util from 'util';
-import * as cp from 'child_process';
 import Node from '../../../../../stacks/node';
 import { logger } from '../../../../../logger/index';
 import * as fs from 'fs-extra';
