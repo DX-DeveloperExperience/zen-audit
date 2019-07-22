@@ -1,6 +1,6 @@
 import { LightHouse } from './index';
 import Globals from '../../../../utils/globals';
-const logger = require('../../../../logger');
+require('../../../../logger');
 const commands = require('../../../../utils/commands');
 const fs = require('fs-extra');
 
