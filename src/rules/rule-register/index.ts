@@ -1,6 +1,6 @@
 import Rule from '../rule';
 
-interface Constructor<T> {
+export interface Constructor<T> {
   new (...args: any[]): T;
   readonly prototype: T;
 }
@@ -44,9 +44,9 @@ export class RuleRegister {
     };
   }
 
-  static getSubRulesOf(ruleCtor: Rule): Rule[] {
-    if (RuleRegister.subRules[ruleCtor.constructor.name] !== undefined) {
-      return RuleRegister.subRules[ruleCtor.constructor.name].map(subRule => {
+  static getSubRulesOf(rule: Rule): Rule[] {
+    if (RuleRegister.subRules[rule.constructor.name] !== undefined) {
+      return RuleRegister.subRules[rule.constructor.name].map(subRule => {
         return new subRule();
       });
     }
