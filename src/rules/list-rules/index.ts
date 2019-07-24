@@ -1,8 +1,8 @@
 import Rule from '../rule';
-import { StackRegister, Constructor } from '../../stacks/stack-register/index';
+import { StackRegister } from '../../stacks/stack-register/index';
 import { ListStacks } from '../../stacks/list-stacks/index';
 import Stack from '../../stacks/stack/index';
-import { RuleRegister } from '../rule-register';
+import { RuleRegister, Constructor } from '../rule-register';
 
 /**
  * Returns an array of every stack instanciated object
@@ -10,7 +10,7 @@ import { RuleRegister } from '../rule-register';
 export class ListRules {
   private static rules: Rule[] | undefined;
 
-  static async getFirstGradeRules(): Promise<Rule[]> {
+  private static async getFirstGradeRules(): Promise<Rule[]> {
     const stackPromise: Promise<Stack[]> = ListStacks.getAvailableStacks();
 
     const rulesByStackPromise: Promise<
@@ -33,51 +33,44 @@ export class ListRules {
   }
 
   static async getRulesToApply(): Promise<Rule[]> {
-    const firstGradeRulesToApply = ListRules.getFirstGradeRules().then(
-      firstGradeRules => {
-        return firstGradeRules.filter(rule => rule.shouldBeApplied());
-      },
-    );
-
-    const allRulesToApply = firstGradeRulesToApply.then(rulesToApply => {});
+    return ListRules.getFirstGradeRules()
+      .then(firstGradeRules => {
+        return firstGradeRules.filter(
+          async rule => await rule.shouldBeApplied(),
+        );
+      })
+      .then(firstGradeRulesToApply => {
+        return firstGradeRulesToApply.reduce(
+          async (
+            rulesToApply: Promise<Rule[]>,
+            currFirstGradeRule: Rule,
+            index: number,
+          ) => {
+            return [
+              ...(await rulesToApply),
+              ...(await ListRules.getSubRulesOf(currFirstGradeRule)),
+            ];
+          },
+          Promise.resolve([...firstGradeRulesToApply]),
+        );
+      });
   }
 
-  private static getSubRulesOf(rule: Rule) {}
+  private static async getSubRulesOf(rule: Rule): Promise<Rule[]> {
+    const subRules = RuleRegister.getSubRulesOf(rule);
+    const subRulesToApply = await Promise.all(
+      subRules.map(async ruleToApply => await ruleToApply.shouldBeApplied()),
+    );
 
-  /* static async getRulesToApply(): Promise<Rule[]> {
-    if (ListRules.rules !== undefined) {
-      return ListRules.rules;
-    }
-
-    const stackPromise: Promise<Stack[]> = ListStacks.getAvailableStacks();
-
-    const rulesByStackPromise: Promise<
-      Array<Constructor<Rule>>
-    > = stackPromise.then((stacks: Stack[]) => {
-      return stacks.reduce((acc: Array<Constructor<Rule>>, stack: Stack) => {
+    return subRules.reduce(async (keptRules, currSubRule, index) => {
+      if (subRulesToApply[index] === true) {
         return [
-          ...acc,
-          ...StackRegister.getRulesByStack(stack.constructor.name),
+          ...(await keptRules),
+          currSubRule,
+          ...(await ListRules.getSubRulesOf(currSubRule)),
         ];
-      }, []);
-    });
-
-    return rulesByStackPromise.then(rulesConstructors => {
-      const uniqueRulesConstructors = new Set(rulesConstructors);
-      const rules = Array.from(uniqueRulesConstructors).map(
-        ruleConstructor => new ruleConstructor(),
-      );
-
-      return Promise.all(rules.map(rule => rule.shouldBeApplied())).then(
-        values => {
-          return rules.reduce((acc: Rule[], rule: Rule, i: number) => {
-            if (values[i]) {
-              return [...acc, rule];
-            }
-            return acc;
-          }, []);
-        },
-      );
-    });
-  } */
+      }
+      return [...(await keptRules)];
+    }, Promise.resolve([]));
+  }
 }
