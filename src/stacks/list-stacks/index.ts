@@ -19,7 +19,7 @@ export class ListStacks {
             const subStacks = StackRegister.getSubStacksOf(stack);
 
             // if current stack has subStacks, instanciate them and add them to availableStacks if available
-            if (!!subStacks && subStacks.length !== 0) {
+            if (subStacks !== undefined && subStacks.length !== 0) {
               const availableSubStacks = subStacks.filter(subStack => {
                 return subStack.isAvailable();
               });

@@ -1,6 +1,6 @@
 import Rule from '../rule';
 
-interface Constructor<T> {
+export interface Constructor<T> {
   new (...args: any[]): T;
   readonly prototype: T;
 }
@@ -12,7 +12,9 @@ interface Constructor<T> {
  */
 export class RuleRegister {
   private static implementations: Array<Constructor<Rule>> = [];
-
+  private static subRules: {
+    [ruleName: string]: Array<Constructor<Rule>>;
+  } = {};
   /**
    * This method returns every classes that implements the Rule interface.
    */
@@ -27,5 +29,27 @@ export class RuleRegister {
    */
   static register<P extends Constructor<Rule>>(ctor: P) {
     RuleRegister.implementations.push(ctor);
+  }
+
+  static registerSubRuleOf<
+    R extends Constructor<Rule>,
+    U extends Constructor<Rule>
+  >(ruleCtor: U) {
+    return (subRuleCtor: R) => {
+      if (RuleRegister.subRules[ruleCtor.name] === undefined) {
+        RuleRegister.subRules[ruleCtor.name] = [subRuleCtor];
+      } else {
+        RuleRegister.subRules[ruleCtor.name].push(subRuleCtor);
+      }
+    };
+  }
+
+  static getSubRulesOf(rule: Rule): Rule[] {
+    if (RuleRegister.subRules[rule.constructor.name] !== undefined) {
+      return RuleRegister.subRules[rule.constructor.name].map(subRule => {
+        return new subRule();
+      });
+    }
+    return [];
   }
 }
