@@ -33,13 +33,18 @@ export class ListRules {
   }
 
   static async getRulesToApply(): Promise<Rule[]> {
-    return ListRules.getFirstGradeRules()
-      .then(firstGradeRules => {
-        return firstGradeRules.filter(
-          async rule => await rule.shouldBeApplied(),
-        );
-      })
-      .then(firstGradeRulesToApply => {
+    return ListRules.getFirstGradeRules().then(firstGradeRules => {
+      const rulesShouldBeApplied = firstGradeRules.map(rule => {
+        return rule.shouldBeApplied();
+      });
+
+      return Promise.all(rulesShouldBeApplied).then(rules => {
+        return firstGradeRules.filter((rule, index) => {
+          return rules[index];
+        });
+      });
+    });
+    /* .then(firstGradeRulesToApply => {
         return firstGradeRulesToApply.reduce(
           async (
             rulesToApply: Promise<Rule[]>,
@@ -53,7 +58,7 @@ export class ListRules {
           },
           Promise.resolve([...firstGradeRulesToApply]),
         );
-      });
+      }); */
   }
 
   private static async getSubRulesOf(rule: Rule): Promise<Rule[]> {
