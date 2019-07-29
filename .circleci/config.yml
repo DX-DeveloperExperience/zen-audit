@@ -65,7 +65,7 @@ jobs:
             ghr_v0.12.0_linux_386/ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./dist/project-starter-cli-v${VERSION}/
       - run:
           name: run scripts
-          command: chmod +x .circleci/scrips/*.sh && .circleci/scripts/run_all.sh
+          command: chmod +x .circleci/scripts/*.sh && .circleci/scripts/run_all.sh
   publish:
     docker:
       - image: circleci/node:8
