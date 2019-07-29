@@ -45,7 +45,8 @@
     "ts-node": "8.0.2",
     "tslint": "5.13.1",
     "tslint-microsoft-contrib": "6.2.0",
-    "typescript": "3.3.3333"
+    "typescript": "3.3.3333",
+    "vuepress": "1.0.2"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -84,7 +85,9 @@
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "ci": "npm-run-all audit jest-cache prettier-test test",
     "version": "oclif-dev readme && git add README.md",
-    "publish-npm": "npm publish --access public"
+    "publish-npm": "npm publish --access public",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
   },
   "types": "lib/index.d.ts",
   "jest": {
