@@ -1,6 +1,3 @@
-# goes into root directory
-cd ../../
-
 # stores git remote url
 GIT_URL=git config --get remote.origin.url
 
