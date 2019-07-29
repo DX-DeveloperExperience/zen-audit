@@ -1,9 +1,10 @@
 import Rule from '../../rules/rule';
 import inquirer = require('inquirer');
+import { logger } from '../../logger';
 
 export async function promptForRule(rule: Rule) {
   if (rule.shouldBeApplied()) {
-    inquirer
+    return inquirer
       .prompt([
         {
           name: rule.getName(),
@@ -16,8 +17,11 @@ export async function promptForRule(rule: Rule) {
         const apply = rule.apply;
 
         if (apply) {
-          apply.call(rule, answer);
+          return apply.call(rule, answer);
         }
+      })
+      .then(() => {
+        logger.info(`Rule ${rule.getName()} applied succesfully`);
       });
   }
 }
