@@ -5,6 +5,10 @@ const fs = require('fs-extra');
 
 jest.mock('fs-extra');
 
+jest.mock('inquirer');
+
+jest.mock('./../../../../../logger/index');
+
 Globals.rootPath = 'test/nginx';
 const confDirPath = Globals.rootPath + 'config';
 const confFilePath = confDirPath + '/nginx.conf';
@@ -21,5 +25,12 @@ test("should copy file to project's config folder", () => {
     return Promise.resolve();
   });
 
-  new Nginx().apply(true);
+  new Nginx()
+    .apply(true)
+    .then(() => {
+      /** */
+    })
+    .catch(() => {
+      /* */
+    });
 });
