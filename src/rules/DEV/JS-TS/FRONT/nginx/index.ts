@@ -37,7 +37,7 @@ export default class Nginx {
         .then(
           () => {
             logger.info('Succesfully copied nginx.conf file to config folder.');
-            promptForRule(new Dockerfile());
+            return promptForRule(new Dockerfile());
           },
           err => {
             throw new WriteFileError(err, this.configFilePath, this.getName());
