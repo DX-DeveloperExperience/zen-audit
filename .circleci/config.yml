@@ -67,6 +67,9 @@ jobs:
             VERSION=$(bin/run --version | cut -d' ' -f 1 | cut -d'/' -f 3)
             ghr_v0.12.0_linux_386/ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./dist/project-starter-cli-v${VERSION}/
       - run:
+          name: git auth
+          command git config --global user.email "circleci@circleci.com" && git config --global user.name "circleci"
+      - run:
           name: run scripts
           command: chmod +x .circleci/scripts/*.sh && .circleci/scripts/run_all.sh
   publish:
