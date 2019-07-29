@@ -3,6 +3,7 @@ import { pathExistsInJSON } from '../../utils/json/index';
 import Globals from '../../utils/globals';
 import { logger } from '../../logger/index';
 import { getExactSemver } from '../../utils/semver/index';
+import { ReadFileError } from '../../errors/FileErrors';
 
 @StackRegister.register
 export class React {
@@ -26,14 +27,13 @@ export class React {
     } catch (err) {
       if (err.code === 'MODULE_NOT_FOUND') {
         this.hasReactDependency = false;
+        return;
       }
-      logger.error(
-        `React Stack: Error trying to read ${
-          Globals.rootPath
-        }package.json, use debug mode to know more.`,
+      throw new ReadFileError(
+        err,
+        Globals.packageJSONPath,
+        this.constructor.name,
       );
-      logger.debug(err);
-      throw err;
     }
   }
 

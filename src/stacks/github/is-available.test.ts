@@ -1,5 +1,7 @@
 import GitHub from '.';
 
+const commands = require('../../utils/commands');
+
 const fs = require('fs-extra');
 const util = require('util');
 
@@ -25,11 +27,9 @@ test('should return false if .git directory does not exist', () => {
 });
 
 test('should return false if "git remote -v" command does not return a result from github', () => {
-  util.promisify = jest.fn((exec: (cmd: string) => void) => {
-    return (cmd: string) => {
-      expect(cmd).toBe('git remote -v');
-      return Promise.resolve({ stdout: 'bad result' });
-    };
+  commands.execInRootpath = jest.fn(async (cmd: string) => {
+    expect(cmd).toBe('git remote -v');
+    return { stdout: 'bad result' };
   });
 
   fs.lstat = jest.fn(() => {
@@ -48,11 +48,9 @@ test('should return false if "git remote -v" command does not return a result fr
 });
 
 test('should return true if .git exists and "git remote -v" command returns a string containing github.com', () => {
-  util.promisify = jest.fn((exec: (cmd: string) => void) => {
-    return (cmd: string) => {
-      expect(cmd).toBe('git remote -v');
-      return Promise.resolve({ stdout: 'this string contains github.com' });
-    };
+  commands.execInRootpath = jest.fn(async (cmd: string) => {
+    expect(cmd).toBe('git remote -v');
+    return { stdout: 'github.com' };
   });
 
   fs.lstat = jest.fn(() => {

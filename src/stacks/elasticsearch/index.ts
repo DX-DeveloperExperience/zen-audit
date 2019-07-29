@@ -1,9 +1,11 @@
+import { FetchDataError } from './../../errors/FetchData';
 import { StackRegister } from '../stack-register';
 import axios from 'axios';
 import Globals from '../../utils/globals/index';
 
 @StackRegister.register
 export default class Elasticsearch {
+  static version: string = '';
   private isElasticsearchResponse() {
     return axios
       .get(Globals.rootPath, {
@@ -11,10 +13,14 @@ export default class Elasticsearch {
       })
       .then(result => {
         const elasticSearchResponse = result.data;
-        return elasticSearchResponse.tagline === 'You Know, for Search';
+        if (elasticSearchResponse.tagline === 'You Know, for Search') {
+          Elasticsearch.version = elasticSearchResponse.version.number;
+          return true;
+        }
+        return false;
       })
       .catch(err => {
-        return false;
+        throw new FetchDataError(err, Globals.rootPath, this.constructor.name);
       });
   }
 
@@ -22,9 +28,9 @@ export default class Elasticsearch {
     if (Globals.rootPath.startsWith(`http`)) {
       const isElasticsearchResponse = await this.isElasticsearchResponse();
 
-      return Promise.resolve(isElasticsearchResponse);
+      return isElasticsearchResponse;
     }
-    return Promise.resolve(false);
+    return false;
   }
 
   name() {

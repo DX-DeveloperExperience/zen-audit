@@ -1,3 +1,4 @@
+import { FetchDataError } from './../../errors/FetchData';
 import { StackRegister } from '../stack-register';
 import axios from 'axios';
 import { pathExistsInJSON } from '../../utils/json/index';
@@ -5,19 +6,28 @@ import Globals from '../../utils/globals';
 
 @StackRegister.register
 export class Website {
-  isAvailable(): Promise<boolean> {
+  async isAvailable(): Promise<boolean> {
     if (
       !Globals.rootPath.startsWith('http://') &&
       !Globals.rootPath.startsWith('https://')
     ) {
-      return Promise.resolve(false);
+      return false;
     } else {
-      return axios.get(Globals.rootPath).then(result => {
-        return Promise.resolve(
-          pathExistsInJSON(result, ['headers', 'content-type']) &&
-            result.headers['content-type'].startsWith('text/html'),
-        );
-      });
+      return axios
+        .get(Globals.rootPath)
+        .then(result => {
+          return Promise.resolve(
+            pathExistsInJSON(result, ['headers', 'content-type']) &&
+              result.headers['content-type'].startsWith('text/html'),
+          );
+        })
+        .catch(err => {
+          throw new FetchDataError(
+            err,
+            Globals.rootPath,
+            this.constructor.name,
+          );
+        });
     }
   }
 

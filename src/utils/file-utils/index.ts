@@ -43,9 +43,7 @@ export function deleteRecursively(path: string): void {
 }
 
 export function existsPaths(...paths: string[]): Promise<boolean> {
-  return Promise.all(paths.map(path => fs.pathExists(path)))
-    .then(exist => {
-      return exist.includes(true);
-    })
-    .catch(e => false);
+  return Promise.all(paths.map(path => fs.pathExists(path))).then(exist => {
+    return exist.includes(true);
+  });
 }

@@ -1,4 +1,5 @@
 {
+  "rulesDirectory": ["node_modules/tslint-microsoft-contrib"],
   "defaultSeverity": "error",
   "extends": ["tslint:recommended"],
   "jsRules": {
@@ -17,7 +18,7 @@
     "no-var-requires": false,
     "import-blacklist": [true, [".*\\.ts$", ".*\\.js$"]],
     "max-classes-per-file": false,
+    "promise-must-complete": true,
     "no-floating-promises": true
-  },
-  "rulesDirectory": []
+  }
 }

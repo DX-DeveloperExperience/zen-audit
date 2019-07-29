@@ -13,7 +13,7 @@ test('should return false if typescript not in devDependencies', () => {
     },
   };
 
-  jest.mock(Globals.packageJSONPath, () => packageJSON, { virtual: true });
+  jest.mock(Globals.packageJSONPath, () => packageJSON);
 
   const typescript = new TypeScript();
 
@@ -29,7 +29,7 @@ test('should return true if typescript in devDependencies', () => {
     },
   };
 
-  jest.mock(Globals.packageJSONPath, () => packageJSON, { virtual: true });
+  jest.mock(Globals.packageJSONPath, () => packageJSON);
 
   const typescript = new TypeScript();
 

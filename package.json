@@ -1,18 +1,24 @@
 {
   "name": "@dxdeveloperexperience/project-starter",
   "description": "A tool to gather everything you need to deploy a new project",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "author": "Zenika - Demey Emmanuel - Lafrance Antoine",
   "bin": {
     "project-starter-cli": "./bin/run"
   },
   "bugs": "https://github.com/DX-DeveloperExperience/project-starter/issues",
   "dependencies": {
+    "@oclif/command": "1.5.11",
+    "@oclif/config": "1.12.9",
+    "@oclif/dev-cli": "1.22.0",
+    "@oclif/plugin-help": "2.1.6",
+    "@oclif/tslint": "3.1.1",
     "@types/mustache": "0.8.32",
     "axios": "0.19.0",
     "check-node-version": "3.3.0",
     "fs-extra": "8.0.1",
     "inquirer": "6.2.2",
+    "mdpdf": "2.0.4",
     "mustache": "3.0.1",
     "request": "2.88.0",
     "sync-request": "6.1.0",
@@ -20,11 +26,6 @@
     "winston": "3.2.1"
   },
   "devDependencies": {
-    "@oclif/command": "1.5.11",
-    "@oclif/config": "1.12.9",
-    "@oclif/dev-cli": "1.22.0",
-    "@oclif/plugin-help": "2.1.6",
-    "@oclif/tslint": "3.1.1",
     "@types/axios": "0.14.0",
     "@types/fs-extra": "7.0.0",
     "@types/inquirer": "0.0.44",
@@ -43,7 +44,9 @@
     "ts-jest": "24.0.0",
     "ts-node": "8.0.2",
     "tslint": "5.13.1",
-    "typescript": "3.3.3333"
+    "tslint-microsoft-contrib": "6.2.0",
+    "typescript": "3.3.3333",
+    "vuepress": "1.0.2"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -71,7 +74,8 @@
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p . -t stylish",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme && npm run copy-templates",
+    "copy-templates": "cp -r src/rules/DEV/SCM/github/templates/template_files lib/rules/DEV/SCM/github/templates/template_files",
     "test": "jest --runInBand",
     "test:cov": "jest --coverage --runInBand",
     "jest-cache": "jest --clearCache --detectOpenHandles ",
@@ -81,7 +85,9 @@
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "ci": "npm-run-all audit jest-cache prettier-test test",
     "version": "oclif-dev readme && git add README.md",
-    "publish-npm": "npm publish --access public"
+    "publish-npm": "npm publish --access public",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
   },
   "types": "lib/index.d.ts",
   "jest": {

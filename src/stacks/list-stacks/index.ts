@@ -1,12 +1,11 @@
 import { StackRegister, Constructor } from '../stack-register';
 import Stack from '../stack';
-import Globals from '../../utils/globals';
 
 export class ListStacks {
-  static stacks: Stack[];
-  static getAvailableStacksIn(rootPath: string) {
-    if (ListStacks.stacks) {
-      return Promise.resolve(ListStacks.stacks);
+  static stacks: Stack[] | undefined;
+  static async getAvailableStacks() {
+    if (ListStacks.stacks !== undefined) {
+      return ListStacks.stacks;
     }
 
     const stacks = StackRegister.getStacks();
@@ -20,7 +19,7 @@ export class ListStacks {
             const subStacks = StackRegister.getSubStacksOf(stack);
 
             // if current stack has subStacks, instanciate them and add them to availableStacks if available
-            if (!!subStacks && subStacks.length !== 0) {
+            if (subStacks !== undefined && subStacks.length !== 0) {
               const availableSubStacks = subStacks.filter(subStack => {
                 return subStack.isAvailable();
               });
@@ -37,21 +36,14 @@ export class ListStacks {
     });
   }
 
-  static findAvailableStackIn(
+  static findAvailableStack(
     ctor: Constructor<Stack>,
-    path: string,
   ): Promise<Stack | undefined> {
-    return ListStacks.getAvailableStacksIn(path).then(stacks => {
+    return ListStacks.getAvailableStacks().then(stacks => {
       return stacks.find(stack => {
         return stack.constructor.name === ctor.name;
       });
     });
-  }
-
-  static findAvailableStack(
-    ctor: Constructor<Stack>,
-  ): Promise<Stack | undefined> {
-    return this.findAvailableStackIn(ctor, Globals.rootPath);
   }
 
   static async stackIsAvailable(ctor: Constructor<Stack>): Promise<boolean> {
