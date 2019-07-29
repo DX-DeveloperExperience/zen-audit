@@ -1,37 +1,47 @@
 import { StackRegister } from '../stack-register';
-import * as util from 'util';
-import * as cp from 'child_process';
-import { logger } from '../../logger/index';
 import * as fs from 'fs-extra';
 import Globals from '../../utils/globals';
+import { execInRootpath } from '../../utils/commands';
+import { DirError } from '../../errors/DirErrors';
 
 @StackRegister.register
 export default class GitHub {
   async isAvailable(): Promise<boolean> {
-    const exec = util.promisify(cp.exec);
+    return this.dotGitExists()
+      .then(dotGitExists => {
+        return dotGitExists && this.gitIsInstalled();
+      })
+      .catch(err => {
+        throw err;
+      });
+  }
 
+  async dotGitExists() {
     return fs
       .lstat(`${Globals.rootPath}.git`)
       .then(lstat => {
-        if (!lstat.isDirectory()) {
-          return false;
-        }
-        return exec(`git remote -v`, { cwd: Globals.rootPath })
-          .then((value: { stdout: string }) => {
-            return value.stdout.includes('github.com');
-          })
-          .catch(err => {
-            logger.error('Could not execute "git" command, is git installed ?');
-            logger.debug(err);
-            return false;
-          });
+        return lstat.isDirectory();
       })
       .catch(err => {
         if (err.code === 'ENOENT') {
           return false;
         }
-        logger.debug(err);
-        return false;
+        throw new DirError(
+          err,
+          `${Globals.rootPath}.git`,
+          this.constructor.name,
+        );
+      });
+  }
+
+  async gitIsInstalled() {
+    return execInRootpath(`git remote -v`)
+      .then((value: { stdout: string }) => {
+        return value.stdout.includes('github.com');
+      })
+      .catch(err => {
+        err.message = `GitHub Stack: Error trying to execute "git remote -v" command`;
+        throw err;
       });
   }
 

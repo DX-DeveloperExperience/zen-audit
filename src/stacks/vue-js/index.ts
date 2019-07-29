@@ -2,6 +2,7 @@ import { StackRegister } from '../stack-register';
 import Globals from '../../utils/globals';
 import { pathExistsInJSON } from '../../utils/json/index';
 import { getExactSemver } from '../../utils/semver/index';
+import { ReadFileError } from '../../errors/FileErrors';
 
 @StackRegister.register
 export default class VueJS {
@@ -20,11 +21,16 @@ export default class VueJS {
 
         this.hasVueDependency = true;
       }
-    } catch (e) {
-      if (e.code === 'MODULE_NOT_FOUND') {
+    } catch (err) {
+      if (err.code === 'MODULE_NOT_FOUND') {
         this.hasVueDependency = false;
+        return;
       }
-      throw e;
+      throw new ReadFileError(
+        err,
+        Globals.packageJSONPath,
+        this.constructor.name,
+      );
     }
   }
 

@@ -1,7 +1,7 @@
 import { StackRegister } from '../stack-register';
-import { logger } from '../../logger/index';
 import Globals from '../../utils/globals';
 import { pathExistsInJSON } from '../../utils/json';
+import { ReadFileError } from '../../errors/FileErrors';
 
 @StackRegister.register
 export default class TypeScript {
@@ -16,12 +16,15 @@ export default class TypeScript {
         'typescript',
       ]);
     } catch (err) {
-      logger.error(
-        `TypeScript Stack: Error while reading/parsing ${
-          Globals.packageJSONPath
-        }.`,
+      if (err.code === 'MODULE_NOT_FOUND') {
+        this.hasDevDependency = false;
+        return;
+      }
+      throw new ReadFileError(
+        err,
+        Globals.packageJSONPath,
+        this.constructor.name,
       );
-      logger.debug(err);
     }
   }
 

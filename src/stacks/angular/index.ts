@@ -2,6 +2,7 @@ import { StackRegister } from '../stack-register';
 import Globals from '../../utils/globals';
 import { pathExistsInJSON } from '../../utils/json/index';
 import { getExactSemver } from '../../utils/semver/index';
+import { ReadFileError } from '../../errors/FileErrors';
 
 @StackRegister.register
 export default class Angular {
@@ -17,16 +18,22 @@ export default class Angular {
       if (
         pathExistsInJSON(this.parsedJSON, ['dependencies', '@angular/core'])
       ) {
+        this.hasAngularDependency = true;
         this.libraryVersion = this.getLibraryVersion();
         this.generatedCLI = this.isGeneratedCLI();
       } else {
         this.hasAngularDependency = false;
       }
-    } catch (e) {
-      if (e.code === 'MODULE_NOT_FOUND') {
+    } catch (err) {
+      if (err.code === 'MODULE_NOT_FOUND') {
         this.hasAngularDependency = false;
+        return;
       }
-      throw e;
+      throw new ReadFileError(
+        err,
+        Globals.packageJSONPath,
+        this.constructor.name,
+      );
     }
   }
 
