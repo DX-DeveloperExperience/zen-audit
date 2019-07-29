@@ -1,5 +1,5 @@
 # stores git remote url
-GIT_URL=git config --get remote.origin.url
+GIT_URL=$(git config --get remote.origin.url)
 
 # runs the documentation building script
 npm run docs:build
