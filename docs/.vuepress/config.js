@@ -1,6 +1,6 @@
 module.exports = {
-  title: 'Hello VuePress',
+  title: 'Zodit',
   description: 'Just playing around',
   dest: 'docs_build',
-  base: '/project-starter/'
+  base: '/project-starter/',
 };
