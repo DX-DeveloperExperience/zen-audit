@@ -33,6 +33,7 @@
     "@types/mock-fs": "3.6.30",
     "@types/node": "10.12.29",
     "@types/winston": "2.4.4",
+    "copyfiles": "2.1.1",
     "coveralls": "3.0.3",
     "globby": "8.0.2",
     "husky": "1.3.1",
@@ -74,8 +75,8 @@
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "tslint -p . -t stylish",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme && npm run copy-templates",
-    "copy-templates": "cp -r src/rules/DEV/SCM/github/templates/template_files lib/rules/DEV/SCM/github/templates/template_files",
+    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme && npm run copy-static-files",
+    "copy-static-files": "find src -not -name '*.ts' -type f -exec copyfiles -u 1 {} lib/ \\;",
     "test": "jest --runInBand",
     "test:cov": "jest --coverage --runInBand",
     "jest-cache": "jest --clearCache --detectOpenHandles ",
