@@ -10,6 +10,7 @@ import Choice from '../../../../../choice';
 import { RuleRegister } from '../../../../rule-register';
 import Nginx from '../nginx';
 import { myCopy } from '../../../../../utils/file-utils';
+import { logger } from '../../../../../logger';
 
 @StackRegister.registerRuleForStacks([Angular, React, VueJS])
 @RuleRegister.registerSubRuleOf(Nginx)
@@ -22,7 +23,10 @@ export default class Dockerfile {
   }
   async apply(apply: boolean): Promise<void> {
     if (apply) {
-      return myCopy(this.defaultDockerFilePath, this.dockerFilePath).catch(
+      return myCopy(this.defaultDockerFilePath, this.dockerFilePath).then(
+        () => {
+          logger.info(`${this.getName()}: Succesfully copied Dockerfile`);
+        },
         err => {
           if (err instanceof WriteFileError) {
             throw err;
