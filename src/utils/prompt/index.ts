@@ -2,8 +2,12 @@ import Rule from '../../rules/rule';
 import inquirer = require('inquirer');
 import { logger } from '../../logger';
 import { RuleRegister } from '../../rules/rule-register';
+import { Subject } from 'rxjs';
+const rx = require('rxjs');
 
-export async function promptForRule(rule: Rule): Promise<void> {
+// export const ui = new inquirer.ui.BottomBar();
+
+/* export async function promptForRule(rule: Rule): Promise<void> {
   if (rule.shouldBeApplied()) {
     return inquirer
       .prompt([
@@ -30,21 +34,56 @@ export async function promptForRule(rule: Rule): Promise<void> {
         }
       });
   }
+} */
+
+function addRulesToPrompts(prompts: Subject<any>, rules: Rule[]) {
+  rules.forEach(async rule => {
+    prompts.next({
+      name: rule.constructor.name,
+      message: rule.getShortDescription(),
+      type: rule.getPromptType(),
+      choices: await rule.getChoices(),
+      filter: (input: any) => {
+        return { input, rule };
+      },
+    });
+  });
 }
 
 export async function promptForRules(rules: Rule[]): Promise<void> {
-  const promptsProm = rules.map(async rule => {
+  const prompts = new rx.Subject();
+
+  addRulesToPrompts(prompts, rules);
+
+  inquirer.prompt(prompts).ui.process.subscribe((output: any) => {
+    const rule: Rule = output.answer.rule;
+    const apply = output.answer.rule.apply;
+    const ruleAnswer = output.answer.input;
+
+    if (apply) {
+      apply.call(rule, ruleAnswer).then(() => {
+        const subRules = RuleRegister.getSubRulesOf(rule);
+
+        if (subRules.length !== 0) {
+          addRulesToPrompts(prompts, subRules);
+        }
+      });
+    }
+  });
+
+  /* const promptsProm = rules.map(async rule => {
     return {
       name: rule.constructor.name,
       message: rule.getShortDescription(),
       type: rule.getPromptType(),
       choices: await rule.getChoices(),
-    };
+      when: () => {},
+    } as inquirer.Question;
   });
 
-  const prompts = await Promise.all(promptsProm);
+  const prompts = await Promise.all(promptsProm); */
 
-  const answers: {} = await inquirer.prompt(prompts);
+  /* const answers: {} = await inquirer.prompt(prompts);
 
   Object.entries(answers).forEach(([_, answer], i) => {
     const apply = rules[i].apply;
@@ -62,5 +101,5 @@ export async function promptForRules(rules: Rule[]): Promise<void> {
         },
       );
     }
-  });
+  }); */
 }
