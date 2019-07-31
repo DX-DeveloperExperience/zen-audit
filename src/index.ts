@@ -11,6 +11,7 @@ import * as fs from 'fs-extra';
 import { YesNo, Ok } from './choice/index';
 import { generateReport } from './report';
 import Globals from './utils/globals/index';
+import { promptForRules } from './utils/prompt';
 
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
@@ -186,47 +187,20 @@ class ProjectFillerCli extends Command {
     cli.action.start('Searching for rules');
     ListRules.getRulesToApply()
       .then(async foundRules => {
-        const promptsProm = foundRules.map(async rule => {
-          return {
-            name: rule.constructor.name,
-            message: rule.getShortDescription(),
-            type: rule.getPromptType(),
-            choices: await rule.getChoices(),
-          };
-        });
-
-        if (promptsProm.length === 0) {
-          return [];
+        if (foundRules.length === 0) {
+          cli.action.stop('No found rules.');
+        } else {
+          cli.action.stop(
+            `${foundRules.length} rule${
+              foundRules.length > 0 ? 's' : ''
+            } found ! Let's go !`,
+          );
         }
 
-        const prompts = await Promise.all(promptsProm);
-
-        cli.action.stop(
-          `${prompts.length} rule${
-            prompts.length > 0 ? 's' : ''
-          } found ! Let's go !`,
-        );
-
-        const answers: {} = await inquirer.prompt(prompts);
-
-        return Object.entries(answers).map(([_, answer], i) => {
-          const apply = foundRules[i].apply;
-
-          if (apply) {
-            return apply.call(foundRules[i], answer);
-          }
-        });
+        return promptForRules(foundRules);
       })
       .then(async applies => {
-        if (applies.length === 0) {
-          logger.info("No rule to apply, you're good to go ! :)");
-          return;
-        } else {
-          cli.action.start('Applying rules, please wait');
-          return Promise.all(applies).then(() => {
-            cli.action.stop('Rules applied ! Congratulations !');
-          });
-        }
+        cli.action.stop('Rules applied ! Congratulations !');
       })
       .catch(err => {
         logger.error(err.message);
