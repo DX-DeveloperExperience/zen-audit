@@ -10,14 +10,14 @@ import { ensureDir, copy } from 'fs-extra';
 import Globals from '../../../../../utils/globals';
 import { logger } from '../../../../../logger';
 import Choice from '../../../../../choice';
-import { promptForRule } from '../../../../../utils/prompt';
-import Dockerfile from '../dockerfile';
+import { myCopy } from '../../../../../utils/file-utils';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Angular, React, VueJS])
 export default class Nginx {
   private configDirPath = Globals.rootPath + 'config';
   private configFilePath = this.configDirPath + '/nginx.conf';
+  private defaultConfFilePath = __dirname + '/nginx.conf';
 
   async shouldBeApplied(): Promise<boolean> {
     return true;
@@ -28,7 +28,7 @@ export default class Nginx {
       return ensureDir(this.configDirPath)
         .then(
           () => {
-            return copy(__dirname + 'nginx.conf', this.configFilePath);
+            return myCopy(this.defaultConfFilePath, this.configFilePath);
           },
           err => {
             throw new DirError(err, this.configDirPath, this.getName());
@@ -37,10 +37,11 @@ export default class Nginx {
         .then(
           () => {
             logger.info('Succesfully copied nginx.conf file to config folder.');
-            return promptForRule(new Dockerfile());
           },
           err => {
-            throw new WriteFileError(err, this.configFilePath, this.getName());
+            if (err instanceof WriteFileError) {
+              throw err;
+            }
           },
         );
     }

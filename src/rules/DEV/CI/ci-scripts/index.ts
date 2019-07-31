@@ -4,16 +4,18 @@ import { RuleRegister } from '../../../rule-register';
 import { StackRegister } from '../../../../stacks/stack-register';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import { Website } from '../../../../stacks/website';
-import { copy } from 'fs-extra';
+import { ensureDir } from 'fs-extra';
 import Globals from '../../../../utils/globals';
 import { logger } from '../../../../logger';
 import Choice from '../../../../choice';
+import { DirError } from '../../../../errors/DirErrors';
+import { myCopy } from '../../../../utils/file-utils';
 
 @RuleRegister.register
 @StackRegister.registerRuleForAll({ excludes: [Elasticsearch, Website] })
 export default class CiScripts {
   private scriptsPath = Globals.rootPath + 'ci-scripts';
-  private defaultScriptsPath = __dirname + 'scripts/';
+  private defaultScriptsPath = __dirname + '/scripts';
 
   async shouldBeApplied(): Promise<boolean> {
     return true;
@@ -21,26 +23,31 @@ export default class CiScripts {
 
   async apply(apply: boolean): Promise<void> {
     if (apply) {
-      return copy(this.defaultScriptsPath, this.scriptsPath, {
-        overwrite: false,
-        errorOnExist: true,
-      }).then(
-        () => {
-          logger.info(
-            `${this.getName()}: Succesfully added CI scripts to ci-scripts folder. \
-            Please take some time to update them to fit your project and place them in your CI's folder. \
-            Then just run 'run_all.sh' in your CI.`,
+      return new Promise((resolve, reject) => {
+        return ensureDir(this.scriptsPath)
+          .then(
+            () => {
+              return myCopy(this.defaultScriptsPath, this.scriptsPath);
+            },
+            err => {
+              reject(new DirError(err, this.scriptsPath, this.getName()));
+            },
+          )
+          .then(
+            () => {
+              logger.info(
+                `${this.getName()}: Succesfully added CI scripts to ci-scripts folder. Please take some time to update them to fit your project and place them in your CI's folder. Then just run 'run_all.sh' in your CI.`,
+              );
+              resolve();
+            },
+            err => {
+              if (err instanceof WriteFileError) {
+                reject(err);
+              }
+              resolve();
+            },
           );
-        },
-        err => {
-          if (err.message.endsWith('already exists')) {
-            logger.error(
-              this.getName() + ': Error while copying scripts: ' + err.message,
-            );
-          }
-          throw new WriteFileError(err, this.scriptsPath, this.getName());
-        },
-      );
+      });
     }
   }
   getName(): string {
