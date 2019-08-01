@@ -85,6 +85,7 @@ export class Nodemon {
               logger.info(
                 'Nodemon: Succesfully added nodemon script. Run "npm run nodemon" to run it.',
               );
+              resolve();
             },
             err => {
               reject(
