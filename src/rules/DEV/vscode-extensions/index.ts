@@ -1,3 +1,4 @@
+import { WriteFileError } from './../../../errors/FileErrors';
 import { RuleRegister } from '../../rule-register';
 import { StackRegister } from '../../../stacks/stack-register';
 import { ListStacks } from '../../../stacks/list-stacks';
@@ -7,6 +8,7 @@ import * as cp from 'child_process';
 import Elasticsearch from '../../../stacks/elasticsearch';
 import Choice from '../../../choice';
 import Globals from '../../../utils/globals';
+import { logger } from '../../../logger';
 
 @RuleRegister.register
 @StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
@@ -72,18 +74,38 @@ export class VSCodeExtensions {
       filteredAnswers,
     );
 
-    return fs
-      .ensureFile(this.extensionsJSONPath)
-      .catch(err => {
-        throw err;
-      })
-      .then(() => {
-        return fs.writeJSON(
-          this.extensionsJSONPath,
-          this.parsedExtensionsFile,
-          { spaces: '\t' },
+    return new Promise<void>((resolve, reject) => {
+      fs.ensureFile(this.extensionsJSONPath)
+        .then(
+          () => {
+            return fs.writeJSON(
+              this.extensionsJSONPath,
+              this.parsedExtensionsFile,
+              { spaces: '\t' },
+            );
+          },
+          err => {
+            reject(
+              new WriteFileError(err, this.extensionsJSONPath, this.getName()),
+            );
+          },
+        )
+        .then(
+          () => {
+            logger.info(
+              `${this.getName()}: Succesfully added extensions recommendations to ${
+                this.extensionsJSONPath
+              }`,
+            );
+            resolve();
+          },
+          err => {
+            reject(
+              new WriteFileError(err, this.extensionsJSONPath, this.getName()),
+            );
+          },
         );
-      });
+    });
   }
 
   getPromptType() {
