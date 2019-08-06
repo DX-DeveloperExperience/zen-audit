@@ -92,7 +92,7 @@
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs"
   },
-  "types": "lib/index.d.ts",
+  "types": "lib/exports.d.ts",
   "jest": {
     "roots": [
       "<rootDir>/src"
