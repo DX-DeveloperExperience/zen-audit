@@ -1,7 +1,6 @@
 import { ListRules } from './rules/list-rules';
 import { Command, flags, run } from '@oclif/command';
 import { cli } from 'cli-ux';
-import * as inquirer from 'inquirer';
 import * as Path from 'path';
 import { init, importClassesIn } from './init/index';
 import { StackRegister } from './stacks/stack-register';
@@ -57,7 +56,13 @@ class ProjectFillerCli extends Command {
     }),
   };
 
-  static args = [{ name: 'path' }];
+  static args = [
+    {
+      name: 'path',
+      required: true,
+      description: 'The path to your project',
+    },
+  ];
 
   async run() {
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
@@ -67,7 +72,34 @@ class ProjectFillerCli extends Command {
       return;
     }
 
-    Globals.rootPath = args.path;
+    this.parseProjectPath(args.path);
+
+    init();
+
+    if (runFlags.custom) {
+      console.log(runFlags.custom);
+      // importClassesIn(runFlags.custom);
+    }
+
+    if (runFlags.debug) {
+      logger.level = 'debug';
+    }
+
+    if (runFlags.list) {
+      this.listAllStacksAndRules();
+    } else if (runFlags.stacks) {
+      this.listFoundStacks();
+    } else if (runFlags.apply) {
+      this.applyAllRules();
+    } else if (runFlags.manual) {
+      this.applyFoundRulesManually();
+    } else if (runFlags.rules) {
+      this.listFoundRules();
+    }
+  }
+
+  parseProjectPath(path: string) {
+    Globals.rootPath = path;
 
     try {
       if (
@@ -98,28 +130,6 @@ class ProjectFillerCli extends Command {
       );
       logger.debug(err);
       return;
-    }
-
-    init();
-
-    if (runFlags.custom) {
-      importClassesIn(runFlags.custom);
-    }
-
-    if (runFlags.debug) {
-      logger.level = 'debug';
-    }
-
-    if (runFlags.list) {
-      this.listAllStacksAndRules();
-    } else if (runFlags.stacks) {
-      this.listFoundStacks();
-    } else if (runFlags.apply) {
-      this.applyAllRules();
-    } else if (runFlags.manual) {
-      this.applyFoundRulesManually();
-    } else if (runFlags.rules) {
-      this.listFoundRules();
     }
   }
 
