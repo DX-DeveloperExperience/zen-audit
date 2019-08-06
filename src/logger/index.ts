@@ -1,25 +1,7 @@
 import { createLogger, format, transports } from 'winston';
 import * as Transport from 'winston-transport';
+import winston = require('winston');
 // import { ui } from '../utils/prompt';
-
-class CustomTransport extends Transport {
-  constructor() {
-    super();
-  }
-
-  log(info: string, callback: Function) {
-    setImmediate(() => {
-      this.emit('logged', info);
-    });
-
-    callback();
-  }
-}
-
-const transport = new CustomTransport();
-transport.on('logged', info => {
-  // ui.log.write('logging', info);
-});
 
 /**
  * To log anything, just import 'logger' from './logger/logger.servie'
@@ -28,7 +10,7 @@ transport.on('logged', info => {
  */
 export const logger = createLogger({
   level: 'info',
-  silent: true,
+  // silent: true,
   format: format.combine(
     format.colorize(),
     format.timestamp({
@@ -39,8 +21,8 @@ export const logger = createLogger({
       if (logger.level === 'debug' && info.stack !== undefined) {
         stackTrace = '\n' + info.stack;
       }
-      return `[${info.level}]: ${info.message} ${stackTrace}`;
+      return `\n[${info.level}]: ${info.message} ${stackTrace}\n`;
     }),
   ),
-  transports: [transport],
+  transports: [new winston.transports.Console()],
 });
