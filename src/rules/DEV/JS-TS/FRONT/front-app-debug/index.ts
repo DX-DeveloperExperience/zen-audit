@@ -1,5 +1,4 @@
 import { WriteFileError } from './../../../../../errors/FileErrors';
-import { Constructor } from '../../../../../stacks/stack-register/index';
 import { ListStacks } from '../../../../../stacks/list-stacks/index';
 import { RuleRegister } from '../../../../rule-register';
 import { StackRegister } from '../../../../../stacks/stack-register';
@@ -13,6 +12,7 @@ import Stack from '../../../../../stacks/stack';
 import { pathExistsInJSON } from '../../../../../utils/json';
 import * as fs from 'fs-extra';
 import { logger } from '../../../../../logger';
+import Constructor from '../../../../../constructor';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([VueJS, Angular, React])

@@ -1,10 +1,7 @@
 import Rule from '../../rules/rule';
 import Stack from '../stack';
+import Constructor from '../../constructor';
 
-export interface Constructor<T> {
-  new (...args: any[]): T;
-  readonly prototype: T;
-}
 interface RegisterRuleForAllOptions {
   excludes?: Array<Constructor<Stack>>;
 }

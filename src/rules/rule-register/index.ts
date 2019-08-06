@@ -1,9 +1,5 @@
 import Rule from '../rule';
-
-export interface Constructor<T> {
-  new (...args: any[]): T;
-  readonly prototype: T;
-}
+import Constructor from '../../constructor';
 
 /**
  * This class is a register for all implementations of the Rule interface.

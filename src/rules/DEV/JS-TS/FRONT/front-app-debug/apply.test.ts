@@ -1,5 +1,5 @@
 import { ListStacks } from '../../../../../stacks/list-stacks/index';
-import { Constructor } from '../../../../../stacks/stack-register/index';
+import Constructor from '../../../../../constructor';
 import VueJS from '../../../../../stacks/vue-js/index';
 import { FrontAppDebug } from './index';
 import Globals from '../../../../../utils/globals';

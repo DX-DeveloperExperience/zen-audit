@@ -1,4 +1,4 @@
-import { Constructor } from '../../../../../stacks/stack-register/index';
+import Constructor from '../../../../../constructor';
 import { ListStacks } from '../../../../../stacks/list-stacks/index';
 import { FrontAppDebug } from '../front-app-debug';
 import Globals from '../../../../../utils/globals';

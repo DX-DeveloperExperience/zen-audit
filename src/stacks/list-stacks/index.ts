@@ -1,5 +1,6 @@
-import { StackRegister, Constructor } from '../stack-register';
+import { StackRegister } from '../stack-register';
 import Stack from '../stack';
+import Constructor from '../../constructor';
 
 export class ListStacks {
   static stacks: Stack[] | undefined;

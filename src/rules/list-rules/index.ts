@@ -2,7 +2,8 @@ import Rule from '../rule';
 import { StackRegister } from '../../stacks/stack-register/index';
 import { ListStacks } from '../../stacks/list-stacks/index';
 import Stack from '../../stacks/stack/index';
-import { RuleRegister, Constructor } from '../rule-register';
+import { RuleRegister } from '../rule-register';
+import Constructor from '../../constructor';
 
 /**
  * Returns an array of every stack instanciated object
