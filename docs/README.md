@@ -14,13 +14,17 @@ Just download the [tarball](https://github.com/DX-DeveloperExperience/project-st
 
 ### List of possible flags
 
-|      Flag       |                                                               Description |
-| :-------------: | ------------------------------------------------------------------------: |
-|  -h or --help   |                                      Displays flags and their description |
-| -v or --version |                                             Displays the version of Zodit |
-|  -r or --rules  | Searches and displays rules that may apply to your project (default flag) |
-|  -s or --stack  |                        Searches and displays stacks found in your project |
-| -m or --manual  |        Searches for rules and prompt you for each of them to apply or not |
-|  -l or --list   |                          Displays a list of all possible Stacks and Rules |
-|  -d or --debug  |                                       Debug mode, errors are more verbose |
+|          Flag           |                                                               Description |
+| :---------------------: | ------------------------------------------------------------------------: |
+|      -h or --help       |                                      Displays flags and their description |
+|     -v or --version     |                                             Displays the version of Zodit |
+|      -r or --rules      | Searches and displays rules that may apply to your project (default flag) |
+|      -s or --stack      |                        Searches and displays stacks found in your project |
+|     -m or --manual      |        Searches for rules and prompt you for each of them to apply or not |
+|      -l or --list       |                          Displays a list of all possible Stacks and Rules |
+|      -d or --debug      |                                       Debug mode, errors are more verbose |
+| -c=path or --debug=path |                                                          Add custom rules |
 
+## Custom rules
+
+You may add custom rules for your audit. Please follow the [guide](/custom-rules/)
