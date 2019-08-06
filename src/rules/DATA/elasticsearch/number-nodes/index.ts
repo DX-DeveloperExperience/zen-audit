@@ -5,7 +5,6 @@ import { RuleRegister } from '../../../rule-register/index';
 import { StackRegister } from '../../../../stacks/stack-register';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import Globals from '../../../../utils/globals';
-import { logger } from '../../../../logger';
 
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])

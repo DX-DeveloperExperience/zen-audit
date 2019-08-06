@@ -3,7 +3,6 @@ import Rule from '../../rules/rule';
 import inquirer = require('inquirer');
 import { RuleRegister } from '../../rules/rule-register';
 import { Subject } from 'rxjs';
-import { resolve } from 'path';
 const rx = require('rxjs');
 
 function addRulesToPrompts(prompts: Subject<any>, rules: Rule[]) {
