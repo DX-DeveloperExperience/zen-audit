@@ -53,20 +53,35 @@ export class Linter {
   async apply(apply: boolean): Promise<void> {
     const linterChoice = await this.getLinterChoice();
     if (apply) {
-      if (this.linterInDevDep) {
-        logger.info(`${this.linterChoice} already installed.`);
-      } else {
-        const linterToInstall =
-          linterChoice === 'tslint' ? 'tslint typescript' : 'eslint';
-
-        return installNpmDevDep(linterToInstall).then(() => {
-          if (!this.linterHasConfigFile) {
-            return this.writeLinterFile();
-          } else {
-            logger.info(`${this.linterChoice}.json file already existing.`);
-          }
-        });
-      }
+      return new Promise((resolve, reject) => {
+        if (this.linterInDevDep) {
+          logger.info(`${this.linterChoice} already installed.`);
+          resolve();
+        } else {
+          const linterToInstall =
+            linterChoice === 'tslint' ? 'tslint typescript' : 'eslint';
+          installNpmDevDep(linterToInstall)
+            .then(() => {
+              resolve();
+            })
+            .catch(err => {
+              reject(err);
+            });
+        }
+      }).then(() => {
+        if (this.linterHasConfigFile) {
+          logger.info(`${this.linterChoice}.json file already existing.`);
+          return Promise.resolve();
+        } else {
+          this.writeLinterFile()
+            .then(() => {
+              return Promise.resolve();
+            })
+            .catch(err => {
+              throw err;
+            });
+        }
+      });
     }
   }
 
