@@ -45,21 +45,6 @@ export class ListRules {
         });
       });
     });
-    /* .then(firstGradeRulesToApply => {
-        return firstGradeRulesToApply.reduce(
-          async (
-            rulesToApply: Promise<Rule[]>,
-            currFirstGradeRule: Rule,
-            index: number,
-          ) => {
-            return [
-              ...(await rulesToApply),
-              ...(await ListRules.getSubRulesOf(currFirstGradeRule)),
-            ];
-          },
-          Promise.resolve([...firstGradeRulesToApply]),
-        );
-      }); */
   }
 
   private static async getSubRulesOf(rule: Rule): Promise<Rule[]> {
