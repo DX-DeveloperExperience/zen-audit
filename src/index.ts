@@ -77,8 +77,8 @@ class ProjectFillerCli extends Command {
     init();
 
     if (runFlags.custom) {
-      // console.log(runFlags.custom);
-      // importClassesIn(runFlags.custom);
+      const customPath = Path.resolve(runFlags.custom);
+      importClassesIn(customPath);
     }
 
     if (runFlags.debug) {
