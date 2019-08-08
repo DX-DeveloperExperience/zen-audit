@@ -15,7 +15,7 @@ import { myCopy } from '../../../../../utils/file-utils';
 @RuleRegister.register
 @StackRegister.registerRuleForStacks([Angular, React, VueJS])
 export default class Nginx {
-  private configDirPath = Globals.rootPath + 'config';
+  private configDirPath = Globals.rootPath + 'nginx-config';
   private configFilePath = this.configDirPath + '/nginx.conf';
   private defaultConfFilePath = __dirname + '/nginx.conf';
 
@@ -25,25 +25,26 @@ export default class Nginx {
 
   async apply(apply: boolean): Promise<void> {
     if (apply) {
-      return ensureDir(this.configDirPath)
-        .then(
-          () => {
+      return new Promise((resolve, reject) => {
+        ensureDir(this.configDirPath)
+          .then(() => {
             return myCopy(this.defaultConfFilePath, this.configFilePath);
-          },
-          err => {
-            throw new DirError(err, this.configDirPath, this.getName());
-          },
-        )
-        .then(
-          () => {
-            logger.info('Succesfully copied nginx.conf file to config folder.');
-          },
-          err => {
-            if (err instanceof WriteFileError) {
-              throw err;
-            }
-          },
-        );
+          })
+          .then(
+            () => {
+              logger.info(
+                'Succesfully copied nginx.conf file to config folder.',
+              );
+              resolve();
+            },
+            err => {
+              if (err.message.endsWith('already exists')) {
+                resolve();
+              }
+              reject(err);
+            },
+          );
+      });
     }
   }
 
@@ -54,7 +55,7 @@ export default class Nginx {
     return 'Would you like to add a configuration file for Nginx ?';
   }
   getLongDescription(): string {
-    throw new Error('Method not implemented.');
+    return 'Nginx long description';
   }
   getPromptType(): string {
     return 'list';
