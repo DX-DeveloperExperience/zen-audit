@@ -3,7 +3,7 @@ import Stack from '../stack';
 import Constructor from '../../constructor';
 
 interface RegisterRuleForAllOptions {
-  excludes?: Array<Constructor<Stack>>;
+  excludes: Array<Constructor<Stack>>;
 }
 
 /**
@@ -82,13 +82,12 @@ export class StackRegister {
     return [];
   }
 
-  static registerRuleForAll(options: RegisterRuleForAllOptions = {}) {
+  static registerRuleForAll(
+    options: RegisterRuleForAllOptions = { excludes: [] },
+  ) {
     return <P extends Constructor<Rule>>(ruleCtor: P) => {
       StackRegister.getConstructors()
-        .filter(
-          stackCtor =>
-            options.excludes && !options.excludes.includes(stackCtor),
-        )
+        .filter(stackCtor => !options.excludes.includes(stackCtor))
         .forEach(stackCtor => {
           StackRegister.rulesByStack[stackCtor.name].push(ruleCtor);
         });
