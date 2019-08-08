@@ -7,15 +7,17 @@ const rx = require('rxjs');
 
 function addRulesToPrompts(prompts: Subject<any>, rules: Rule[]) {
   rules.forEach(async rule => {
-    prompts.next({
-      name: rule.constructor.name,
-      message: rule.getShortDescription(),
-      type: rule.getPromptType(),
-      choices: await rule.getChoices(),
-      filter: (input: any) => {
-        return { input, rule };
-      },
-    });
+    if (await rule.shouldBeApplied()) {
+      prompts.next({
+        name: rule.constructor.name,
+        message: rule.getShortDescription(),
+        type: rule.getPromptType(),
+        choices: await rule.getChoices(),
+        filter: (input: any) => {
+          return { input, rule };
+        },
+      });
+    }
   });
 }
 
@@ -30,26 +32,26 @@ export async function promptForRules(rules: Rule[]): Promise<void> {
     const apply = output.answer.rule.apply;
     const ruleAnswer = output.answer.input;
 
-    if (rules[i] === undefined) {
-      prompts.complete();
-    }
     if (apply) {
       cli.action.start('Applying rule');
       apply.call(rule, ruleAnswer).then(() => {
         cli.action.stop('Rule applied !\n');
         const subRules = RuleRegister.getSubRulesOf(rule);
-
         if (subRules.length !== 0) {
           addRulesToPrompts(prompts, subRules);
         } else if (rules[i] !== undefined) {
           addRulesToPrompts(prompts, [rules[i]]);
           i++;
+        } else {
+          prompts.complete();
         }
       });
     } else {
       if (rules[i] !== undefined) {
         addRulesToPrompts(prompts, [rules[i]]);
         i++;
+      } else {
+        prompts.complete();
       }
     }
   });
