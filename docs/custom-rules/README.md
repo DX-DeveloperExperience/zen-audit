@@ -8,12 +8,29 @@ In order to add your custom rules, first you have to install our project as a de
 
 Then you need to create a folder with the name of your choice, containing another folder named 'rules'.
 In this 'rules' folder, you can create your first rule. You need to write them using TypeScript as we use decorators to register rules into our application.
+Each rule file must be an index.ts file inside a folder with the name of its corresponding rule.
 
-::: tip
+Your directory structure should look like this:
+
+```
+custom-folder
+    ├─ rules
+    │    ├─ my-custom-rule1
+    │    |   └─ index.ts
+    |    └─ my-custom-rule2
+    |        └─ index.ts
+    └─ stacks
+        ├─ my-custom-stack1
+        |   └─ index.ts
+        └─ mu-custom-stack2
+            └─ index.ts
+```
+
+::: warning
 Decorators are an experimental feature for the moment, so you need to set "experimentalDecorators" option to true in your tsconfig.json
 :::
 
-First let's take a look at the Rule interface as you will need to implement its methods :
+Before you start writing your first rule, let's take a look at the Rule interface as you will need to implement its methods :
 
 ```ts
 export default interface Rule {
@@ -44,7 +61,7 @@ export default interface Rule {
 }
 ```
 
-Create a TypeScript file inside the 'rules' folder, and write your class definition like this:
+Create a TypeScript file inside your custom-rule folder named index.ts, and write your class definition like this:
 
 ```ts
 @RuleRegister.register
