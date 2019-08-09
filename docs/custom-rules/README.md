@@ -64,7 +64,6 @@ export default interface Rule {
 Create a TypeScript file inside your custom-rule folder named index.ts, and write your class definition like this:
 
 ```ts
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([Stack1, Stack2...]) // Replace Stack1, Stack2... with Stack classes
 // or @StackRegister.registerRuleForAll({excludes: [Stacks to exclude]})
 export class Rule2 {
@@ -98,7 +97,7 @@ export class Rule2 {
 
 ### Sub-rules
 
-If you want your Rule2 to be prompted only after Rule1 is applied, use the following decorator:
+If you want your Rule2 to be prompted only after Rule1 is applied, use the following decorator instead:
 
 ```ts
 @RuleRegister.registerSubRuleOf(Rule1)
@@ -108,7 +107,7 @@ export class Rule2 {...}
 When you're finished writing your rules, run our application using the custom flag :
 
 ```bash
-bin/run -c=path/to/custom-rules-and-stacks path/to/your/project
+bin/run -c=path/to/custom-folder path/to/your/project
 ```
 
 <script>
