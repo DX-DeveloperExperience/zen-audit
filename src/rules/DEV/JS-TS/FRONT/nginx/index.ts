@@ -1,18 +1,14 @@
 import { YesNo } from './../../../../../choice/index';
-import { WriteFileError } from './../../../../../errors/FileErrors';
-import { DirError } from './../../../../../errors/DirErrors';
-import { RuleRegister } from '../../../../rule-register';
 import { StackRegister } from '../../../../../stacks/stack-register';
 import Angular from '../../../../../stacks/angular';
 import { React } from '../../../../../stacks/react';
 import VueJS from '../../../../../stacks/vue-js';
-import { ensureDir, copy } from 'fs-extra';
+import { ensureDir } from 'fs-extra';
 import Globals from '../../../../../utils/globals';
 import { logger } from '../../../../../logger';
 import Choice from '../../../../../choice';
 import { myCopy } from '../../../../../utils/file-utils';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([Angular, React, VueJS])
 export default class Nginx {
   private configDirPath = Globals.rootPath + 'nginx-config';

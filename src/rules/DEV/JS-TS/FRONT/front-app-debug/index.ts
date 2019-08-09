@@ -1,6 +1,5 @@
 import { WriteFileError } from './../../../../../errors/FileErrors';
 import { ListStacks } from '../../../../../stacks/list-stacks/index';
-import { RuleRegister } from '../../../../rule-register';
 import { StackRegister } from '../../../../../stacks/stack-register';
 import VueJS from '../../../../../stacks/vue-js';
 import Angular from '../../../../../stacks/angular';
@@ -14,7 +13,6 @@ import * as fs from 'fs-extra';
 import { logger } from '../../../../../logger';
 import Constructor from '../../../../../constructor';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([VueJS, Angular, React])
 export class FrontAppDebug {
   private parsedLaunchConf: LaunchConfFile;

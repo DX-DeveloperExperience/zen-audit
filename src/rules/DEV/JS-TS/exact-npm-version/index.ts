@@ -1,5 +1,4 @@
 import { WriteFileError } from './../../../../errors/FileErrors';
-import { RuleRegister } from '../../../rule-register';
 import * as fs from 'fs-extra';
 import { StackRegister } from '../../../../stacks/stack-register';
 import { jsonObjectsToCheck } from './constants';
@@ -14,7 +13,6 @@ import { getExactSemver, matchesSemver } from '../../../../utils/semver/index';
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
  * accent in Semver of every dependency.
  */
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class ExactNpmVersion {
   private parsedPackageJSON: any;

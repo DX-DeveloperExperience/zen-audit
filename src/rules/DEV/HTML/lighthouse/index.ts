@@ -1,7 +1,6 @@
 import { WriteFileError } from './../../../../errors/FileErrors';
 import Choice, { YesNo } from './../../../../choice/index';
 import { React } from './../../../../stacks/react/index';
-import { RuleRegister } from '../../../rule-register';
 import { StackRegister } from '../../../../stacks/stack-register';
 import Angular from '../../../../stacks/angular';
 import VueJS from '../../../../stacks/vue-js';
@@ -13,7 +12,6 @@ import { copyFile, ensureDir, readJSON, writeJSON, promises } from 'fs-extra';
 import { DirError } from '../../../../errors/DirErrors';
 import { logger } from '../../../../logger';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([React, Angular, VueJS])
 export class LightHouse {
   private parsedPackage: IPackageJSON;

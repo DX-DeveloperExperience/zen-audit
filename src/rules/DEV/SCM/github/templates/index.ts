@@ -1,6 +1,5 @@
 import { WriteFileError } from './../../../../../errors/FileErrors';
 import { DirError } from './../../../../../errors/DirErrors';
-import { RuleRegister } from '../../../../rule-register/index';
 import { StackRegister } from '../../../../../stacks/stack-register';
 import GitHub from '../../../../../stacks/github';
 import * as fs from 'fs-extra';
@@ -9,7 +8,6 @@ import { logger } from '../../../../../logger/index';
 import Choice from '../../../../../choice/index';
 import Globals from '../../../../../utils/globals/index';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([GitHub])
 export class GitHubTemplates {
   private readonly templatesPath: string;

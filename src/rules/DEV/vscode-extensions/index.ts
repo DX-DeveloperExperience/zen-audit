@@ -1,5 +1,4 @@
 import { WriteFileError } from './../../../errors/FileErrors';
-import { RuleRegister } from '../../rule-register';
 import { StackRegister } from '../../../stacks/stack-register';
 import { ListStacks } from '../../../stacks/list-stacks';
 import { possibleChoices } from './constants';
@@ -10,7 +9,6 @@ import Choice from '../../../choice';
 import Globals from '../../../utils/globals';
 import { logger } from '../../../logger';
 
-@RuleRegister.register
 @StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
 export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];

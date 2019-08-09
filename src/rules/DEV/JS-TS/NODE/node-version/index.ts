@@ -1,5 +1,4 @@
 import { WriteFileError } from './../../../../../errors/FileErrors';
-import { RuleRegister } from '../../../../rule-register';
 import { StackRegister } from '../../../../../stacks/stack-register';
 import { Ok } from '../../../../../choice';
 import * as cp from 'child_process';
@@ -10,7 +9,6 @@ import { ReadFileError } from '../../../../../errors/FileErrors';
 import { readJSON, writeJSON } from 'fs-extra';
 import { logger } from '../../../../../logger';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class NodeVersion {
   readonly requiredFiles: string[] = [];
