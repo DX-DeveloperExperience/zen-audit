@@ -2,7 +2,7 @@ import { ListRules } from './rules/list-rules';
 import { Command, flags, run } from '@oclif/command';
 import { cli } from 'cli-ux';
 import * as Path from 'path';
-import { init, importClassesIn } from './init/index';
+import { init, importClassesIn, importCustomClassesIn } from './init/index';
 import { StackRegister } from './stacks/stack-register';
 import { ListStacks } from './stacks/list-stacks/index';
 import { logger } from './logger/index';
@@ -78,7 +78,7 @@ class ProjectFillerCli extends Command {
 
     if (runFlags.custom) {
       const customPath = Path.resolve(runFlags.custom);
-      importClassesIn(customPath);
+      importCustomClassesIn(customPath);
     }
 
     if (runFlags.debug) {
