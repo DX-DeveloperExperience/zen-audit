@@ -8,27 +8,25 @@ export function importClassesIn(rootPath: string) {
     if (stat.isDirectory()) {
       importClassesIn(fullPath);
     } else if (path.startsWith('index.')) {
-      require(`${rootPath}`);
+      require(rootPath);
     }
   });
 }
 
 export function importCustomClassesIn(rootPath: string) {
-  const dirContent = fs.readdirSync(rootPath);
-
-  if (dirContent.includes('index.ts')) {
+  if (fs.readdirSync(rootPath).includes('index.ts')) {
     ts.createProgram([`${rootPath}/index.ts`], {
       target: ts.ScriptTarget.ES5,
     }).emit();
   }
 
-  dirContent.forEach(path => {
+  fs.readdirSync(rootPath).forEach(path => {
     const fullPath = rootPath + '/' + path;
     const stat = fs.lstatSync(fullPath);
     if (stat.isDirectory()) {
       importCustomClassesIn(fullPath);
-    } else if (path.startsWith('index.')) {
-      require(`${rootPath}`);
+    } else if (path === 'index.js') {
+      require(rootPath);
     }
   });
 }
