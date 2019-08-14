@@ -1,5 +1,5 @@
 {
-  "name": "@dxdeveloperexperience/project-starter",
+  "name": "ZenAudit",
   "description": "A tool to gather everything you need to deploy a new project",
   "version": "0.8.0",
   "author": "Zenika - Demey Emmanuel - Lafrance Antoine",
@@ -92,7 +92,6 @@
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs"
   },
-  "types": "lib/exports.d.ts",
   "jest": {
     "roots": [
       "<rootDir>/src"
