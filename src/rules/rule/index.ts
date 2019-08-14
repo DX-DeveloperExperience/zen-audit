@@ -4,17 +4,28 @@ import Choice from '../../choice';
  */
 export default interface Rule {
   /**
-   * Tells if the project contains what is necessary to apply this rule.
+   * Resolves a promise to true if the audited project should apply this rule. For example,
+   * if the rule is to add rules to the .gitignore file, if the existing .gitignore does not contains
+   * all the rules, this method resolves to true.
    */
   shouldBeApplied(): Promise<boolean>;
   /**
-   * Add what is necessary to the project so the rule is applied.
+   * Add what is necessary to the project so the rule should not be applied again.
    * Takes a boolean or an array of string to tell if the rule has to be applied,
    * or the choices to apply if the user has multiple choices to apply.
    */
   apply?: (answers: boolean | string[]) => Promise<void>;
+  /**
+   * Returns the name of the Rule as it will be seen in the prompt.
+   */
   getName(): string;
+  /**
+   * Returns the description of the stack that will be seen before asking if the user wants to apply it.
+   */
   getShortDescription(): string;
+  /**
+   * Returns a longer description that will appear in the generated Markdown/PDF report.
+   */
   getLongDescription(): string;
   /**
    * Gives the prompt type as a string. Please refer to Inquirer documentation to know which
