@@ -1,6 +1,5 @@
 import { WriteFileError } from './../../../../../errors/FileErrors';
 import { DirError } from './../../../../../errors/DirErrors';
-import { RuleRegister } from '../../../../rule-register/index';
 import { StackRegister } from '../../../../../stacks/stack-register';
 import GitHub from '../../../../../stacks/github';
 import * as fs from 'fs-extra';

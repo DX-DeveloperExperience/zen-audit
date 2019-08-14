@@ -1,4 +1,3 @@
-import { RuleRegister } from '../../../rule-register';
 import { StackRegister } from '../../../../stacks/stack-register';
 import { YesNo } from '../../../../choice';
 import { logger } from '../../../../logger/index';
@@ -15,7 +14,6 @@ import { Website } from '../../../../stacks/website';
  * add this file, and fill it with rules corresponding to your project
  * gathered from these sources: https://github.com/github/gitignore
  */
-@RuleRegister.register
 @StackRegister.registerRuleForAll({ excludes: [Elasticsearch, Website] })
 export class GitIgnore {
   readonly requiredFiles: string[] = ['.gitignore'];

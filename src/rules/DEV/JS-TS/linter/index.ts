@@ -2,7 +2,6 @@ import {
   WriteFileError,
   CreateFileError,
 } from './../../../../errors/FileErrors';
-import { RuleRegister } from '../../../rule-register';
 import { StackRegister } from '../../../../stacks/stack-register';
 import { ListStacks } from '../../../../stacks/list-stacks/index';
 import { linterJSON } from './constants';
@@ -15,7 +14,6 @@ import { YesNo } from '../../../../choice/index';
 import Globals from '../../../../utils/globals';
 import { installNpmDevDep } from '../../../../utils/commands';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([TypeScript, Node])
 export class Linter {
   private packageJSONPath: string;

@@ -1,12 +1,10 @@
 import { FetchDataError } from './../../../../errors/FetchData';
 import { YesNo } from '../../../../choice/index';
 import Axios from 'axios';
-import { RuleRegister } from '../../../rule-register/index';
 import { StackRegister } from '../../../../stacks/stack-register';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import Globals from '../../../../utils/globals';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
 export class ElasticsearchNodesNumber {
   async shouldBeApplied(): Promise<boolean> {

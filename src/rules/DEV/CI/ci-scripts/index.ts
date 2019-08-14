@@ -1,6 +1,5 @@
 import { YesNo } from './../../../../choice/index';
 import { WriteFileError } from './../../../../errors/FileErrors';
-import { RuleRegister } from '../../../rule-register';
 import { StackRegister } from '../../../../stacks/stack-register';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import { Website } from '../../../../stacks/website';
@@ -11,7 +10,6 @@ import Choice from '../../../../choice';
 import { DirError } from '../../../../errors/DirErrors';
 import { myCopy } from '../../../../utils/file-utils';
 
-@RuleRegister.register
 @StackRegister.registerRuleForAll({ excludes: [Elasticsearch, Website] })
 export default class CiScripts {
   private scriptsPath = Globals.rootPath + 'ci-scripts';

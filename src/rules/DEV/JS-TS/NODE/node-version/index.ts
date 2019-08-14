@@ -1,5 +1,4 @@
 import { WriteFileError } from './../../../../../errors/FileErrors';
-import { RuleRegister } from '../../../../rule-register';
 import { StackRegister } from '../../../../../stacks/stack-register';
 import { Ok } from '../../../../../choice';
 import * as cp from 'child_process';

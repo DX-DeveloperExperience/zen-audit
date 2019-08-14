@@ -1,5 +1,4 @@
 import { WriteFileError } from './../../../../../errors/FileErrors';
-import { RuleRegister } from '../../../../rule-register';
 import { YesNo } from '../../../../../choice/index';
 import Choice from '../../../../../choice/index';
 import Globals from '../../../../../utils/globals/index';
@@ -14,7 +13,6 @@ import {
 } from '../../../../../utils/commands';
 import { ReadFileError } from '../../../../../errors/FileErrors';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([Node])
 export class Nodemon {
   private parsedJSON: any;

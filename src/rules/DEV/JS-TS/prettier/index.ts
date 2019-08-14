@@ -1,8 +1,5 @@
 import { StackRegister } from '../../../../stacks/stack-register';
 import { logger } from '../../../../logger/index';
-import { RuleRegister } from '../../../rule-register';
-import * as util from 'util';
-import * as cp from 'child_process';
 import TypeScript from '../../../../stacks/typescript';
 import Node from '../../../../stacks/node';
 import { hasDevDependency } from '../../../../utils/json/index';
@@ -11,7 +8,6 @@ import { execInRootpath } from '../../../../utils/commands';
 /**
  * Looks for Prettier dependency in package.json, and add it if necessary.
  */
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class Prettier {
   private packagePath: string;

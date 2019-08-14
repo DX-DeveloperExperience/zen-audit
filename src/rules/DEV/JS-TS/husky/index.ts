@@ -1,5 +1,4 @@
 import { ReadFileError, WriteFileError } from './../../../../errors/FileErrors';
-import { RuleRegister } from '../../../rule-register';
 import { StackRegister } from '../../../../stacks/stack-register';
 import { YesNo } from '../../../../choice/index';
 import { logger } from '../../../../logger';
@@ -10,7 +9,6 @@ import { hasDevDependency, pathExistsInJSON } from '../../../../utils/json';
 import Globals from '../../../../utils/globals';
 import { installNpmDevDep } from '../../../../utils/commands';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class Husky {
   private parsedPackage: any;
