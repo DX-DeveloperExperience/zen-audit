@@ -10,7 +10,6 @@ import { ReadFileError } from '../../../../../errors/FileErrors';
 import { readJSON, writeJSON } from 'fs-extra';
 import { logger } from '../../../../../logger';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([Node, TypeScript])
 export class NodeVersion {
   readonly requiredFiles: string[] = [];

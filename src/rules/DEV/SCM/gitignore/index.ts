@@ -8,6 +8,7 @@ import Elasticsearch from '../../../../stacks/elasticsearch';
 import axios from 'axios';
 import Globals from '../../../../utils/globals';
 import { ReadFileError } from '../../../../errors/FileErrors';
+import { Website } from '../../../../stacks/website';
 
 /**
  * This Rule will look for a .gitignore file. If it doesn't exist, applying this rule will
@@ -15,7 +16,7 @@ import { ReadFileError } from '../../../../errors/FileErrors';
  * gathered from these sources: https://github.com/github/gitignore
  */
 @RuleRegister.register
-@StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
+@StackRegister.registerRuleForAll({ excludes: [Elasticsearch, Website] })
 export class GitIgnore {
   readonly requiredFiles: string[] = ['.gitignore'];
   private gitIgnoreContent: string | undefined;

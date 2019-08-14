@@ -14,7 +14,6 @@ import * as fs from 'fs-extra';
 import { logger } from '../../../../../logger';
 import Constructor from '../../../../../constructor';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([VueJS, Angular, React])
 export class FrontAppDebug {
   private parsedLaunchConf: LaunchConfFile;
@@ -43,42 +42,44 @@ export class FrontAppDebug {
   }
 
   async apply(apply: boolean): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.addMissingConfigurations()
-        .then(
-          () => {
-            return fs.writeJSON(
-              this.launchConfFilePath,
-              this.parsedLaunchConf,
-              {
-                spaces: '\t',
-              },
-            );
-          },
-          err => {
-            reject(err);
-          },
-        )
-        .then(
-          () => {
-            logger.info(
-              `FrontAppDebug: Succesfully written VSCode debug configurations to: ${
-                this.launchConfFilePath
-              }`,
-            );
-            resolve();
-          },
-          err => {
-            reject(
-              new WriteFileError(
-                err,
+    if (apply) {
+      return new Promise<void>((resolve, reject) => {
+        this.addMissingConfigurations()
+          .then(
+            () => {
+              return fs.writeJSON(
                 this.launchConfFilePath,
-                this.constructor.name,
-              ),
-            );
-          },
-        );
-    });
+                this.parsedLaunchConf,
+                {
+                  spaces: '\t',
+                },
+              );
+            },
+            err => {
+              reject(err);
+            },
+          )
+          .then(
+            () => {
+              logger.info(
+                `FrontAppDebug: Succesfully written VSCode debug configurations to: ${
+                  this.launchConfFilePath
+                }`,
+              );
+              resolve();
+            },
+            err => {
+              reject(
+                new WriteFileError(
+                  err,
+                  this.launchConfFilePath,
+                  this.constructor.name,
+                ),
+              );
+            },
+          );
+      });
+    }
   }
 
   private addMissingConfigurations(): Promise<void> {

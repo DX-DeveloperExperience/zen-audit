@@ -9,9 +9,10 @@ import Elasticsearch from '../../../stacks/elasticsearch';
 import Choice from '../../../choice';
 import Globals from '../../../utils/globals';
 import { logger } from '../../../logger';
+import { Website } from '../../../stacks/website';
 
 @RuleRegister.register
-@StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
+@StackRegister.registerRuleForAll({ excludes: [Elasticsearch, Website] })
 export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
   private extensionsJSONPath: string;

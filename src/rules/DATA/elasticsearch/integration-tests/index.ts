@@ -10,7 +10,6 @@ import Axios from 'axios';
 import { outputFile } from 'fs-extra';
 import { logger } from '../../../../logger';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([Elasticsearch])
 export class IntegrationTests {
   private templateUrl: string =

@@ -9,7 +9,6 @@ import { logger } from '../../../../../logger/index';
 import Choice from '../../../../../choice/index';
 import Globals from '../../../../../utils/globals/index';
 
-@RuleRegister.register
 @StackRegister.registerRuleForStacks([GitHub])
 export class GitHubTemplates {
   private readonly templatesPath: string;
