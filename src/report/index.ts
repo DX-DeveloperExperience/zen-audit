@@ -22,8 +22,8 @@ export function generateReport(reportData: {
   }>;
 }) {
   const reportDirPath = Globals.rootPath.startsWith('http')
-    ? './zodit-reports/'
-    : `${Globals.rootPath}zodit-reports/`;
+    ? `./${Globals.ourName}-reports/`
+    : `${Globals.rootPath}${Globals.ourName}-reports/`;
 
   return new Promise<void>((resolve, reject) => {
     fs.readFile(__dirname + '/report.md', { encoding: 'utf-8' })
@@ -86,7 +86,9 @@ async function generateMarkdown(data: string, reportDirPath: string) {
       .then(
         () => {
           logger.info(
-            `Generated Zodit markdown report at: ${reportMarkdownPath}`,
+            `Generated ${
+              Globals.ourName
+            } markdown report at: ${reportMarkdownPath}`,
           );
           resolve();
         },
