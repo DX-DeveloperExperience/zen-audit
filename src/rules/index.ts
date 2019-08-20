@@ -1,6 +1,4 @@
 export * from './rule';
-export * from './rule-register';
-export * from './list-rules';
 export * from './DATA/ELASTICSEARCH/mlock';
 export * from './DATA/ELASTICSEARCH/integration-tests';
 export * from './DATA/ELASTICSEARCH/nodes-version';

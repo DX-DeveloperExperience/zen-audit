@@ -1,6 +1,5 @@
 import { YesNo } from './../../../../choice/index';
 import { WriteFileError } from './../../../../errors/FileErrors';
-import { StackRegister } from '../../../../stacks/stack-register';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import { Website } from '../../../../stacks/website';
 import { ensureDir } from 'fs-extra';
@@ -9,8 +8,9 @@ import { logger } from '../../../../logger';
 import Choice from '../../../../choice';
 import { DirError } from '../../../../errors/DirErrors';
 import { myCopy } from '../../../../utils/file-utils';
+import { Register } from '../../../../register';
 
-@StackRegister.registerRuleForAll({ excludes: [Elasticsearch, Website] })
+@Register.ruleForAll({ excludes: [Elasticsearch, Website] })
 export default class CiScripts {
   private scriptsPath = Globals.rootPath + 'ci-scripts';
   private defaultScriptsPath = __dirname + '/scripts';

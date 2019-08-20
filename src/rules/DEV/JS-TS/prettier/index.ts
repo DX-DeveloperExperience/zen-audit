@@ -1,4 +1,4 @@
-import { StackRegister } from '../../../../stacks/stack-register';
+import { Register } from './../../../../register/index';
 import { logger } from '../../../../logger/index';
 import TypeScript from '../../../../stacks/typescript';
 import Node from '../../../../stacks/node';
@@ -8,7 +8,7 @@ import { execInRootpath } from '../../../../utils/commands';
 /**
  * Looks for Prettier dependency in package.json, and add it if necessary.
  */
-@StackRegister.registerRuleForStacks([Node, TypeScript])
+@Register.ruleForStacks([Node, TypeScript])
 export class Prettier {
   private packagePath: string;
   private parsedPackage: any;

@@ -1,21 +1,17 @@
-import { FetchDataError } from './../../../../errors/FetchData';
+import { Register } from './../../../../register/index';
+import { FetchDataError } from '../../../../errors/FetchData';
 import { YesNo } from '../../../../choice/index';
-import { StackRegister } from '../../../../stacks/stack-register';
-import Elasticsearch from '../../../../stacks/elasticsearch';
 import Axios from 'axios';
+import Elasticsearch from '../../../../stacks/elasticsearch';
 import Globals from '../../../../utils/globals';
 
-@StackRegister.registerRuleForStacks([Elasticsearch])
-export class ElasticsearchTemplate {
+@Register.ruleForStacks([Elasticsearch])
+export class ElasticsearchNodesNumber {
   async shouldBeApplied(): Promise<boolean> {
-    const url = `${Globals.rootPath}_template`;
+    const url = `${Globals.rootPath}_nodes`;
     return Axios.get(url)
-      .then(({ data: templates }) => {
-        return (
-          Object.keys(templates).filter(
-            templateName => !templateName.startsWith('.'),
-          ).length === 0
-        );
+      .then(result => {
+        return Object.keys(result.data.nodes).length < 3;
       })
       .catch(err => {
         throw new FetchDataError(err, url, this.constructor.name);
@@ -23,11 +19,11 @@ export class ElasticsearchTemplate {
   }
 
   getName() {
-    return 'Elasticsearch Template';
+    return 'Elasticsearch Nodes';
   }
 
   getShortDescription() {
-    return 'You should use templates for configuring your indices';
+    return 'An Elasticsearch cluster should at least has 3 nodes';
   }
 
   getLongDescription() {

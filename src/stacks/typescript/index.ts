@@ -1,9 +1,9 @@
-import { StackRegister } from '../stack-register';
 import Globals from '../../utils/globals';
 import { pathExistsInJSON } from '../../utils/json';
 import { ReadFileError } from '../../errors/FileErrors';
+import { Register } from '../../register';
 
-@StackRegister.register
+@Register.stack
 export default class TypeScript {
   private parsedPackage: object = {};
   private hasDevDependency: boolean = false;

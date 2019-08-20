@@ -1,8 +1,8 @@
+import { Register } from './../../../../../register/index';
 import { WriteFileError } from './../../../../../errors/FileErrors';
 import { YesNo } from '../../../../../choice/index';
 import Choice from '../../../../../choice/index';
 import Globals from '../../../../../utils/globals/index';
-import { StackRegister } from '../../../../../stacks/stack-register';
 import { pathExistsInJSON } from '../../../../../utils/json';
 import Node from '../../../../../stacks/node';
 import { logger } from '../../../../../logger/index';
@@ -13,7 +13,7 @@ import {
 } from '../../../../../utils/commands';
 import { ReadFileError } from '../../../../../errors/FileErrors';
 
-@StackRegister.registerRuleForStacks([Node])
+@Register.ruleForStacks([Node])
 export class Nodemon {
   private parsedJSON: any;
 

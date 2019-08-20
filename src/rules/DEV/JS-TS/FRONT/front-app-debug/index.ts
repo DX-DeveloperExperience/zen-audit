@@ -1,6 +1,5 @@
+import { Register } from './../../../../../register/index';
 import { WriteFileError } from './../../../../../errors/FileErrors';
-import { ListStacks } from '../../../../../stacks/list-stacks/index';
-import { StackRegister } from '../../../../../stacks/stack-register';
 import VueJS from '../../../../../stacks/vue-js';
 import Angular from '../../../../../stacks/angular';
 import { React } from '../../../../../stacks/react';
@@ -13,7 +12,7 @@ import * as fs from 'fs-extra';
 import { logger } from '../../../../../logger';
 import Constructor from '../../../../../constructor';
 
-@StackRegister.registerRuleForStacks([VueJS, Angular, React])
+@Register.ruleForStacks([VueJS, Angular, React])
 export class FrontAppDebug {
   private parsedLaunchConf: LaunchConfFile;
   private existingConfigs: LaunchConf[] | undefined;
@@ -138,7 +137,7 @@ export class FrontAppDebug {
       return this.foundStacks;
     } else {
       const areAvailablePromise = this.stacksToCheck.map(stackToCheck => {
-        return ListStacks.stackIsAvailable(stackToCheck);
+        return Register.stackIsAvailable(stackToCheck);
       });
 
       return Promise.all(areAvailablePromise).then(areAvailable => {

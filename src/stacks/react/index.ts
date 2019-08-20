@@ -1,11 +1,10 @@
-import { StackRegister } from '../stack-register';
 import { pathExistsInJSON } from '../../utils/json/index';
 import Globals from '../../utils/globals';
-import { logger } from '../../logger/index';
 import { getExactSemver } from '../../utils/semver/index';
 import { ReadFileError } from '../../errors/FileErrors';
+import { Register } from '../../register';
 
-@StackRegister.register
+@Register.stack
 export class React {
   readonly libraryVersion: string = '';
   readonly generatedCLI: boolean = false;

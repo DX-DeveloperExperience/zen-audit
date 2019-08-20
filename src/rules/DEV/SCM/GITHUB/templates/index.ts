@@ -1,6 +1,6 @@
-import { WriteFileError } from './../../../../../errors/FileErrors';
-import { DirError } from './../../../../../errors/DirErrors';
-import { StackRegister } from '../../../../../stacks/stack-register';
+import { Register } from './../../../../../register/index';
+import { WriteFileError } from '../../../../../errors/FileErrors';
+import { DirError } from '../../../../../errors/DirErrors';
 import GitHub from '../../../../../stacks/github';
 import * as fs from 'fs-extra';
 import { YesNo } from '../../../../../choice/index';
@@ -8,7 +8,7 @@ import { logger } from '../../../../../logger/index';
 import Choice from '../../../../../choice/index';
 import Globals from '../../../../../utils/globals/index';
 
-@StackRegister.registerRuleForStacks([GitHub])
+@Register.ruleForStacks([GitHub])
 export class GitHubTemplates {
   private readonly templatesPath: string;
   constructor() {
@@ -60,39 +60,37 @@ export class GitHubTemplates {
       });
   }
 
-  async apply(apply: boolean): Promise<void> {
-    if (apply) {
-      return new Promise((resolve, reject) => {
-        fs.ensureDir(this.templatesPath)
-          .then(
-            () => {
-              return fs.copy(`${__dirname}/template_files`, this.templatesPath);
-            },
-            err => {
-              reject(
-                new DirError(err, this.templatesPath, this.constructor.name),
-              );
-            },
-          )
-          .then(
-            () => {
-              logger.info(
-                'Succesully added issue templates file into .github/ISSUE_TEMPLATE directory. You may customize them to suit your needs.',
-              );
-              resolve();
-            },
-            err => {
-              reject(
-                new WriteFileError(
-                  err,
-                  `${__dirname}/template_files`,
-                  this.constructor.name,
-                ),
-              );
-            },
-          );
-      });
-    }
+  async apply(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      fs.ensureDir(this.templatesPath)
+        .then(
+          () => {
+            return fs.copy(`${__dirname}/template_files`, this.templatesPath);
+          },
+          err => {
+            reject(
+              new DirError(err, this.templatesPath, this.constructor.name),
+            );
+          },
+        )
+        .then(
+          () => {
+            logger.info(
+              'Succesully added issue templates file into .github/ISSUE_TEMPLATE directory. You may customize them to suit your needs.',
+            );
+            resolve();
+          },
+          err => {
+            reject(
+              new WriteFileError(
+                err,
+                `${__dirname}/template_files`,
+                this.constructor.name,
+              ),
+            );
+          },
+        );
+    });
   }
 
   getName(): string {

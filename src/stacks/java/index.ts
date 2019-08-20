@@ -1,8 +1,8 @@
-import { StackRegister } from '../stack-register';
 import { existsPaths } from '../../utils/file-utils';
 import Globals from '../../utils/globals';
+import { Register } from '../../register';
 
-@StackRegister.register
+@Register.stack
 export default class Java {
   isAvailable() {
     return existsPaths(

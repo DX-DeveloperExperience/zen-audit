@@ -1,10 +1,10 @@
-import { StackRegister } from '../stack-register';
 import * as fs from 'fs-extra';
 import Globals from '../../utils/globals';
 import { execInRootpath } from '../../utils/commands';
 import { DirError } from '../../errors/DirErrors';
+import { Register } from '../../register';
 
-@StackRegister.register
+@Register.stack
 export default class GitHub {
   async isAvailable(): Promise<boolean> {
     return this.dotGitExists()

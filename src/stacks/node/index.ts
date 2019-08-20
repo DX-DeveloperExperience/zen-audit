@@ -1,9 +1,8 @@
-import { StackRegister } from '../stack-register';
-import { existsPaths } from '../../utils/file-utils/index';
 import Globals from '../../utils/globals';
 import { ReadFileError } from '../../errors/FileErrors';
+import { Register } from '../../register';
 
-@StackRegister.register
+@Register.stack
 export default class Node {
   async isAvailable(): Promise<boolean> {
     try {

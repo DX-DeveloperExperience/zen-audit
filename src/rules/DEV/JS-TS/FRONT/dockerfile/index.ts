@@ -1,13 +1,13 @@
+import { Register } from './../../../../../register/index';
 import { WriteFileError } from './../../../../../errors/FileErrors';
 import { YesNo } from './../../../../../choice/index';
 import Globals from '../../../../../utils/globals';
 import Choice from '../../../../../choice';
-import { RuleRegister } from '../../../../rule-register';
 import Nginx from '../nginx';
 import { myCopy } from '../../../../../utils/file-utils';
 import { logger } from '../../../../../logger';
 
-@RuleRegister.registerSubRuleOf(Nginx)
+@Register.subRuleOf(Nginx)
 export default class Dockerfile {
   private dockerFilePath = Globals.rootPath + 'Dockerfile';
   private defaultDockerFilePath = __dirname + '/Dockerfile';

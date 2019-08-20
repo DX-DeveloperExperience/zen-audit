@@ -1,8 +1,10 @@
 import { cli } from 'cli-ux';
 import Rule from '../../rules/rule';
 import inquirer = require('inquirer');
-import { RuleRegister } from '../../rules/rule-register';
+// import { RuleRegister } from '../../rules/rule-register';
 import { Subject } from 'rxjs';
+import { Register } from '../../register';
+import { logger } from '../../logger';
 const rx = require('rxjs');
 
 function addRulesToPrompts(prompts: Subject<any>, rules: Rule[]) {
@@ -36,7 +38,7 @@ export async function promptForRules(rules: Rule[]): Promise<void> {
       cli.action.start('Applying rule');
       apply.call(rule, ruleAnswer).then(() => {
         cli.action.stop('Rule applied !\n');
-        const subRules = RuleRegister.getSubRulesOf(rule);
+            const subRules = Register.getSubRulesOf(rule);
         if (subRules.length !== 0) {
           addRulesToPrompts(prompts, subRules);
         } else if (rules[i] !== undefined) {

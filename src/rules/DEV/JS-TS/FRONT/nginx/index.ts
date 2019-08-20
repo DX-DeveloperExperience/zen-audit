@@ -1,5 +1,5 @@
+import { Register } from './../../../../../register/index';
 import { YesNo } from './../../../../../choice/index';
-import { StackRegister } from '../../../../../stacks/stack-register';
 import Angular from '../../../../../stacks/angular';
 import { React } from '../../../../../stacks/react';
 import VueJS from '../../../../../stacks/vue-js';
@@ -9,7 +9,7 @@ import { logger } from '../../../../../logger';
 import Choice from '../../../../../choice';
 import { myCopy } from '../../../../../utils/file-utils';
 
-@StackRegister.registerRuleForStacks([Angular, React, VueJS])
+@Register.ruleForStacks([Angular, React, VueJS])
 export default class Nginx {
   private configDirPath = Globals.rootPath + 'nginx-config';
   private configFilePath = this.configDirPath + '/nginx.conf';
