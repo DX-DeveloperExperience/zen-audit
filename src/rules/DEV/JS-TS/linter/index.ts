@@ -47,39 +47,37 @@ export class Linter {
     return !this.linterInDevDep || !this.linterHasConfigFile;
   }
 
-  async apply(apply: boolean): Promise<void> {
+  async apply(): Promise<void> {
     const linterChoice = await this.getLinterChoice();
-    if (apply) {
-      return new Promise((resolve, reject) => {
-        if (this.linterInDevDep) {
-          logger.info(`${this.linterChoice} already installed.`);
-          resolve();
-        } else {
-          const linterToInstall =
-            linterChoice === 'tslint' ? 'tslint typescript' : 'eslint';
-          installNpmDevDep(linterToInstall)
-            .then(() => {
-              resolve();
-            })
-            .catch(err => {
-              reject(err);
-            });
-        }
-      }).then(() => {
-        if (this.linterHasConfigFile) {
-          logger.info(`${this.linterChoice}.json file already existing.`);
-          return Promise.resolve();
-        } else {
-          this.writeLinterFile()
-            .then(() => {
-              return Promise.resolve();
-            })
-            .catch(err => {
-              throw err;
-            });
-        }
-      });
-    }
+    return new Promise((resolve, reject) => {
+      if (this.linterInDevDep) {
+        logger.info(`${this.linterChoice} already installed.`);
+        resolve();
+      } else {
+        const linterToInstall =
+          linterChoice === 'tslint' ? 'tslint typescript' : 'eslint';
+        installNpmDevDep(linterToInstall)
+          .then(() => {
+            resolve();
+          })
+          .catch(err => {
+            reject(err);
+          });
+      }
+    }).then(() => {
+      if (this.linterHasConfigFile) {
+        logger.info(`${this.linterChoice}.json file already existing.`);
+        return Promise.resolve();
+      } else {
+        this.writeLinterFile()
+          .then(() => {
+            return Promise.resolve();
+          })
+          .catch(err => {
+            throw err;
+          });
+      }
+    });
   }
 
   private async writeLinterFile(): Promise<void> {

@@ -18,15 +18,13 @@ export class Prettier {
     this.parsedPackage = require(this.packagePath);
   }
 
-  async apply(apply: boolean) {
-    if (apply) {
-      return execInRootpath('npm i prettier -DE').then(
-        (result: { stdout: string; stderr: string }) => {
-          logger.debug(result.stderr);
-          logger.info('Succesfully installed prettier.');
-        },
-      );
-    }
+  async apply() {
+    return execInRootpath('npm i prettier -DE').then(
+      (result: { stdout: string; stderr: string }) => {
+        logger.debug(result.stderr);
+        logger.info('Succesfully installed prettier.');
+      },
+    );
   }
 
   async shouldBeApplied() {

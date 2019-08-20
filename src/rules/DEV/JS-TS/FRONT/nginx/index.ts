@@ -19,29 +19,25 @@ export default class Nginx {
     return true;
   }
 
-  async apply(apply: boolean): Promise<void> {
-    if (apply) {
-      return new Promise((resolve, reject) => {
-        ensureDir(this.configDirPath)
-          .then(() => {
-            return myCopy(this.defaultConfFilePath, this.configFilePath);
-          })
-          .then(
-            () => {
-              logger.info(
-                'Succesfully copied nginx.conf file to config folder.',
-              );
+  async apply(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      ensureDir(this.configDirPath)
+        .then(() => {
+          return myCopy(this.defaultConfFilePath, this.configFilePath);
+        })
+        .then(
+          () => {
+            logger.info('Succesfully copied nginx.conf file to config folder.');
+            resolve();
+          },
+          err => {
+            if (err.message.endsWith('already exists')) {
               resolve();
-            },
-            err => {
-              if (err.message.endsWith('already exists')) {
-                resolve();
-              }
-              reject(err);
-            },
-          );
-      });
-    }
+            }
+            reject(err);
+          },
+        );
+    });
   }
 
   getName(): string {

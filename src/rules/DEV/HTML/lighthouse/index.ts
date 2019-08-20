@@ -35,7 +35,7 @@ export class LightHouse {
     return !this.hasDevdependency || !this.hasLighthouseScript;
   }
 
-  async apply(apply: boolean): Promise<void> {
+  async apply(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.hasDevdependency) {
         resolve(installNpmDevDep('lighthouse'));

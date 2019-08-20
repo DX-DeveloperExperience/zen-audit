@@ -35,68 +35,66 @@ export class Nodemon {
     }
   }
 
-  async apply(apply: boolean): Promise<void> {
-    if (apply) {
-      return new Promise((resolve, reject) => {
-        installNpmDevDep('nodemon')
-          .then(
-            () => {
-              logger.info(
-                'Nodemon: Succesfully installed nodemon as dev dependency. Checking for existing script.',
-              );
-              return fs.readJSON(Globals.packageJSONPath, {
-                encoding: 'utf-8',
-              });
-            },
-            err => {
-              reject(err);
-            },
-          )
-          .then(
-            packageJSON => {
-              if (!pathExistsInJSON(packageJSON, ['scripts', 'nodemon'])) {
-                if (!pathExistsInJSON(packageJSON, ['scripts'])) {
-                  packageJSON.scripts = { nodemon: 'nodemon' };
-                } else {
-                  packageJSON.scripts.nodemon = 'nodemon';
-                }
+  async apply(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      installNpmDevDep('nodemon')
+        .then(
+          () => {
+            logger.info(
+              'Nodemon: Succesfully installed nodemon as dev dependency. Checking for existing script.',
+            );
+            return fs.readJSON(Globals.packageJSONPath, {
+              encoding: 'utf-8',
+            });
+          },
+          err => {
+            reject(err);
+          },
+        )
+        .then(
+          packageJSON => {
+            if (!pathExistsInJSON(packageJSON, ['scripts', 'nodemon'])) {
+              if (!pathExistsInJSON(packageJSON, ['scripts'])) {
+                packageJSON.scripts = { nodemon: 'nodemon' };
               } else {
-                logger.info('Nodemon: Script already existing.');
+                packageJSON.scripts.nodemon = 'nodemon';
               }
+            } else {
+              logger.info('Nodemon: Script already existing.');
+            }
 
-              return fs.writeJSON(Globals.packageJSONPath, packageJSON, {
-                spaces: '\t',
-              });
-            },
-            err => {
-              reject(
-                new ReadFileError(
-                  err,
-                  Globals.packageJSONPath,
-                  this.constructor.name,
-                ),
-              );
-            },
-          )
-          .then(
-            () => {
-              logger.info(
-                'Nodemon: Succesfully added nodemon script. Run "npm run nodemon" to run it.',
-              );
-              resolve();
-            },
-            err => {
-              reject(
-                new WriteFileError(
-                  err,
-                  Globals.packageJSONPath,
-                  this.constructor.name,
-                ),
-              );
-            },
-          );
-      });
-    }
+            return fs.writeJSON(Globals.packageJSONPath, packageJSON, {
+              spaces: '\t',
+            });
+          },
+          err => {
+            reject(
+              new ReadFileError(
+                err,
+                Globals.packageJSONPath,
+                this.constructor.name,
+              ),
+            );
+          },
+        )
+        .then(
+          () => {
+            logger.info(
+              'Nodemon: Succesfully added nodemon script. Run "npm run nodemon" to run it.',
+            );
+            resolve();
+          },
+          err => {
+            reject(
+              new WriteFileError(
+                err,
+                Globals.packageJSONPath,
+                this.constructor.name,
+              ),
+            );
+          },
+        );
+    });
   }
 
   getChoices(): Choice[] {

@@ -52,26 +52,24 @@ export class ExactNpmVersion {
   /**
    * Removes tilds or circumflex inside package.json's dependencies' Semvers
    */
-  async apply(apply: boolean) {
-    if (apply) {
-      return fs
-        .writeFile(Globals.packageJSONPath, this.correctSemverNotation(), {
-          encoding: 'utf8',
-        })
-        .then(() => {
-          logger.info(
-            'Succesfully updated package.json with exact semver notation',
-          );
-        })
-        .catch(err => {
-          logger.debug(err);
-          throw new WriteFileError(
-            err,
-            Globals.packageJSONPath,
-            this.constructor.name,
-          );
-        });
-    }
+  async apply() {
+    return fs
+      .writeFile(Globals.packageJSONPath, this.correctSemverNotation(), {
+        encoding: 'utf8',
+      })
+      .then(() => {
+        logger.info(
+          'Succesfully updated package.json with exact semver notation',
+        );
+      })
+      .catch(err => {
+        logger.debug(err);
+        throw new WriteFileError(
+          err,
+          Globals.packageJSONPath,
+          this.constructor.name,
+        );
+      });
   }
 
   /**

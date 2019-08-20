@@ -34,21 +34,7 @@ export async function promptForRules(rules: Rule[]): Promise<void> {
     const apply = output.answer.rule.apply;
     const ruleAnswer = output.answer.input;
 
-    if (apply) {
-      cli.action.start('Applying rule');
-      apply.call(rule, ruleAnswer).then(() => {
-        cli.action.stop('Rule applied !\n');
-            const subRules = Register.getSubRulesOf(rule);
-        if (subRules.length !== 0) {
-          addRulesToPrompts(prompts, subRules);
-        } else if (rules[i] !== undefined) {
-          addRulesToPrompts(prompts, [rules[i]]);
-          i++;
-        } else {
-          prompts.complete();
-        }
-      });
-    } else {
+    function addRuleOrComplete() {
       if (rules[i] !== undefined) {
         addRulesToPrompts(prompts, [rules[i]]);
         i++;
@@ -56,5 +42,30 @@ export async function promptForRules(rules: Rule[]): Promise<void> {
         prompts.complete();
       }
     }
+    if (apply) {
+      cli.action.start('Applying rule');
+      if (
+        (typeof ruleAnswer === 'boolean' && ruleAnswer === false) ||
+        (Array.isArray(ruleAnswer) && ruleAnswer.length === 0)
+      ) {
+        cli.action.stop('Rule not applied');
+      } else {
+        apply
+          .call(rule, ruleAnswer)
+          .then(() => {
+            cli.action.stop('Rule applied !\n');
+            const subRules = Register.getSubRulesOf(rule);
+            if (subRules.length !== 0) {
+              addRulesToPrompts(prompts, subRules);
+            } else {
+              addRuleOrComplete();
+            }
+          })
+          .catch(logger.error);
+        return;
+      }
+    }
+
+    addRuleOrComplete();
   });
 }

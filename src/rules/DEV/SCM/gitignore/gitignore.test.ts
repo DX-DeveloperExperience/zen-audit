@@ -71,7 +71,7 @@ test('shouldBeApplied should return true if .gitignore\
   return gitIgnore.shouldBeApplied().then(result => {
     expect(result).toBeTruthy();
 
-    return gitIgnore.apply(true).then(() => {
+    return gitIgnore.apply().then(() => {
       expect(resultGitignore).toEqual(
         '# comment\n' +
           '# another comment\n' +

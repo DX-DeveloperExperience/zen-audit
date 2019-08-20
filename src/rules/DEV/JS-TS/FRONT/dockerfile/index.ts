@@ -16,19 +16,17 @@ export default class Dockerfile {
     return true;
   }
 
-  async apply(apply: boolean): Promise<void> {
-    if (apply) {
-      return myCopy(this.defaultDockerFilePath, this.dockerFilePath).then(
-        () => {
-          logger.info(`${this.getName()}: Succesfully copied Dockerfile`);
-        },
-        err => {
-          if (err instanceof WriteFileError) {
-            throw err;
-          }
-        },
-      );
-    }
+  async apply(): Promise<void> {
+    return myCopy(this.defaultDockerFilePath, this.dockerFilePath).then(
+      () => {
+        logger.info(`${this.getName()}: Succesfully copied Dockerfile`);
+      },
+      err => {
+        if (err instanceof WriteFileError) {
+          throw err;
+        }
+      },
+    );
   }
   getName(): string {
     return 'Dockerfile';

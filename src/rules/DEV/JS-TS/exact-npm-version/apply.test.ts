@@ -52,7 +52,7 @@ test('Should replace ^ or ~ in package.json', () => {
     return Promise.resolve();
   });
 
-  return new ExactNpmVersion().apply(true).then(() => {
+  return new ExactNpmVersion().apply().then(() => {
     expect(correctSemverNotation).toEqual(correctedJSON);
   });
 });
@@ -102,7 +102,7 @@ test('Should not replace ^ or ~ in package.json for object that does not need to
     return Promise.resolve();
   });
 
-  return new ExactNpmVersion().apply(true).then(() => {
+  return new ExactNpmVersion().apply().then(() => {
     expect(correctSemverNotation).toEqual(correctedJSON);
   });
 });

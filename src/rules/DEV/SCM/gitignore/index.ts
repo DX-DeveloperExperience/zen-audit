@@ -126,33 +126,31 @@ export class GitIgnore {
     });
   }
 
-  async apply(apply: boolean): Promise<void> {
-    if (apply) {
-      return Promise.all([
-        this.getMissingGitRules(),
-        this.getGitIgnoreContent(),
-      ]).then((result: [string[], string]) => {
-        const missingRules = result[0];
-        const gitIgnoreContent = result[1];
-        if (missingRules !== undefined) {
-          return fs
-            .writeFile(
-              this.gitIgnorePath,
-              (gitIgnoreContent + '\n' + missingRules.join('\n')).trim(),
-              { encoding: 'utf-8' },
-            )
-            .then(() => {
-              logger.info('Succesfully added rules to .gitignore file.');
-            })
-            .catch(err => {
-              logger.error(
-                `An error occured while trying to write to your project's .gitignore file.`,
-              );
-              logger.debug(err);
-            });
-        }
-      });
-    }
+  async apply(): Promise<void> {
+    return Promise.all([
+      this.getMissingGitRules(),
+      this.getGitIgnoreContent(),
+    ]).then((result: [string[], string]) => {
+      const missingRules = result[0];
+      const gitIgnoreContent = result[1];
+      if (missingRules !== undefined) {
+        return fs
+          .writeFile(
+            this.gitIgnorePath,
+            (gitIgnoreContent + '\n' + missingRules.join('\n')).trim(),
+            { encoding: 'utf-8' },
+          )
+          .then(() => {
+            logger.info('Succesfully added rules to .gitignore file.');
+          })
+          .catch(err => {
+            logger.error(
+              `An error occured while trying to write to your project's .gitignore file.`,
+            );
+            logger.debug(err);
+          });
+      }
+    });
   }
 
   getName() {

@@ -43,10 +43,10 @@ test('should add missing configurations', () => {
   };
 
   Register.stackIsAvailable = jest.fn(async (stackCtor: Constructor<Stack>) => {
-      if (stackCtor === VueJS) {
-        return true;
-      }
-      return false;
+    if (stackCtor === VueJS) {
+      return true;
+    }
+    return false;
   });
 
   jest.mock(launchFilePath, () => mockLaunchFile, { virtual: true });
@@ -55,7 +55,7 @@ test('should add missing configurations', () => {
 
   const frontAppDebug = new FrontAppDebug();
 
-  return frontAppDebug.apply(true).then(() => {
+  return frontAppDebug.apply().then(() => {
     expect(fs.writeJSON).toBeCalledWith(launchFilePath, resultLaunchFile, {
       spaces: '\t',
     });

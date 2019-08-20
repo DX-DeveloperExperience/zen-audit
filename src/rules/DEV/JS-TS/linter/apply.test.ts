@@ -44,5 +44,5 @@ test('should install tslint as devDependencies and create tslint.json', () => {
     return Promise.resolve();
   });
 
-  return linterRule.apply(true);
+  return linterRule.apply();
 });

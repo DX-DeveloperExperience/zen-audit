@@ -19,34 +19,32 @@ export default class CiScripts {
     return true;
   }
 
-  async apply(apply: boolean): Promise<void> {
-    if (apply) {
-      return new Promise((resolve, reject) => {
-        return ensureDir(this.scriptsPath)
-          .then(
-            () => {
-              return myCopy(this.defaultScriptsPath, this.scriptsPath);
-            },
-            err => {
-              reject(new DirError(err, this.scriptsPath, this.getName()));
-            },
-          )
-          .then(
-            () => {
-              logger.info(
-                `${this.getName()}: Succesfully added CI scripts to ci-scripts folder. Please take some time to update them to fit your project and place them in your CI's folder. Then just run 'run_all.sh' in your CI.`,
-              );
-              resolve();
-            },
-            err => {
-              if (err instanceof WriteFileError) {
-                reject(err);
-              }
-              resolve();
-            },
-          );
-      });
-    }
+  async apply(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      return ensureDir(this.scriptsPath)
+        .then(
+          () => {
+            return myCopy(this.defaultScriptsPath, this.scriptsPath);
+          },
+          err => {
+            reject(new DirError(err, this.scriptsPath, this.getName()));
+          },
+        )
+        .then(
+          () => {
+            logger.info(
+              `${this.getName()}: Succesfully added CI scripts to ci-scripts folder. Please take some time to update them to fit your project and place them in your CI's folder. Then just run 'run_all.sh' in your CI.`,
+            );
+            resolve();
+          },
+          err => {
+            if (err instanceof WriteFileError) {
+              reject(err);
+            }
+            resolve();
+          },
+        );
+    });
   }
   getName(): string {
     return 'CI Scripts';

@@ -39,45 +39,43 @@ export class FrontAppDebug {
     });
   }
 
-  async apply(apply: boolean): Promise<void> {
-    if (apply) {
-      return new Promise<void>((resolve, reject) => {
-        this.addMissingConfigurations()
-          .then(
-            () => {
-              return fs.writeJSON(
+  async apply(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.addMissingConfigurations()
+        .then(
+          () => {
+            return fs.writeJSON(
+              this.launchConfFilePath,
+              this.parsedLaunchConf,
+              {
+                spaces: '\t',
+              },
+            );
+          },
+          err => {
+            reject(err);
+          },
+        )
+        .then(
+          () => {
+            logger.info(
+              `FrontAppDebug: Succesfully written VSCode debug configurations to: ${
+                this.launchConfFilePath
+              }`,
+            );
+            resolve();
+          },
+          err => {
+            reject(
+              new WriteFileError(
+                err,
                 this.launchConfFilePath,
-                this.parsedLaunchConf,
-                {
-                  spaces: '\t',
-                },
-              );
-            },
-            err => {
-              reject(err);
-            },
-          )
-          .then(
-            () => {
-              logger.info(
-                `FrontAppDebug: Succesfully written VSCode debug configurations to: ${
-                  this.launchConfFilePath
-                }`,
-              );
-              resolve();
-            },
-            err => {
-              reject(
-                new WriteFileError(
-                  err,
-                  this.launchConfFilePath,
-                  this.constructor.name,
-                ),
-              );
-            },
-          );
-      });
-    }
+                this.constructor.name,
+              ),
+            );
+          },
+        );
+    });
   }
 
   private addMissingConfigurations(): Promise<void> {
@@ -125,9 +123,13 @@ export class FrontAppDebug {
       return this.existingConfigs;
     }
 
-    if (pathExistsInJSON(this.parsedLaunchConf, ['configurations'])) {
-      return (this.existingConfigs = this.parsedLaunchConf.configurations);
-    } else {
+    try {
+      if (pathExistsInJSON(this.parsedLaunchConf, ['configurations'])) {
+        return (this.existingConfigs = this.parsedLaunchConf.configurations);
+      } else {
+        return (this.existingConfigs = []);
+      }
+    } catch (err) {
       return (this.existingConfigs = []);
     }
   }

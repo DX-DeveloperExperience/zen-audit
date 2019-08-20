@@ -17,12 +17,10 @@ export class Husky {
     this.parsedPackage = require(Globals.packageJSONPath);
   }
 
-  async apply(apply: boolean): Promise<void> {
-    if (apply) {
-      return installNpmDevDep('husky').then(() => {
-        return this.writeHuskyHook();
-      });
-    }
+  async apply(): Promise<void> {
+    return installNpmDevDep('husky').then(() => {
+      return this.writeHuskyHook();
+    });
   }
 
   private async writeHuskyHook(): Promise<void> {
