@@ -1,4 +1,4 @@
-import { WriteFileError } from './../../../../errors/FileErrors';
+import { WriteFileError } from '../../../../errors/file-errors';
 import * as fs from 'fs-extra';
 import { jsonObjectsToCheck } from './constants';
 import { YesNo } from '../../../../choice';

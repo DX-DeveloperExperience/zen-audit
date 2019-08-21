@@ -1,4 +1,4 @@
-import { ReadFileError, WriteFileError } from './../../../../errors/FileErrors';
+import { ReadFileError, WriteFileError } from '../../../../errors/file-errors';
 import { YesNo } from '../../../../choice/index';
 import { logger } from '../../../../logger';
 import Node from '../../../../stacks/node';

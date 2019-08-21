@@ -1,7 +1,7 @@
 import {
   WriteFileError,
   CreateFileError,
-} from './../../../../errors/FileErrors';
+} from '../../../../errors/file-errors';
 import { linterJSON } from './constants';
 import { logger } from '../../../../logger/index';
 import TypeScript from '../../../../stacks/typescript/index';

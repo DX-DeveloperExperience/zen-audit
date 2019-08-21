@@ -1,5 +1,5 @@
 import { Register } from './../../../../../register/index';
-import { WriteFileError } from './../../../../../errors/FileErrors';
+import { WriteFileError } from '../../../../../errors/file-errors';
 import { YesNo } from '../../../../../choice/index';
 import Choice from '../../../../../choice/index';
 import Globals from '../../../../../utils/globals/index';
@@ -11,7 +11,7 @@ import {
   installNpmDevDep,
   execInRootpath,
 } from '../../../../../utils/commands';
-import { ReadFileError } from '../../../../../errors/FileErrors';
+import { ReadFileError } from '../../../../../errors/file-errors';
 
 @Register.ruleForStacks([Node])
 export class Nodemon {

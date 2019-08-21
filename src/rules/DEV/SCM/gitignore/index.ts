@@ -4,7 +4,7 @@ import * as fs from 'fs-extra';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import axios from 'axios';
 import Globals from '../../../../utils/globals';
-import { ReadFileError } from '../../../../errors/FileErrors';
+import { ReadFileError } from '../../../../errors/file-errors';
 import { Website } from '../../../../stacks/website';
 import { Register } from '../../../../register';
 

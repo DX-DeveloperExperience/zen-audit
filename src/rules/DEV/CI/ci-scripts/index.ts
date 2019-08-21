@@ -1,13 +1,13 @@
 import { YesNo } from './../../../../choice/index';
-import { WriteFileError } from './../../../../errors/FileErrors';
+import { WriteFileError } from '../../../../errors/file-errors';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import { Website } from '../../../../stacks/website';
 import { ensureDir } from 'fs-extra';
 import Globals from '../../../../utils/globals';
 import { logger } from '../../../../logger';
 import Choice from '../../../../choice';
-import { DirError } from '../../../../errors/DirErrors';
-import { myCopy } from '../../../../utils/file-utils';
+import { DirError } from '../../../../errors/dir-errors';
+import { copy } from '../../../../utils/file-utils';
 import { Register } from '../../../../register';
 
 @Register.ruleForAll({ excludes: [Elasticsearch, Website] })
@@ -24,7 +24,7 @@ export default class CiScripts {
       return ensureDir(this.scriptsPath)
         .then(
           () => {
-            return myCopy(this.defaultScriptsPath, this.scriptsPath);
+            return copy(this.defaultScriptsPath, this.scriptsPath);
           },
           err => {
             reject(new DirError(err, this.scriptsPath, this.getName()));

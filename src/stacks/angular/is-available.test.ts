@@ -1,6 +1,6 @@
 import Globals from '../../utils/globals';
 import Angular from '.';
-import { ReadFileError } from '../../errors/FileErrors';
+import { ReadFileError } from '../../errors/file-errors';
 
 Globals.rootPath = 'test/angular/';
 

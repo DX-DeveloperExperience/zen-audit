@@ -1,7 +1,7 @@
 import { pathExistsInJSON } from '../../utils/json/index';
 import Globals from '../../utils/globals';
 import { getExactSemver } from '../../utils/semver/index';
-import { ReadFileError } from '../../errors/FileErrors';
+import { ReadFileError } from '../../errors/file-errors';
 import { Register } from '../../register';
 
 @Register.stack

@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import Globals from '../../utils/globals';
 import { execInRootpath } from '../../utils/commands';
-import { DirError } from '../../errors/DirErrors';
+import { DirError } from '../../errors/dir-errors';
 import { Register } from '../../register';
 
 @Register.stack

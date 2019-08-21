@@ -1,4 +1,4 @@
-import { WriteFileError } from './../../errors/FileErrors';
+import { WriteFileError } from '../../errors/file-errors';
 import * as fs from 'fs-extra';
 import { logger } from '../../logger';
 
@@ -50,7 +50,7 @@ export function existsPaths(...paths: string[]): Promise<boolean> {
   });
 }
 
-export async function myCopy(from: string, to: string) {
+export async function copy(from: string, to: string) {
   return fs
     .copy(from, to, {
       overwrite: false,
@@ -61,7 +61,7 @@ export async function myCopy(from: string, to: string) {
         logger.warn(err.message);
         throw err;
       } else {
-        throw new WriteFileError(err, to, myCopy.caller.name);
+        throw new WriteFileError(err, to, copy.caller.name);
       }
     });
 }

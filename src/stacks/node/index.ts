@@ -1,5 +1,5 @@
 import Globals from '../../utils/globals';
-import { ReadFileError } from '../../errors/FileErrors';
+import { ReadFileError } from '../../errors/file-errors';
 import { Register } from '../../register';
 
 @Register.stack

@@ -1,10 +1,10 @@
 import { Register } from './../../../../../register/index';
-import { WriteFileError } from './../../../../../errors/FileErrors';
+import { WriteFileError } from '../../../../../errors/file-errors';
 import { YesNo } from './../../../../../choice/index';
 import Globals from '../../../../../utils/globals';
 import Choice from '../../../../../choice';
 import Nginx from '../nginx';
-import { myCopy } from '../../../../../utils/file-utils';
+import { copy } from '../../../../../utils/file-utils';
 import { logger } from '../../../../../logger';
 
 @Register.subRuleOf(Nginx)
@@ -17,7 +17,7 @@ export default class Dockerfile {
   }
 
   async apply(): Promise<void> {
-    return myCopy(this.defaultDockerFilePath, this.dockerFilePath).then(
+    return copy(this.defaultDockerFilePath, this.dockerFilePath).then(
       () => {
         logger.info(`${this.getName()}: Succesfully copied Dockerfile`);
       },

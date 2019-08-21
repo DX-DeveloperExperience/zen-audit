@@ -1,6 +1,6 @@
 import { Register } from './../../../../register/index';
-import { WriteFileError } from '../../../../errors/FileErrors';
-import { FetchDataError } from '../../../../errors/FetchData';
+import { WriteFileError } from '../../../../errors/file-errors';
+import { FetchDataError } from '../../../../errors/fetch-data-errors';
 import Choice, { YesNo } from '../../../../choice/index';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import inquirer = require('inquirer');

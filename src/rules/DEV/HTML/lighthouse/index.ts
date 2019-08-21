@@ -1,4 +1,4 @@
-import { WriteFileError } from './../../../../errors/FileErrors';
+import { WriteFileError } from '../../../../errors/file-errors';
 import Choice, { YesNo } from './../../../../choice/index';
 import { React } from './../../../../stacks/react/index';
 import Angular from '../../../../stacks/angular';
@@ -8,7 +8,7 @@ import { IPackageJSON } from '../../../../utils/json/types/package';
 import { pathExistsInJSON } from '../../../../utils/json';
 import { installNpmDevDep } from '../../../../utils/commands';
 import { copyFile, ensureDir, readJSON, writeJSON, promises } from 'fs-extra';
-import { DirError } from '../../../../errors/DirErrors';
+import { DirError } from '../../../../errors/dir-errors';
 import { logger } from '../../../../logger';
 import { Register } from '../../../../register';
 

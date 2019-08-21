@@ -1,5 +1,5 @@
 import { Register } from './../../../../../register/index';
-import { WriteFileError } from './../../../../../errors/FileErrors';
+import { WriteFileError } from '../../../../../errors/file-errors';
 import VueJS from '../../../../../stacks/vue-js';
 import Angular from '../../../../../stacks/angular';
 import { React } from '../../../../../stacks/react';

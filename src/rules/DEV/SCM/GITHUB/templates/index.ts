@@ -1,6 +1,6 @@
 import { Register } from './../../../../../register/index';
-import { WriteFileError } from '../../../../../errors/FileErrors';
-import { DirError } from '../../../../../errors/DirErrors';
+import { WriteFileError } from '../../../../../errors/file-errors';
+import { DirError } from '../../../../../errors/dir-errors';
 import GitHub from '../../../../../stacks/github';
 import * as fs from 'fs-extra';
 import { YesNo } from '../../../../../choice/index';

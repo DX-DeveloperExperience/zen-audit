@@ -7,7 +7,7 @@ import { ensureDir } from 'fs-extra';
 import Globals from '../../../../../utils/globals';
 import { logger } from '../../../../../logger';
 import Choice from '../../../../../choice';
-import { myCopy } from '../../../../../utils/file-utils';
+import { copy } from '../../../../../utils/file-utils';
 
 @Register.ruleForStacks([Angular, React, VueJS])
 export default class Nginx {
@@ -23,7 +23,7 @@ export default class Nginx {
     return new Promise((resolve, reject) => {
       ensureDir(this.configDirPath)
         .then(() => {
-          return myCopy(this.defaultConfFilePath, this.configFilePath);
+          return copy(this.defaultConfFilePath, this.configFilePath);
         })
         .then(
           () => {

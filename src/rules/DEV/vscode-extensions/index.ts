@@ -1,5 +1,5 @@
 import { Register } from './../../../register/index';
-import { WriteFileError } from './../../../errors/FileErrors';
+import { WriteFileError } from '../../../errors/file-errors';
 import { possibleChoices } from './constants';
 import * as fs from 'fs-extra';
 import * as cp from 'child_process';
@@ -7,7 +7,6 @@ import Elasticsearch from '../../../stacks/elasticsearch';
 import Choice from '../../../choice';
 import Globals from '../../../utils/globals';
 import { logger } from '../../../logger';
-import { Website } from '../../../stacks/website';
 
 @Register.ruleForAll({ excludes: [Elasticsearch] })
 export class VSCodeExtensions {

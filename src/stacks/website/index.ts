@@ -1,5 +1,5 @@
 import { Register } from './../../register/index';
-import { FetchDataError } from './../../errors/FetchData';
+import { FetchDataError } from '../../errors/fetch-data-errors';
 import axios from 'axios';
 import { pathExistsInJSON } from '../../utils/json/index';
 import Globals from '../../utils/globals';

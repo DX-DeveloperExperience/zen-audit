@@ -1,4 +1,4 @@
-import { FetchDataError } from './../../errors/FetchData';
+import { FetchDataError } from '../../errors/fetch-data-errors';
 import axios from 'axios';
 import Globals from '../../utils/globals/index';
 import { Register } from '../../register';

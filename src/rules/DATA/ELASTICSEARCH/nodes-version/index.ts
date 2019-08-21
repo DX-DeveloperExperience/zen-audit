@@ -1,5 +1,5 @@
 import { Register } from './../../../../register/index';
-import { FetchDataError } from '../../../../errors/FetchData';
+import { FetchDataError } from '../../../../errors/fetch-data-errors';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import Globals from '../../../../utils/globals';
 import { YesNo } from '../../../../choice';
