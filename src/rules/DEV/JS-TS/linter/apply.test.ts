@@ -1,7 +1,7 @@
 import { Linter } from './index';
-import { ListStacks } from '../../../../stacks/list-stacks/index';
 import Stack from '../../../../stacks/stack/index';
 import Globals from '../../../../utils/globals/index';
+import { Register } from '../../../../register';
 const commands = require('../../../../utils/commands/index');
 
 const fs = require('fs-extra');
@@ -32,8 +32,8 @@ test('should install tslint as devDependencies and create tslint.json', () => {
     },
   };
 
-  ListStacks.findAvailableStack = jest.fn(() => {
-    return Promise.resolve({} as Stack);
+  Register.stackIsAvailable = jest.fn(() => {
+    return Promise.resolve(true);
   });
 
   jest.mock('linter/package.json', () => packageJSON, { virtual: true });
@@ -44,5 +44,5 @@ test('should install tslint as devDependencies and create tslint.json', () => {
     return Promise.resolve();
   });
 
-  return linterRule.apply(true);
+  return linterRule.apply();
 });

@@ -1,21 +1,22 @@
-import { FetchDataError } from './../../../../errors/FetchData';
-import { YesNo } from '../../../../choice/index';
-import { StackRegister } from '../../../../stacks/stack-register';
+import { Register } from './../../../../register/index';
+import { FetchDataError } from '../../../../errors/fetch-data-errors';
 import Elasticsearch from '../../../../stacks/elasticsearch';
-import Axios from 'axios';
 import Globals from '../../../../utils/globals';
+import { YesNo } from '../../../../choice';
+import Axios from 'axios';
 
-@StackRegister.registerRuleForStacks([Elasticsearch])
-export class ElasticsearchTemplate {
+@Register.ruleForStacks([Elasticsearch])
+export class ElasticsearchNodesVersion {
   async shouldBeApplied(): Promise<boolean> {
-    const url = `${Globals.rootPath}_template`;
+    const url = `${Globals.rootPath}_nodes`;
     return Axios.get(url)
-      .then(({ data: templates }) => {
-        return (
-          Object.keys(templates).filter(
-            templateName => !templateName.startsWith('.'),
-          ).length === 0
+      .then(result => {
+        const versions = Object.values(result.data.nodes).map(
+          (node: any) => node.version,
         );
+
+        const set = new Set(versions);
+        return set.size > 1;
       })
       .catch(err => {
         throw new FetchDataError(err, url, this.constructor.name);
@@ -23,11 +24,11 @@ export class ElasticsearchTemplate {
   }
 
   getName() {
-    return 'Elasticsearch Template';
+    return 'Elasticsearch Version';
   }
 
   getShortDescription() {
-    return 'You should use templates for configuring your indices';
+    return 'An Elasticsearch cluster should have all nodes using the same version of Elasticsearch';
   }
 
   getLongDescription() {

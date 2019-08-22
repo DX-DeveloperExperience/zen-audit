@@ -1,7 +1,5 @@
-import { createLogger, format, transports } from 'winston';
-import * as Transport from 'winston-transport';
+import { createLogger, format } from 'winston';
 import winston = require('winston');
-// import { ui } from '../utils/prompt';
 
 /**
  * To log anything, just import 'logger' from './logger/logger.servie'
@@ -10,7 +8,6 @@ import winston = require('winston');
  */
 export const logger = createLogger({
   level: 'info',
-  // silent: true,
   format: format.combine(
     format.colorize(),
     format.timestamp({

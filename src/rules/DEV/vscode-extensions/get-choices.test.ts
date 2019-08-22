@@ -1,4 +1,4 @@
-import { ListStacks } from '../../../stacks/list-stacks/index';
+import { Register } from './../../../register/index';
 import Stack from '../../../stacks/stack';
 import { VSCodeExtensions } from './index';
 import Globals from '../../../utils/globals';
@@ -13,7 +13,7 @@ afterEach(() => {
 });
 
 test('should give us a list of choices corresponding to stacks', () => {
-  ListStacks.getAvailableStacks = jest.fn(() => {
+  Register.getAvailableStacks = jest.fn(() => {
     return Promise.resolve([
       {
         name() {
@@ -44,7 +44,7 @@ test('should not add already existing extensions in choice list', () => {
     virtual: true,
   });
 
-  ListStacks.getAvailableStacks = jest.fn(() => {
+  Register.getAvailableStacks = jest.fn(() => {
     return Promise.resolve([
       {
         name() {

@@ -1,9 +1,9 @@
-import { StackRegister } from '../stack-register/index';
 import Globals from '../../utils/globals';
 import { pathExistsInJSON } from '../../utils/json/index';
 import Node from '../node';
+import { Register } from '../../register';
 
-@StackRegister.registerSubStackOf(Node)
+@Register.subStackOf(Node)
 export class NodeBackend {
   private hasExpress: boolean = false;
   private hasRestify: boolean = false;

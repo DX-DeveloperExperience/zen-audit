@@ -1,10 +1,10 @@
-import { StackRegister } from '../stack-register';
+import { Register } from './../../register/index';
 import Globals from '../../utils/globals';
 import { pathExistsInJSON } from '../../utils/json/index';
 import { getExactSemver } from '../../utils/semver/index';
-import { ReadFileError } from '../../errors/FileErrors';
+import { ReadFileError } from '../../errors/file-errors';
 
-@StackRegister.register
+@Register.stack
 export default class VueJS {
   readonly libraryVersion: string = '';
   readonly generatedCLI: boolean = false;

@@ -1,13 +1,13 @@
-import { WriteFileError } from './../../../../../errors/FileErrors';
+import { Register } from './../../../../../register/index';
+import { WriteFileError } from '../../../../../errors/file-errors';
 import { YesNo } from './../../../../../choice/index';
 import Globals from '../../../../../utils/globals';
 import Choice from '../../../../../choice';
-import { RuleRegister } from '../../../../rule-register';
 import Nginx from '../nginx';
-import { myCopy } from '../../../../../utils/file-utils';
+import { copy } from '../../../../../utils/file-utils';
 import { logger } from '../../../../../logger';
 
-@RuleRegister.registerSubRuleOf(Nginx)
+@Register.subRuleOf(Nginx)
 export default class Dockerfile {
   private dockerFilePath = Globals.rootPath + 'Dockerfile';
   private defaultDockerFilePath = __dirname + '/Dockerfile';
@@ -16,19 +16,17 @@ export default class Dockerfile {
     return true;
   }
 
-  async apply(apply: boolean): Promise<void> {
-    if (apply) {
-      return myCopy(this.defaultDockerFilePath, this.dockerFilePath).then(
-        () => {
-          logger.info(`${this.getName()}: Succesfully copied Dockerfile`);
-        },
-        err => {
-          if (err instanceof WriteFileError) {
-            throw err;
-          }
-        },
-      );
-    }
+  async apply(): Promise<void> {
+    return copy(this.defaultDockerFilePath, this.dockerFilePath).then(
+      () => {
+        logger.info(`${this.getName()}: Succesfully copied Dockerfile`);
+      },
+      err => {
+        if (err instanceof WriteFileError) {
+          throw err;
+        }
+      },
+    );
   }
   getName(): string {
     return 'Dockerfile';

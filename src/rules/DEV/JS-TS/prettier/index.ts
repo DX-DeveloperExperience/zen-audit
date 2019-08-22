@@ -1,4 +1,4 @@
-import { StackRegister } from '../../../../stacks/stack-register';
+import { Register } from './../../../../register/index';
 import { logger } from '../../../../logger/index';
 import TypeScript from '../../../../stacks/typescript';
 import Node from '../../../../stacks/node';
@@ -8,7 +8,7 @@ import { execInRootpath } from '../../../../utils/commands';
 /**
  * Looks for Prettier dependency in package.json, and add it if necessary.
  */
-@StackRegister.registerRuleForStacks([Node, TypeScript])
+@Register.ruleForStacks([Node, TypeScript])
 export class Prettier {
   private packagePath: string;
   private parsedPackage: any;
@@ -18,15 +18,13 @@ export class Prettier {
     this.parsedPackage = require(this.packagePath);
   }
 
-  async apply(apply: boolean) {
-    if (apply) {
-      return execInRootpath('npm i prettier -DE').then(
-        (result: { stdout: string; stderr: string }) => {
-          logger.debug(result.stderr);
-          logger.info('Succesfully installed prettier.');
-        },
-      );
-    }
+  async apply() {
+    return execInRootpath('npm i prettier -DE').then(
+      (result: { stdout: string; stderr: string }) => {
+        logger.debug(result.stderr);
+        logger.info('Succesfully installed prettier.');
+      },
+    );
   }
 
   async shouldBeApplied() {
