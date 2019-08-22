@@ -92,7 +92,8 @@
     "version": "oclif-dev readme && git add README.md",
     "publish-npm": "npm publish --access public",
     "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs"
+    "docs:build": "vuepress build docs",
+    "typedoc": "typedoc src --mode modules --json docs/API/api.json --options typedoc.js"
   },
   "jest": {
     "roots": [
