@@ -13,22 +13,19 @@
 
     function getClassifiedClasses() {
         let classesObj = {};
-        // classPaths2.forEach(classPath => {
-        //    classesObj = classifyClass(classesObj, classPath);
-        // })
-        classifyClass(classesObj, "errors/dir-errors/index");
-        classifyClass(classesObj, "constructor/index");
-
+        classPaths.forEach(classPath => {
+           classifyClass(classesObj, classPath);
+        })
 
         return classesObj;
     }
 
     function classifyClass(classesObj, classPath) {
-        console.log(classesObj)
-        if(classPath !== 'index') {
-            const splitClassPath = classPath.split('/');
+        const splitClassPath = classPath.split('/');
+        if(splitClassPath.length !== 1) {
             let newObj = classesObj[splitClassPath[0]];
-            let catName = splitClassPath[0];
+            let catName = splitClassPath[0].toString();
+            console.log(classesObj[splitClassPath[0]])
 
             if(newObj === undefined) {
                 newObj = {};
