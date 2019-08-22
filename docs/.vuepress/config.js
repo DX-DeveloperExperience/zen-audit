@@ -17,6 +17,10 @@ module.exports = {
         link: '/included/',
       },
       {
+        text: 'API',
+        link: '/API/',
+      },
+      {
         text: 'GitHub',
         link: 'https://github.com/DX-DeveloperExperience/project-starter',
       },
