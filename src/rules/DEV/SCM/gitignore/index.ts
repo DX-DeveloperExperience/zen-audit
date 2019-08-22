@@ -131,8 +131,7 @@ export class GitIgnore {
       this.getMissingGitRules(),
       this.getGitIgnoreContent(),
     ]).then((result: [string[], string]) => {
-      const missingRules = result[0];
-      const gitIgnoreContent = result[1];
+      const [missingRules, gitIgnoreContent] = result;
       if (missingRules !== undefined) {
         return fs
           .writeFile(

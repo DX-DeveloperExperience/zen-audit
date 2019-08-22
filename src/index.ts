@@ -1,10 +1,7 @@
-// import { ListRules } from './rules/list-rules';
 import { Command, flags, run } from '@oclif/command';
 import { cli } from 'cli-ux';
 import * as Path from 'path';
 import { init, importCustomClassesIn } from './init/index';
-// import { StackRegister } from './stacks/stack-register';
-// import { ListStacks } from './stacks/list-stacks/index';
 import { logger } from './logger/index';
 import * as fs from 'fs-extra';
 import { YesNo, Ok } from './choice/index';

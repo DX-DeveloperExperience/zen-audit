@@ -19,10 +19,7 @@ afterEach(() => {
 });
 
 Register.stackIsAvailable = jest.fn(async (stackCtor: Constructor<Stack>) => {
-  if (stackCtor === VueJS) {
-    return true;
-  }
-  return false;
+  return stackCtor === VueJS;
 });
 
 test('should return true if .vscode/launch.json does not exist', () => {
@@ -51,10 +48,7 @@ test('should return true if .vscode/launch.json misses configurations', () => {
   };
 
   Register.stackIsAvailable = jest.fn(async (stackCtor: Constructor<Stack>) => {
-    if (stackCtor === VueJS) {
-      return true;
-    }
-    return false;
+    return stackCtor === VueJS;
   });
 
   jest.mock(launchFilePath, () => mockLaunchFile, { virtual: true });
@@ -72,11 +66,7 @@ test('should return false if .vscode/launch.json has all configurations', () => 
   };
 
   Register.stackIsAvailable = jest.fn(async (stackCtor: Constructor<Stack>) => {
-    if (stackCtor === VueJS) {
-      return true;
-    }
-
-    return false;
+    return stackCtor === VueJS;
   });
 
   jest.mock(launchFilePath, () => mockLaunchFile, { virtual: true });
