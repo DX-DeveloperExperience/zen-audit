@@ -1,8 +1,6 @@
 # API
 
-{{ classPaths }}
-
-{{ classifiedClasses }}
+<TreeItem class="item" v-for="i in classifiedClasses" v-bind:item="i"/>
 
 <script>
     const api = require('./api.json');
