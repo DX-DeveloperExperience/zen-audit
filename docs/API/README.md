@@ -2,42 +2,39 @@
 
 {{ classPaths }}
 
-{{ classifiedClass }}
+{{ classifiedClasses }}
 
 <script>
     const api = require('./api.json');
     const classPaths = api.children.map(child => child.name.replace(/\"/gi, ''));
-    const classPaths2 = [ "choice/index", "constructor/index", "errors/dir-errors/index"];
 
     const classifiedClasses = getClassifiedClasses();
 
     function getClassifiedClasses() {
-        let classesObj = {};
+        let classObjs = [];
         classPaths.forEach(classPath => {
-           classifyClass(classesObj, classPath);
+           classifyClass(classObjs, classPath);
         })
 
-        return classesObj;
+        return classObjs;
     }
 
-    function classifyClass(classesObj, classPath) {
-        const splitClassPath = classPath.split('/');
-        if(splitClassPath.length !== 1) {
-            let newObj = classesObj[splitClassPath[0]];
-            let catName = splitClassPath[0].toString();
-            console.log(classesObj[splitClassPath[0]])
+    function classifyClass(classObjs, classPath) {
+        let splitClassPath = classPath.split('/');
 
-            if(newObj === undefined) {
-                newObj = {};
-                splitClassPath.shift();
-                classesObj[catName] = classifyClass(newObj, splitClassPath.join('/'))
-                return classesObj;
-            } else {
-                splitClassPath.shift();
-                return classifyClass(newObj, splitClassPath.join('/'))
+        if(splitClassPath.length > 1) {
+            const firstOfSplit = splitClassPath.shift();
+            const rejoinedClassPath = splitClassPath.join('/');
+            if(classObjs.length > 0) {
+                const classObjsNames = classObjs.map(classObj => classObj.name);
+                const existingNameIndex = classObjsNames.indexOf(firstOfSplit);
+                if(existingNameIndex !== -1) {
+                    classifyClass(classObjs[existingNameIndex].children, rejoinedClassPath);
+                    return;
+                }
             }
-        } else {
-            return classesObj;
+            classObjs.push({name: firstOfSplit, children: []});
+            classifyClass(classObjs[classObjs.length - 1].children, rejoinedClassPath);
         }
     }
 
@@ -46,7 +43,7 @@
             classPaths: function () {
                 return classPaths;
             },
-            classifiedClass: function () {
+            classifiedClasses: function () {
                 return classifiedClasses;
             }
         }
