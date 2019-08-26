@@ -26,7 +26,7 @@ test("should copy file to project's config folder", () => {
   });
 
   new Nginx()
-    .apply(true)
+    .apply()
     .then(() => {
       /** */
     })

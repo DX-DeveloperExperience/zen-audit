@@ -1,16 +1,16 @@
 import { YesNo } from './../../../../choice/index';
-import { WriteFileError } from './../../../../errors/FileErrors';
-import { StackRegister } from '../../../../stacks/stack-register';
+import { WriteFileError } from '../../../../errors/file-errors';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import { Website } from '../../../../stacks/website';
 import { ensureDir } from 'fs-extra';
 import Globals from '../../../../utils/globals';
 import { logger } from '../../../../logger';
 import Choice from '../../../../choice';
-import { DirError } from '../../../../errors/DirErrors';
-import { myCopy } from '../../../../utils/file-utils';
+import { DirError } from '../../../../errors/dir-errors';
+import { copy } from '../../../../utils/file-utils';
+import { Register } from '../../../../register';
 
-@StackRegister.registerRuleForAll({ excludes: [Elasticsearch, Website] })
+@Register.ruleForAll({ excludes: [Elasticsearch, Website] })
 export default class CiScripts {
   private scriptsPath = Globals.rootPath + 'ci-scripts';
   private defaultScriptsPath = __dirname + '/scripts';
@@ -19,34 +19,32 @@ export default class CiScripts {
     return true;
   }
 
-  async apply(apply: boolean): Promise<void> {
-    if (apply) {
-      return new Promise((resolve, reject) => {
-        return ensureDir(this.scriptsPath)
-          .then(
-            () => {
-              return myCopy(this.defaultScriptsPath, this.scriptsPath);
-            },
-            err => {
-              reject(new DirError(err, this.scriptsPath, this.getName()));
-            },
-          )
-          .then(
-            () => {
-              logger.info(
-                `${this.getName()}: Succesfully added CI scripts to ci-scripts folder. Please take some time to update them to fit your project and place them in your CI's folder. Then just run 'run_all.sh' in your CI.`,
-              );
-              resolve();
-            },
-            err => {
-              if (err instanceof WriteFileError) {
-                reject(err);
-              }
-              resolve();
-            },
-          );
-      });
-    }
+  async apply(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      return ensureDir(this.scriptsPath)
+        .then(
+          () => {
+            return copy(this.defaultScriptsPath, this.scriptsPath);
+          },
+          err => {
+            reject(new DirError(err, this.scriptsPath, this.getName()));
+          },
+        )
+        .then(
+          () => {
+            logger.info(
+              `${this.getName()}: Succesfully added CI scripts to ci-scripts folder. Please take some time to update them to fit your project and place them in your CI's folder. Then just run 'run_all.sh' in your CI.`,
+            );
+            resolve();
+          },
+          err => {
+            if (err instanceof WriteFileError) {
+              reject(err);
+            }
+            resolve();
+          },
+        );
+    });
   }
   getName(): string {
     return 'CI Scripts';

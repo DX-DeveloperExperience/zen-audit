@@ -1,7 +1,7 @@
-import { WriteFileError } from './../../../../errors/FileErrors';
-import { FetchDataError } from './../../../../errors/FetchData';
-import Choice, { YesNo } from './../../../../choice/index';
-import { StackRegister } from '../../../../stacks/stack-register';
+import { Register } from './../../../../register/index';
+import { WriteFileError } from '../../../../errors/file-errors';
+import { FetchDataError } from '../../../../errors/fetch-data-errors';
+import Choice, { YesNo } from '../../../../choice/index';
 import Elasticsearch from '../../../../stacks/elasticsearch';
 import inquirer = require('inquirer');
 import { cli } from 'cli-ux';
@@ -9,7 +9,7 @@ import Axios from 'axios';
 import { outputFile } from 'fs-extra';
 import { logger } from '../../../../logger';
 
-@StackRegister.registerRuleForStacks([Elasticsearch])
+@Register.ruleForStacks([Elasticsearch])
 export class IntegrationTests {
   private templateUrl: string =
     'https://github.com/DX-DeveloperExperience/testcontainer-elasticsearch/archive/1.0-SNAPSHOT.tar.gz';
@@ -31,7 +31,7 @@ export class IntegrationTests {
       });
   }
 
-  async apply(apply: boolean): Promise<void> {
+  async apply(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       Axios.get(this.templateUrl, { responseType: 'arraybuffer' })
         .then(

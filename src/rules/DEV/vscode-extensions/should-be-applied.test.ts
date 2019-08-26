@@ -1,6 +1,6 @@
 import { VSCodeExtensions } from '.';
 import Globals from '../../../utils/globals/index';
-import { ListStacks } from '../../../stacks/list-stacks/index';
+import { Register } from '../../../register';
 
 const fs = require('fs-extra');
 jest.mock('fs-extra');
@@ -16,7 +16,7 @@ afterEach(() => {
 });
 
 beforeEach(() => {
-  ListStacks.getAvailableStacks = jest.fn(() => {
+  Register.getAvailableStacks = jest.fn(() => {
     return Promise.resolve([
       {
         name() {

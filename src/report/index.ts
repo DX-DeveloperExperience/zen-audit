@@ -1,12 +1,12 @@
-import { DirError } from './../errors/DirErrors';
-import { WriteFileError } from './../errors/FileErrors';
+import { DirError } from '../errors/dir-errors';
+import { WriteFileError } from '../errors/file-errors';
 import { Ok } from '../choice/index';
 import * as fs from 'fs-extra';
 import * as mustache from 'mustache';
 import Globals from '../utils/globals/index';
 import { logger } from '../logger/index';
 import * as inquirer from 'inquirer';
-import { ReadFileError } from '../errors/FileErrors';
+import { ReadFileError } from '../errors/file-errors';
 const mdpdf = require('mdpdf');
 
 const date = new Date();

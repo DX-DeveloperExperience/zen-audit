@@ -1,6 +1,5 @@
-import { WriteFileError } from './../../../errors/FileErrors';
-import { StackRegister } from '../../../stacks/stack-register';
-import { ListStacks } from '../../../stacks/list-stacks';
+import { Register } from './../../../register/index';
+import { WriteFileError } from '../../../errors/file-errors';
 import { possibleChoices } from './constants';
 import * as fs from 'fs-extra';
 import * as cp from 'child_process';
@@ -8,9 +7,8 @@ import Elasticsearch from '../../../stacks/elasticsearch';
 import Choice from '../../../choice';
 import Globals from '../../../utils/globals';
 import { logger } from '../../../logger';
-import { Website } from '../../../stacks/website';
 
-@StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
+@Register.ruleForAll({ excludes: [Elasticsearch] })
 export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
   private extensionsJSONPath: string;
@@ -116,7 +114,7 @@ export class VSCodeExtensions {
       return this.missingExtensions;
     }
 
-    const stackNamesPromise = ListStacks.getAvailableStacks().then(stacks =>
+    const stackNamesPromise = Register.getAvailableStacks().then(stacks =>
       stacks.map(stack => {
         return stack.name();
       }),

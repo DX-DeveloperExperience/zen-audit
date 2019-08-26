@@ -16,7 +16,7 @@ test('Should ensure .github/ISSUE_TEMPLATE existence and create default template
   fs.ensureDir.mockReturnValue(Promise.resolve());
   fs.writeFile.mockReturnValue(Promise.resolve());
 
-  return templates.apply(true).then(() => {
+  return templates.apply().then(() => {
     expect(fs.ensureDir).toBeCalledWith(templateDirPath);
     expect(fs.copy).toBeCalledWith(
       `${__dirname}/template_files`,

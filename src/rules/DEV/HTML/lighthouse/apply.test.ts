@@ -53,7 +53,7 @@ test('should install lighthouse as a devDependency and add js script file and sc
     return Promise.resolve();
   });
 
-  return new LightHouse().apply(true).then(() => {
+  return new LightHouse().apply().then(() => {
     expect(commands.installNpmDevDep).toBeCalledWith('lighthouse');
     expect(fs.ensureDir).toBeCalledWith(
       Globals.rootPath + 'lighthouse-scripts/',
