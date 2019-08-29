@@ -14,7 +14,7 @@ export default interface Rule {
    * Takes a boolean or an array of string to tell if the rule has to be applied,
    * or the choices to apply if the user has multiple choices to apply.
    */
-  apply?: (answers?: string[]) => Promise<void>;
+  apply?(answers?: string[]): Promise<void>;
   /**
    * Returns the name of the Rule as it will be seen in the prompt.
    */

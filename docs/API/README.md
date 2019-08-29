@@ -1,38 +1,42 @@
+---
+sidebar: false
+---
+
 # API
 
 <TreeItem class="item" v-for="i in classifiedClasses" v-bind:item="i"/>
 
 <script>
     const api = require('./api.json');
-    const classPaths = api.children.map(child => child.name.replace(/\"/gi, ''));
-
+    const classObjs = api.children.map(child => { return { classPath: child.name.replace(/\"/gi, ''), content: child}; });
+    console.log(classObjs)
     const classifiedClasses = getClassifiedClasses();
 
     function getClassifiedClasses() {
-        let classObjs = [];
-        classPaths.forEach(classPath => {
-           classifyClass(classObjs, classPath);
+        let classified = [];
+        classObjs.forEach(classObj => {
+           classifyClass(classified, classObj);
         })
 
-        return classObjs;
+        return classified;
     }
 
-    function classifyClass(classObjs, classPath) {
-        let splitClassPath = classPath.split('/');
+    function classifyClass(classifieds, classObj) {
+        let splitClassPath = classObj.classPath.split('/');
 
         if(splitClassPath.length > 1) {
             const firstOfSplit = splitClassPath.shift();
-            const rejoinedClassPath = splitClassPath.join('/');
-            if(classObjs.length > 0) {
-                const classObjsNames = classObjs.map(classObj => classObj.name);
-                const existingNameIndex = classObjsNames.indexOf(firstOfSplit);
+            classObj.classPath = splitClassPath.join('/');
+            if(classifieds.length > 0) {
+                const classifiedNames = classifieds.map(classified => classified.name);
+                const existingNameIndex = classifiedNames.indexOf(firstOfSplit);
                 if(existingNameIndex !== -1) {
-                    classifyClass(classObjs[existingNameIndex].children, rejoinedClassPath);
+                    classifyClass(classifieds[existingNameIndex].children, classObj);
                     return;
                 }
             }
-            classObjs.push({name: firstOfSplit, children: []});
-            classifyClass(classObjs[classObjs.length - 1].children, rejoinedClassPath);
+            classifieds.push({name: firstOfSplit, children: [], content: classObj.content});
+            classifyClass(classifieds[classifieds.length - 1].children, classObj);
         }
     }
 
