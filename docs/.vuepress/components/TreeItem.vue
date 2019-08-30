@@ -4,7 +4,7 @@
     <div :class="{bold: isFolder}" @click="toggle">
       <h3 class="item-name">
         {{ item.name }}
-        <span v-if="!isFolder">{{ item.content.children[0].kindString }}</span>
+        <!--span v-if="!isFolder">{{ item.content.children[0].kindString }}</span-->
         <span v-if="isFolder">[{{ isOpen ? '-' : '+' }}]</span>
       </h3>
     </div>
@@ -12,7 +12,7 @@
       <tree-item class="item" v-for="(child, index) in item.children" :key="index" :item="child"></tree-item>
     </ul>
     <div v-else v-show="showClassDoc" @click="toggle">
-      <ClassDoc :items="item.content.children" :groups="item.content.groups" />
+      <ClassDoc v-if="item.content.children && item.content.groups" :items="item.content.children" :groups="item.content.groups" />
     </div>
   </li>
 </template>
