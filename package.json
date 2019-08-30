@@ -72,10 +72,7 @@
   "main": "lib/index.js",
   "oclif": {
     "commands": "./lib/commands",
-    "bin": "project-starter-cli",
-    "plugins": [
-      "@oclif/plugin-help"
-    ]
+    "bin": "project-starter-cli"
   },
   "repository": "DX-DeveloperExperience/project-starter",
   "scripts": {
