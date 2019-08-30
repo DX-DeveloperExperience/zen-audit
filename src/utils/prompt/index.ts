@@ -1,27 +1,71 @@
+import { cli } from 'cli-ux';
 import Rule from '../../rules/rule';
 import inquirer = require('inquirer');
+// import { RuleRegister } from '../../rules/rule-register';
+import { Subject } from 'rxjs';
+import { Register } from '../../register';
 import { logger } from '../../logger';
+const rx = require('rxjs');
 
-export async function promptForRule(rule: Rule) {
-  if (rule.shouldBeApplied()) {
-    return inquirer
-      .prompt([
-        {
-          name: rule.getName(),
-          message: rule.getShortDescription(),
-          type: rule.getPromptType(),
-          choices: await rule.getChoices(),
+function addRulesToPrompts(prompts: Subject<any>, rules: Rule[]) {
+  rules.forEach(async rule => {
+    if (await rule.shouldBeApplied()) {
+      prompts.next({
+        name: rule.constructor.name,
+        message: rule.getShortDescription(),
+        type: rule.getPromptType(),
+        choices: await rule.getChoices(),
+        filter: (input: any) => {
+          return { input, rule };
         },
-      ])
-      .then(answer => {
-        const apply = rule.apply;
-
-        if (apply) {
-          return apply.call(rule, answer);
-        }
-      })
-      .then(() => {
-        logger.info(`Rule ${rule.getName()} applied succesfully`);
       });
-  }
+    }
+  });
+}
+
+export async function promptForRules(rules: Rule[]): Promise<void> {
+  const prompts = new rx.Subject();
+
+  let i = 1;
+  addRulesToPrompts(prompts, [rules[0]]);
+
+  inquirer.prompt(prompts).ui.process.subscribe((output: any) => {
+    const rule: Rule = output.answer.rule;
+    const apply = output.answer.rule.apply;
+    const ruleAnswer = output.answer.input;
+
+    function addRuleOrComplete() {
+      if (rules[i] !== undefined) {
+        addRulesToPrompts(prompts, [rules[i]]);
+        i++;
+      } else {
+        prompts.complete();
+      }
+    }
+    if (apply) {
+      cli.action.start('Applying rule');
+      if (
+        (typeof ruleAnswer === 'boolean' && ruleAnswer === false) ||
+        (Array.isArray(ruleAnswer) && ruleAnswer.length === 0)
+      ) {
+        cli.action.stop('Rule not applied');
+      } else {
+        apply
+          .call(rule, ruleAnswer)
+          .then(() => {
+            cli.action.stop('Rule applied !\n');
+            const subRules = Register.getSubRulesOf(rule);
+            if (subRules.length !== 0) {
+              addRulesToPrompts(prompts, subRules);
+            } else {
+              addRuleOrComplete();
+            }
+          })
+          .catch(logger.error);
+        return;
+      }
+    }
+
+    addRuleOrComplete();
+  });
 }

@@ -1,8 +1,9 @@
 import { LaunchConf, LaunchConfFile } from '../constants';
-import { Constructor } from '../../../../../../stacks/stack-register/index';
 import VueJS from '../../../../../../stacks/vue-js/index';
 import Stack from '../../../../../../stacks/stack';
 import Angular from '../../../../../../stacks/angular';
+import Constructor from '../../../../../../constructor';
+
 export const configs: {
   [key: string]: { stack: Constructor<Stack>; confs: LaunchConf[] };
 } = {

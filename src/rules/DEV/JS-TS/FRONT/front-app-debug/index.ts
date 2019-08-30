@@ -1,8 +1,5 @@
-import { WriteFileError } from './../../../../../errors/FileErrors';
-import { Constructor } from '../../../../../stacks/stack-register/index';
-import { ListStacks } from '../../../../../stacks/list-stacks/index';
-import { RuleRegister } from '../../../../rule-register';
-import { StackRegister } from '../../../../../stacks/stack-register';
+import { Register } from './../../../../../register/index';
+import { WriteFileError } from '../../../../../errors/file-errors';
 import VueJS from '../../../../../stacks/vue-js';
 import Angular from '../../../../../stacks/angular';
 import { React } from '../../../../../stacks/react';
@@ -13,9 +10,9 @@ import Stack from '../../../../../stacks/stack';
 import { pathExistsInJSON } from '../../../../../utils/json';
 import * as fs from 'fs-extra';
 import { logger } from '../../../../../logger';
+import Constructor from '../../../../../constructor';
 
-@RuleRegister.register
-@StackRegister.registerRuleForStacks([VueJS, Angular, React])
+@Register.ruleForStacks([VueJS, Angular, React])
 export class FrontAppDebug {
   private parsedLaunchConf: LaunchConfFile;
   private existingConfigs: LaunchConf[] | undefined;
@@ -42,7 +39,7 @@ export class FrontAppDebug {
     });
   }
 
-  async apply(apply: boolean): Promise<void> {
+  async apply(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       this.addMissingConfigurations()
         .then(
@@ -126,9 +123,13 @@ export class FrontAppDebug {
       return this.existingConfigs;
     }
 
-    if (pathExistsInJSON(this.parsedLaunchConf, ['configurations'])) {
-      return (this.existingConfigs = this.parsedLaunchConf.configurations);
-    } else {
+    try {
+      if (pathExistsInJSON(this.parsedLaunchConf, ['configurations'])) {
+        return (this.existingConfigs = this.parsedLaunchConf.configurations);
+      } else {
+        return (this.existingConfigs = []);
+      }
+    } catch (err) {
       return (this.existingConfigs = []);
     }
   }
@@ -138,7 +139,7 @@ export class FrontAppDebug {
       return this.foundStacks;
     } else {
       const areAvailablePromise = this.stacksToCheck.map(stackToCheck => {
-        return ListStacks.stackIsAvailable(stackToCheck);
+        return Register.stackIsAvailable(stackToCheck);
       });
 
       return Promise.all(areAvailablePromise).then(areAvailable => {

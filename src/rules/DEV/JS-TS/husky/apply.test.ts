@@ -46,7 +46,7 @@ test('Method apply() should add husky to devDependencies and pre-push hook', () 
     return Promise.resolve();
   });
 
-  return husky.apply(true).then(() => {
+  return husky.apply().then(() => {
     expect(commands.installNpmDevDep).toBeCalledWith('husky');
     expect(fs.writeJSON).toBeCalledWith(Globals.packageJSONPath, finalPackage, {
       spaces: '\t',

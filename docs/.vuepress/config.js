@@ -1,6 +1,30 @@
 module.exports = {
-  title: 'Zodit',
-  description: 'Just playing around',
+  title: 'ZenAudit',
+  description: 'Make your projects audits a breeze',
   dest: 'docs_build',
   base: '/project-starter/',
+  themeConfig: {
+    logo: '/logotype.png',
+    title: false,
+    nav: [
+      { text: 'Home', link: '/' },
+      {
+        text: 'Custom Rules and Stacks',
+        link: '/custom/',
+      },
+      {
+        text: 'Included Stacks and Rules',
+        link: '/included/',
+      },
+      {
+        text: 'API',
+        link: '/API/',
+      },
+      {
+        text: 'GitHub',
+        link: 'https://github.com/DX-DeveloperExperience/project-starter',
+      },
+    ],
+    sidebar: 'auto',
+  },
 };

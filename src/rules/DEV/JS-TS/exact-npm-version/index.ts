@@ -1,7 +1,5 @@
-import { WriteFileError } from './../../../../errors/FileErrors';
-import { RuleRegister } from '../../../rule-register';
+import { WriteFileError } from '../../../../errors/file-errors';
 import * as fs from 'fs-extra';
-import { StackRegister } from '../../../../stacks/stack-register';
 import { jsonObjectsToCheck } from './constants';
 import { YesNo } from '../../../../choice';
 import Node from '../../../../stacks/node/index';
@@ -9,13 +7,13 @@ import TypeScript from '../../../../stacks/typescript/index';
 import { logger } from '../../../../logger';
 import Globals from '../../../../utils/globals';
 import { getExactSemver, matchesSemver } from '../../../../utils/semver/index';
+import { Register } from '../../../../register';
 
 /**
  * This implementation of Rule modifies Semver in npm's package.json and removes tilds and circumflex
  * accent in Semver of every dependency.
  */
-@RuleRegister.register
-@StackRegister.registerRuleForStacks([Node, TypeScript])
+@Register.ruleForStacks([Node, TypeScript])
 export class ExactNpmVersion {
   private parsedPackageJSON: any;
   private jsonObjToCheckFound: string[] = [];
@@ -54,26 +52,24 @@ export class ExactNpmVersion {
   /**
    * Removes tilds or circumflex inside package.json's dependencies' Semvers
    */
-  async apply(apply: boolean) {
-    if (apply) {
-      return fs
-        .writeFile(Globals.packageJSONPath, this.correctSemverNotation(), {
-          encoding: 'utf8',
-        })
-        .then(() => {
-          logger.info(
-            'Succesfully updated package.json with exact semver notation',
-          );
-        })
-        .catch(err => {
-          logger.debug(err);
-          throw new WriteFileError(
-            err,
-            Globals.packageJSONPath,
-            this.constructor.name,
-          );
-        });
-    }
+  async apply() {
+    return fs
+      .writeFile(Globals.packageJSONPath, this.correctSemverNotation(), {
+        encoding: 'utf8',
+      })
+      .then(() => {
+        logger.info(
+          'Succesfully updated package.json with exact semver notation',
+        );
+      })
+      .catch(err => {
+        logger.debug(err);
+        throw new WriteFileError(
+          err,
+          Globals.packageJSONPath,
+          this.constructor.name,
+        );
+      });
   }
 
   /**

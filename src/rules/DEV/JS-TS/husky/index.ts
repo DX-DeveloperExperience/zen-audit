@@ -1,6 +1,4 @@
-import { ReadFileError, WriteFileError } from './../../../../errors/FileErrors';
-import { RuleRegister } from '../../../rule-register';
-import { StackRegister } from '../../../../stacks/stack-register';
+import { ReadFileError, WriteFileError } from '../../../../errors/file-errors';
 import { YesNo } from '../../../../choice/index';
 import { logger } from '../../../../logger';
 import Node from '../../../../stacks/node';
@@ -9,9 +7,9 @@ import * as fs from 'fs-extra';
 import { hasDevDependency, pathExistsInJSON } from '../../../../utils/json';
 import Globals from '../../../../utils/globals';
 import { installNpmDevDep } from '../../../../utils/commands';
+import { Register } from '../../../../register';
 
-@RuleRegister.register
-@StackRegister.registerRuleForStacks([Node, TypeScript])
+@Register.ruleForStacks([Node, TypeScript])
 export class Husky {
   private parsedPackage: any;
 
@@ -19,12 +17,10 @@ export class Husky {
     this.parsedPackage = require(Globals.packageJSONPath);
   }
 
-  async apply(apply: boolean): Promise<void> {
-    if (apply) {
-      return installNpmDevDep('husky').then(() => {
-        return this.writeHuskyHook();
-      });
-    }
+  async apply(): Promise<void> {
+    return installNpmDevDep('husky').then(() => {
+      return this.writeHuskyHook();
+    });
   }
 
   private async writeHuskyHook(): Promise<void> {

@@ -1,4 +1,6 @@
+import { WriteFileError } from '../../errors/file-errors';
 import * as fs from 'fs-extra';
+import { logger } from '../../logger';
 
 /**
  * A tool class to check whether one or multiple files exist or not
@@ -46,4 +48,20 @@ export function existsPaths(...paths: string[]): Promise<boolean> {
   return Promise.all(paths.map(path => fs.pathExists(path))).then(exist => {
     return exist.includes(true);
   });
+}
+
+export async function copy(from: string, to: string) {
+  return fs
+    .copy(from, to, {
+      overwrite: false,
+      errorOnExist: true,
+    })
+    .catch(err => {
+      if (err.message.endsWith('already exists')) {
+        logger.warn(err.message);
+        throw err;
+      } else {
+        throw new WriteFileError(err, to, copy.caller.name);
+      }
+    });
 }

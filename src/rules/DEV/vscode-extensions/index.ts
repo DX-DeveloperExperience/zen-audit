@@ -1,15 +1,14 @@
-import { RuleRegister } from '../../rule-register';
-import { StackRegister } from '../../../stacks/stack-register';
-import { ListStacks } from '../../../stacks/list-stacks';
+import { Register } from './../../../register/index';
+import { WriteFileError } from '../../../errors/file-errors';
 import { possibleChoices } from './constants';
 import * as fs from 'fs-extra';
 import * as cp from 'child_process';
 import Elasticsearch from '../../../stacks/elasticsearch';
 import Choice from '../../../choice';
 import Globals from '../../../utils/globals';
+import { logger } from '../../../logger';
 
-@RuleRegister.register
-@StackRegister.registerRuleForAll({ excludes: [Elasticsearch] })
+@Register.ruleForAll({ excludes: [Elasticsearch] })
 export class VSCodeExtensions {
   readonly requiredFiles: string[] = ['.vscode/extensions.json'];
   private extensionsJSONPath: string;
@@ -72,18 +71,38 @@ export class VSCodeExtensions {
       filteredAnswers,
     );
 
-    return fs
-      .ensureFile(this.extensionsJSONPath)
-      .catch(err => {
-        throw err;
-      })
-      .then(() => {
-        return fs.writeJSON(
-          this.extensionsJSONPath,
-          this.parsedExtensionsFile,
-          { spaces: '\t' },
+    return new Promise<void>((resolve, reject) => {
+      fs.ensureFile(this.extensionsJSONPath)
+        .then(
+          () => {
+            return fs.writeJSON(
+              this.extensionsJSONPath,
+              this.parsedExtensionsFile,
+              { spaces: '\t' },
+            );
+          },
+          err => {
+            reject(
+              new WriteFileError(err, this.extensionsJSONPath, this.getName()),
+            );
+          },
+        )
+        .then(
+          () => {
+            logger.info(
+              `${this.getName()}: Succesfully added extensions recommendations to ${
+                this.extensionsJSONPath
+              }`,
+            );
+            resolve();
+          },
+          err => {
+            reject(
+              new WriteFileError(err, this.extensionsJSONPath, this.getName()),
+            );
+          },
         );
-      });
+    });
   }
 
   getPromptType() {
@@ -95,7 +114,7 @@ export class VSCodeExtensions {
       return this.missingExtensions;
     }
 
-    const stackNamesPromise = ListStacks.getAvailableStacks().then(stacks =>
+    const stackNamesPromise = Register.getAvailableStacks().then(stacks =>
       stacks.map(stack => {
         return stack.name();
       }),

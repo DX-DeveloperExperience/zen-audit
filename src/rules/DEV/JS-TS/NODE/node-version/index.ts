@@ -1,17 +1,15 @@
-import { WriteFileError } from './../../../../../errors/FileErrors';
-import { RuleRegister } from '../../../../rule-register';
-import { StackRegister } from '../../../../../stacks/stack-register';
+import { WriteFileError } from '../../../../../errors/file-errors';
 import { Ok } from '../../../../../choice';
 import * as cp from 'child_process';
 import TypeScript from '../../../../../stacks/typescript';
 import Node from '../../../../../stacks/node';
 import axios from 'axios';
-import { ReadFileError } from '../../../../../errors/FileErrors';
+import { ReadFileError } from '../../../../../errors/file-errors';
 import { readJSON, writeJSON } from 'fs-extra';
 import { logger } from '../../../../../logger';
+import { Register } from '../../../../../register';
 
-@RuleRegister.register
-@StackRegister.registerRuleForStacks([Node, TypeScript])
+@Register.ruleForStacks([Node, TypeScript])
 export class NodeVersion {
   readonly requiredFiles: string[] = [];
   private nodeVersionSchedule: {} | undefined;

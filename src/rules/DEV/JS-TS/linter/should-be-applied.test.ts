@@ -1,4 +1,4 @@
-import { ListStacks } from '../../../../stacks/list-stacks/index';
+import { Register } from './../../../../register/index';
 import Stack from '../../../../stacks/stack/index';
 import { Linter } from './index';
 import Globals from '../../../../utils/globals/index';
@@ -27,8 +27,8 @@ test('should return true if tslint or eslint not in devDependencies and tslint.j
     },
   };
 
-  ListStacks.findAvailableStack = jest.fn(() => {
-    return Promise.resolve({} as Stack);
+  Register.stackIsAvailable = jest.fn(() => {
+    return Promise.resolve(true);
   });
 
   fs.pathExists = jest.fn(() => {
@@ -51,8 +51,8 @@ test('should return false if tslint in devDependencies and tslint.json exists', 
     },
   };
 
-  ListStacks.findAvailableStack = jest.fn(() => {
-    return Promise.resolve({} as Stack);
+  Register.stackIsAvailable = jest.fn(() => {
+    return Promise.resolve(true);
   });
 
   fs.pathExists = jest.fn(() => {
@@ -74,8 +74,8 @@ test('should return true if tslint in devDependencies and tslint.json does not e
     },
   };
 
-  ListStacks.findAvailableStack = jest.fn(() => {
-    return Promise.resolve({} as Stack);
+  Register.stackIsAvailable = jest.fn(() => {
+    return Promise.resolve(true);
   });
 
   fs.pathExists = jest.fn(() => {
@@ -97,8 +97,8 @@ test('should return false if eslint in devDependencies and eslint.json exists', 
     },
   };
 
-  ListStacks.findAvailableStack = jest.fn(() => {
-    return Promise.resolve(undefined);
+  Register.stackIsAvailable = jest.fn(() => {
+    return Promise.resolve(false);
   });
 
   fs.pathExists = jest.fn(() => {
@@ -120,8 +120,8 @@ test('should return true if eslint in devDependencies and eslint.json does not e
     },
   };
 
-  ListStacks.findAvailableStack = jest.fn(() => {
-    return Promise.resolve(undefined);
+  Register.stackIsAvailable = jest.fn(() => {
+    return Promise.resolve(false);
   });
 
   fs.pathExists = jest.fn(() => {

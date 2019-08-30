@@ -27,5 +27,5 @@ test('Should run npm i prettier -DE command', () => {
     return Promise.resolve({ stdout: '', stderr: '' });
   });
 
-  return prettier.apply(true);
+  return prettier.apply();
 });

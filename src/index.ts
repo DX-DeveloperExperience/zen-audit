@@ -1,16 +1,14 @@
-import { ListRules } from './rules/list-rules';
 import { Command, flags, run } from '@oclif/command';
 import { cli } from 'cli-ux';
-import * as inquirer from 'inquirer';
 import * as Path from 'path';
-import { init, importClassesIn } from './init/index';
-import { StackRegister } from './stacks/stack-register';
-import { ListStacks } from './stacks/list-stacks/index';
+import { init, importCustomClassesIn } from './init/index';
 import { logger } from './logger/index';
 import * as fs from 'fs-extra';
 import { YesNo, Ok } from './choice/index';
 import { generateReport } from './report';
 import Globals from './utils/globals/index';
+import { promptForRules } from './utils/prompt';
+import { Register } from './register';
 
 class ProjectFillerCli extends Command {
   static description = 'describe the command here';
@@ -56,7 +54,13 @@ class ProjectFillerCli extends Command {
     }),
   };
 
-  static args = [{ name: 'path' }];
+  static args = [
+    {
+      name: 'path',
+      required: true,
+      description: 'The path to your project',
+    },
+  ];
 
   async run() {
     const { args, flags: runFlags } = this.parse(ProjectFillerCli);
@@ -66,7 +70,34 @@ class ProjectFillerCli extends Command {
       return;
     }
 
-    Globals.rootPath = args.path;
+    this.parseProjectPath(args.path);
+
+    init();
+
+    if (runFlags.custom) {
+      const customPath = Path.resolve(runFlags.custom);
+      importCustomClassesIn(customPath);
+    }
+
+    if (runFlags.debug) {
+      logger.level = 'debug';
+    }
+
+    if (runFlags.list) {
+      this.listAllStacksAndRules();
+    } else if (runFlags.stacks) {
+      this.listFoundStacks();
+    } else if (runFlags.apply) {
+      this.applyAllRules();
+    } else if (runFlags.manual) {
+      this.applyFoundRulesManually();
+    } else if (runFlags.rules) {
+      this.listFoundRules();
+    }
+  }
+
+  parseProjectPath(path: string) {
+    Globals.rootPath = path;
 
     try {
       if (
@@ -98,48 +129,26 @@ class ProjectFillerCli extends Command {
       logger.debug(err);
       return;
     }
-
-    init();
-
-    if (runFlags.custom) {
-      importClassesIn(runFlags.custom);
-    }
-
-    if (runFlags.debug) {
-      logger.level = 'debug';
-    }
-
-    if (runFlags.list) {
-      this.listAllStacksAndRules();
-    } else if (runFlags.stacks) {
-      this.listFoundStacks();
-    } else if (runFlags.apply) {
-      this.applyAllRules();
-    } else if (runFlags.manual) {
-      this.applyFoundRulesManually();
-    } else if (runFlags.rules) {
-      this.listFoundRules();
-    }
   }
 
   listAllStacksAndRules() {
     cli.action.start('Retrieving rules and stacks');
-    const stacks = StackRegister.getConstructors();
+    const stacksMaps = Register.getStacksMaps();
     cli.action.stop();
-    cli.table(stacks, {
-      name: {},
+    cli.table(stacksMaps, {
+      name: {
+        get: stackMap => stackMap.stack.name(),
+      },
       rules: {
-        get: stack =>
-          StackRegister.getRulesByStack(stack.name)
-            .map(rule => rule.name)
-            .join(', '),
+        get: stackMap =>
+          stackMap.ruleMaps.map(ruleMap => ruleMap.rule.getName()),
       },
     });
   }
 
   listFoundStacks() {
     cli.action.start('Searching for available stacks');
-    ListStacks.getAvailableStacks()
+    Register.getAvailableStacks()
       .then(stacksFound => {
         if (stacksFound.length === 0) {
           cli.action.stop('No stack found.');
@@ -157,7 +166,7 @@ class ProjectFillerCli extends Command {
 
   applyAllRules() {
     cli.action.start('Search for rules');
-    ListRules.getRulesToApply()
+    Register.getRulesToApply()
       .then(foundRules => {
         foundRules.forEach(async rule => {
           const choices = await rule.getChoices();
@@ -165,7 +174,7 @@ class ProjectFillerCli extends Command {
           if (apply) {
             // We call apply with true as answer because it is a YesNo or an Ok Choice List
             if (choices === YesNo || choices === Ok) {
-              return apply.call(rule, true);
+              return apply.call(rule);
             } else {
               // Else we call it with all the possible choices
               const choicesStr = choices.map(choice => {
@@ -184,49 +193,22 @@ class ProjectFillerCli extends Command {
 
   applyFoundRulesManually() {
     cli.action.start('Searching for rules');
-    ListRules.getRulesToApply()
+    Register.getRulesToApply()
       .then(async foundRules => {
-        const promptsProm = foundRules.map(async rule => {
-          return {
-            name: rule.constructor.name,
-            message: rule.getShortDescription(),
-            type: rule.getPromptType(),
-            choices: await rule.getChoices(),
-          };
-        });
-
-        if (promptsProm.length === 0) {
-          return [];
+        if (foundRules.length === 0) {
+          cli.action.stop('No found rules.');
+        } else {
+          cli.action.stop(
+            `${foundRules.length} rule${
+              foundRules.length > 0 ? 's' : ''
+            } found ! Let's go !`,
+          );
         }
 
-        const prompts = await Promise.all(promptsProm);
-
-        cli.action.stop(
-          `${prompts.length} rule${
-            prompts.length > 0 ? 's' : ''
-          } found ! Let's go !`,
-        );
-
-        const answers: {} = await inquirer.prompt(prompts);
-
-        return Object.entries(answers).map(([_, answer], i) => {
-          const apply = foundRules[i].apply;
-
-          if (apply) {
-            return apply.call(foundRules[i], answer);
-          }
-        });
+        return promptForRules(foundRules);
       })
       .then(async applies => {
-        if (applies.length === 0) {
-          logger.info("No rule to apply, you're good to go ! :)");
-          return;
-        } else {
-          cli.action.start('Applying rules, please wait');
-          return Promise.all(applies).then(() => {
-            cli.action.stop('Rules applied ! Congratulations !');
-          });
-        }
+        cli.action.stop('Rules applied ! Congratulations !');
       })
       .catch(err => {
         logger.error(err.message);
@@ -236,7 +218,7 @@ class ProjectFillerCli extends Command {
 
   listFoundRules() {
     cli.action.start('Searching for rules to apply');
-    ListRules.getRulesToApply()
+    Register.getRulesToApply()
       .then(rules => {
         if (rules.length === 0) {
           cli.action.stop();

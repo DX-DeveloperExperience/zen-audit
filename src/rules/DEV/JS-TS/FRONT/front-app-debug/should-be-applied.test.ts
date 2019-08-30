@@ -1,10 +1,10 @@
-import { Constructor } from '../../../../../stacks/stack-register/index';
-import { ListStacks } from '../../../../../stacks/list-stacks/index';
+import Constructor from '../../../../../constructor';
 import { FrontAppDebug } from '../front-app-debug';
 import Globals from '../../../../../utils/globals';
 import Stack from '../../../../../stacks/stack';
 import { configs } from './__mocks__/constants';
 import VueJS from '../../../../../stacks/vue-js/index';
+import { Register } from '../../../../../register';
 
 Globals.rootPath = 'front-app-debug/';
 
@@ -18,11 +18,8 @@ afterEach(() => {
   jest.resetModules();
 });
 
-ListStacks.stackIsAvailable = jest.fn(async (stackCtor: Constructor<Stack>) => {
-  if (stackCtor === VueJS) {
-    return true;
-  }
-  return false;
+Register.stackIsAvailable = jest.fn(async (stackCtor: Constructor<Stack>) => {
+  return stackCtor === VueJS;
 });
 
 test('should return true if .vscode/launch.json does not exist', () => {
@@ -50,14 +47,9 @@ test('should return true if .vscode/launch.json misses configurations', () => {
     ],
   };
 
-  ListStacks.stackIsAvailable = jest.fn(
-    async (stackCtor: Constructor<Stack>) => {
-      if (stackCtor === VueJS) {
-        return true;
-      }
-      return false;
-    },
-  );
+  Register.stackIsAvailable = jest.fn(async (stackCtor: Constructor<Stack>) => {
+    return stackCtor === VueJS;
+  });
 
   jest.mock(launchFilePath, () => mockLaunchFile, { virtual: true });
 
@@ -73,15 +65,9 @@ test('should return false if .vscode/launch.json has all configurations', () => 
     configurations: configs.vuejs.confs,
   };
 
-  ListStacks.stackIsAvailable = jest.fn(
-    async (stackCtor: Constructor<Stack>) => {
-      if (stackCtor === VueJS) {
-        return true;
-      }
-
-      return false;
-    },
-  );
+  Register.stackIsAvailable = jest.fn(async (stackCtor: Constructor<Stack>) => {
+    return stackCtor === VueJS;
+  });
 
   jest.mock(launchFilePath, () => mockLaunchFile, { virtual: true });
 

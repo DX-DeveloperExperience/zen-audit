@@ -2,6 +2,8 @@
 GIT_URL=$(git config --get remote.origin.url)
 echo $GIT_URL
 
+npm run typedoc
+
 # runs the documentation building script
 npm run docs:build
 

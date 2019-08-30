@@ -5,4 +5,5 @@ export default class Globals {
     return `${Globals.rootPath}package.json`;
   }
   static projectName: string = '';
+  static ourName: string = 'ZenAudit';
 }

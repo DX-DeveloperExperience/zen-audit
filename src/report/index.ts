@@ -1,18 +1,22 @@
-import { DirError } from './../errors/DirErrors';
-import { WriteFileError } from './../errors/FileErrors';
+import { DirError } from '../errors/dir-errors';
+import { WriteFileError } from '../errors/file-errors';
 import { Ok } from '../choice/index';
 import * as fs from 'fs-extra';
 import * as mustache from 'mustache';
 import Globals from '../utils/globals/index';
 import { logger } from '../logger/index';
 import * as inquirer from 'inquirer';
-import { ReadFileError } from '../errors/FileErrors';
+import { ReadFileError } from '../errors/file-errors';
 const mdpdf = require('mdpdf');
 
 const date = new Date();
 const dateString = `${date.getFullYear()}-${date.getMonth() +
   1}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
 
+/**
+ * A function that generate a report in PDF.
+ * @param reportData The data to add in the report
+ */
 export function generateReport(reportData: {
   projectName: string;
   rulesInfos: Array<{
@@ -22,8 +26,8 @@ export function generateReport(reportData: {
   }>;
 }) {
   const reportDirPath = Globals.rootPath.startsWith('http')
-    ? './zodit-reports/'
-    : `${Globals.rootPath}zodit-reports/`;
+    ? `./${Globals.ourName}-reports/`
+    : `${Globals.rootPath}${Globals.ourName}-reports/`;
 
   return new Promise<void>((resolve, reject) => {
     fs.readFile(__dirname + '/report.md', { encoding: 'utf-8' })
@@ -86,7 +90,9 @@ async function generateMarkdown(data: string, reportDirPath: string) {
       .then(
         () => {
           logger.info(
-            `Generated Zodit markdown report at: ${reportMarkdownPath}`,
+            `Generated ${
+              Globals.ourName
+            } markdown report at: ${reportMarkdownPath}`,
           );
           resolve();
         },

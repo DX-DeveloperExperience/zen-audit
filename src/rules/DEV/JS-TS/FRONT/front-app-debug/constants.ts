@@ -1,4 +1,4 @@
-import { Constructor } from '../../../../../stacks/stack-register/index';
+import Constructor from '../../../../../constructor';
 import { LaunchConf } from './constants';
 import VueJS from '../../../../../stacks/vue-js';
 import Stack from '../../../../../stacks/stack';
