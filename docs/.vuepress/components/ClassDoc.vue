@@ -54,12 +54,14 @@ export default {
         .reduce((properties, group, index) => {
           return group.children;
         }, [])
-        .map(propertyId =>
-          this.items.filter(item => {
-            return item.id === propertyId && !item.flags.isPrivate;
-          }),
-        )
-        .flat();
+        .reduce((acc, propertyId) => {
+          return [
+            ...acc,
+            ...this.items.filter(item => {
+              return item.id === propertyId && !item.flags.isPrivate;
+            })
+          ]
+        }, [])
     },
   },
 };
