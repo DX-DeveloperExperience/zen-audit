@@ -2,9 +2,9 @@ import { createLogger, format } from 'winston';
 import winston = require('winston');
 
 /**
- * To log anything, just import 'logger' from './logger/logger.servie'
+ * To log anything, just import logger,
  *  and then use : logger.info(), logger.error(), etc
- * Provide methods to log any type of informations: `info()`, `warn()`, `error()`, `debug()`...
+ * Provide methods to log any type of informations: info(), warn(), error(), debug()...
  */
 export const logger = createLogger({
   level: 'info',

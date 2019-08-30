@@ -13,6 +13,10 @@ const date = new Date();
 const dateString = `${date.getFullYear()}-${date.getMonth() +
   1}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
 
+/**
+ * A function that generate a report in PDF.
+ * @param reportData The data to add in the report
+ */
 export function generateReport(reportData: {
   projectName: string;
   rulesInfos: Array<{

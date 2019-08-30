@@ -2,21 +2,37 @@ import Constructor from '../constructor';
 import Stack from '../stacks/stack';
 import Rule from '../rules/rule';
 
+/**
+ * The interface representing the options object used in registerRuleForAll
+ * @ignore
+ */
 interface RegisterRuleForAllOptions {
   excludes: Array<Constructor<Stack>>;
 }
 
+/**
+ * The interface representing the object containing each Rule and its subRules
+ * @ignore
+ */
 interface RuleMap {
   rule: Rule;
   subRules: RuleMap[];
 }
 
+/**
+ * The interface representing the object containing each Stack, its corresponding RuleMaps, and its sub Stacks.
+ * @ignore
+ */
 interface StackMap {
   stack: Stack;
   subStacks: Stack[];
   ruleMaps: RuleMap[];
 }
 
+/**
+ * The Register class that contains register decorators and other methods to retrieve
+ * registered Stacks and Rules
+ */
 export class Register {
   private static instanciatedRules: {
     [ruleName: string]: RuleMap;
@@ -29,6 +45,7 @@ export class Register {
    * A class decorator that makes a class implement the Stack interface,
    * and registers this class in an array.
    * @param ctor The constructor of the class that implements the Stack interface
+   * @decorator
    */
   static stack(ctor: Constructor<Stack>) {
     if (Register.instanciatedStacks[ctor.name] === undefined) {
@@ -41,6 +58,10 @@ export class Register {
     }
   }
 
+  /**
+   * A classs decorator that registers a subStack of a given Stack
+   * @param parentStack The parent Stack
+   */
   static subStackOf(parentStack: Constructor<Stack>) {
     return (subStack: Constructor<Stack>) => {
       const instanciatedSubStack = new subStack();
@@ -78,6 +99,10 @@ export class Register {
     };
   }
 
+  /**
+   * Registers the decorated Rule for every Stacks, except for ones given in options Object.
+   * @param options You may pass an options object with an exclude array property, containing a list of Stacks to exclude from registering.
+   */
   static ruleForAll(options: RegisterRuleForAllOptions = { excludes: [] }) {
     return (ruleCtor: Constructor<Rule>) => {
       {
@@ -100,6 +125,10 @@ export class Register {
     };
   }
 
+  /**
+   * Registers a sub Rule of another Rule, so that the registered Rule will be called only after the parent Rule's apply has been succesful.
+   * @param ruleCtor The parent Rule.
+   */
   static subRuleOf<R extends Constructor<Rule>, U extends Constructor<Rule>>(
     ruleCtor: U,
   ) {
@@ -115,6 +144,9 @@ export class Register {
     };
   }
 
+  /**
+   * Returns all registered Stacks as an Array of Stacks.
+   */
   static getAllStacks(): Stack[] {
     return Object.values(Register.instanciatedStacks).reduce(
       (prev: Stack[], curr: StackMap) => {
@@ -124,6 +156,9 @@ export class Register {
     );
   }
 
+  /**
+   * Returns every Stacks that are available in the audited project.
+   */
   static async getAvailableStacks(): Promise<Stack[]> {
     const allStacks = Register.getAllStacks();
     const isAvailableProm = await Promise.all(
@@ -132,6 +167,10 @@ export class Register {
     return allStacks.filter((_, index) => isAvailableProm[index]);
   }
 
+  /**
+   * Returns a Promise of true if the given Stack is detected in the audited project.
+   * @param ctor The Stack to check.
+   */
   static async stackIsAvailable(ctor: Constructor<Stack>): Promise<boolean> {
     return Register.instanciatedStacks[ctor.name].stack.isAvailable();
   }
@@ -149,6 +188,9 @@ export class Register {
     );
   }
 
+  /**
+   * Returns all the Rules that may be applied in the audited project.
+   */
   static async getRulesToApply(): Promise<Rule[]> {
     return Register.getAvailableStacks().then(availableStacks => {
       const rulesOfAvailableStacks = availableStacks.reduce(
@@ -178,6 +220,10 @@ export class Register {
     });
   }
 
+  /**
+   * Returns an array containing all the sub Rules of a given Rule.
+   * @param rule The Rule for which we want the sub Rules.
+   */
   static getSubRulesOf(rule: Rule): Rule[] {
     return Register.instanciatedRules[rule.constructor.name].subRules.map(
       ruleMap => ruleMap.rule,
