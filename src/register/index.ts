@@ -2,21 +2,37 @@ import Constructor from '../constructor';
 import Stack from '../stacks/stack';
 import Rule from '../rules/rule';
 
+/**
+ * The interface representing the options object used in registerRuleForAll
+ * @ignore
+ */
 interface RegisterRuleForAllOptions {
   excludes: Array<Constructor<Stack>>;
 }
 
+/**
+ * The interface representing the object containing each Rule and its subRules
+ * @ignore
+ */
 interface RuleMap {
   rule: Rule;
   subRules: RuleMap[];
 }
 
+/**
+ * The interface representing the object containing each Stack, its corresponding RuleMaps, and its sub Stacks.
+ * @ignore
+ */
 interface StackMap {
   stack: Stack;
   subStacks: Stack[];
   ruleMaps: RuleMap[];
 }
 
+/**
+ * The Register class that contains register decorators and other methods to retrieve
+ * registered Stacks and Rules
+ */
 export class Register {
   private static instanciatedRules: {
     [ruleName: string]: RuleMap;
@@ -43,8 +59,8 @@ export class Register {
   }
 
   /**
-   * A classs decorator that
-   * @param parentStack
+   * A classs decorator that registers a subStack of a given Stack
+   * @param parentStack The parent Stack
    */
   static subStackOf(parentStack: Constructor<Stack>) {
     return (subStack: Constructor<Stack>) => {

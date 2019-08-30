@@ -1,3 +1,6 @@
+/**
+ * Custom Errors for file handling.
+ */
 class FileError extends Error {
   /**
    * A custom Error used for file reading/writing errors.
