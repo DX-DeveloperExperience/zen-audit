@@ -1,9 +1,10 @@
 <template>
   <div class="classdoc">
-    <!-- <div
+    <div
       class="class-comment"
       v-for="(apiClass, indexClass) in classes"
-    >{{apiClass.comment.shortText}}</div>-->
+      v-if="apiClass.comment"
+    >{{apiClass.comment.shortText}}</div>
     <ClassDoc
       v-for="(item, index) in this.items"
       :key="index"
