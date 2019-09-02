@@ -2,7 +2,7 @@ module.exports = {
   title: 'ZenAudit',
   description: 'Make your projects audits a breeze',
   dest: 'docs_build',
-  base: '/project-starter/',
+  base: '/zen-audit/',
   themeConfig: {
     logo: '/logotype.png',
     title: false,
