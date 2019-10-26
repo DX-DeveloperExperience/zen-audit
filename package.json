@@ -17,7 +17,7 @@
     "axios": "0.19.0",
     "check-node-version": "3.3.0",
     "fs-extra": "8.0.1",
-    "inquirer": "6.2.2",
+    "inquirer": "6.5.2",
     "mdpdf": "2.0.4",
     "mustache": "3.0.1",
     "request": "2.88.0",
@@ -29,7 +29,7 @@
   "devDependencies": {
     "@types/axios": "0.14.0",
     "@types/fs-extra": "7.0.0",
-    "@types/inquirer": "6.0.3",
+    "@types/inquirer": "6.5.0",
     "@types/jest": "24.0.9",
     "@types/mock-fs": "3.6.30",
     "@types/node": "10.12.29",
