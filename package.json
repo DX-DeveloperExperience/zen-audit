@@ -19,7 +19,7 @@
     "fs-extra": "8.0.1",
     "inquirer": "6.2.2",
     "mdpdf": "2.0.4",
-    "mustache": "3.0.1",
+    "mustache": "3.2.1",
     "request": "2.88.0",
     "rxjs": "6.5.2",
     "sync-request": "6.1.0",
