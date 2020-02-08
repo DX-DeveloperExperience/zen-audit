@@ -30,7 +30,7 @@
     "@types/axios": "0.14.0",
     "@types/fs-extra": "7.0.0",
     "@types/inquirer": "6.0.3",
-    "@types/jest": "24.0.9",
+    "@types/jest": "24.9.1",
     "@types/mock-fs": "3.6.30",
     "@types/node": "10.12.29",
     "@types/rx": "4.1.1",
