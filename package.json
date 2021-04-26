@@ -21,7 +21,7 @@
     "mdpdf": "2.0.4",
     "mustache": "3.0.1",
     "request": "2.88.0",
-    "rxjs": "6.5.2",
+    "rxjs": "6.6.7",
     "sync-request": "6.1.0",
     "tslib": "1.10.0",
     "winston": "3.2.1"
